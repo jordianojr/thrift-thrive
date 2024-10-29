@@ -69,6 +69,13 @@
             <p class="text-white mb-2">{{ dealMethod }}</p>
             <p class="text-white-50 small">{{ location }}</p>
           </div>
+
+        <!-- Add to Cart Button -->
+        <button 
+          @click="addToCart" 
+          class="btn btn-success w-100 mb-4">
+          Add to Cart
+        </button>
   
           <!-- Description -->
           <div class="mb-4">
@@ -127,6 +134,7 @@
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+  import { useCartStore } from '@/stores/cartStore';
   import { db } from '@/lib/firebaseConfig';
   import { doc, getDoc } from 'firebase/firestore';
   import Loading from "@/components/LoadingOverlay.vue";
@@ -135,6 +143,9 @@
   const route = useRoute();
   const itemId = route.params.id as string;
   const category = route.params.category as string;
+
+  const cartStore = useCartStore(); // Use the cart store
+
   
   const itemImages = ref<string[]>([]);
   const itemName = ref('');
@@ -200,6 +211,17 @@
   };
   
   onMounted(fetchItem);
+
+  const addToCart = () => {
+  cartStore.addItemToCart({
+    id: itemId,
+    name: itemName.value,
+    price: itemPrice.value,
+    quantity: 1,
+    image: itemImages.value[0] || '',
+  });
+  alert('Item added to cart!');
+};
   
   const redirectToChat = () => {
     router.push({
