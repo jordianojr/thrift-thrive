@@ -73,7 +73,7 @@
         <!-- Add to Cart Button -->
         <button 
           @click="addToCart" 
-          class="btn btn-success w-100 mb-4">
+          class="btn btn-danger w-100 mb-4">
           Add to Cart
         </button>
   
