@@ -89,7 +89,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/chat/:sellerId',
+      path: '/chat/:sellerId?',
       name: 'chat-with-seller',
       component: Chat,
       meta: { requiresAuth: true },
