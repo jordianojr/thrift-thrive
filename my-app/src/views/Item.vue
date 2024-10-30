@@ -213,14 +213,30 @@
   onMounted(fetchItem);
 
   const addToCart = () => {
-  cartStore.addItemToCart({
-    id: itemId,
-    name: itemName.value,
-    price: itemPrice.value,
-    quantity: 1,
-    image: itemImages.value[0] || '',
-  });
-  alert('Item added to cart!');
+  try {
+    if (!itemId || !itemName.value || !itemPrice.value) {
+      console.error('Missing required item data');
+      alert('Error: Could not add item to cart');
+      return;
+    }
+    
+    cartStore.addItemToCart({
+      id: itemId,
+      name: itemName.value,
+      price: itemPrice.value,
+      quantity: 1,
+      image: itemImages.value[0] || '',
+    });
+    console.log('Item added to cart:', {
+      id: itemId,
+      name: itemName.value,
+      price: itemPrice.value
+    });
+    alert('Item added to cart!');
+  } catch (error) {
+    console.error('Error adding item to cart:', error);
+    alert('Error: Could not add item to cart');
+  }
 };
   
   const redirectToChat = () => {
