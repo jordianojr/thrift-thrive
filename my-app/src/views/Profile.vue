@@ -62,7 +62,6 @@ import Listing from '../components/Listing.vue';
 const userEmail = ref('');
 const name = ref('');
 const photoURL = ref('');
-
 const profileRef = ref<HTMLElement | null>(null);
 const customColRef = ref<HTMLElement | null>(null);
 

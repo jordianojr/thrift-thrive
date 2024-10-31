@@ -1,39 +1,61 @@
 <template>
-  <div class="container-fluid text-dark py-5">
+  <div class="container-fluid py-5">
     <div v-if="isLoading" class="loading-container">
       <Loading :isLoading="isLoading" message="Loading blog details..." />
     </div>
     <div v-else>
-      <div class="row g-4">
+      <div class="row">
         <!-- Blog Post Cards -->
         <div
           v-for="post in blogPosts"
           :key="post.id"
-          class="col-12 col-md-6 col-lg-3"
+          class="col-12 col-md-6 col-lg-4"
           ref="blogCard"
         >
-          <div class="blog-card p-4" @click="navigateToPost(post.id)">
-            <div class="d-flex align-items-center mb-3">
-              <img 
-                :src="post.sellerAvatar || '../assets/user.jpeg'" 
-                alt="Seller Avatar" 
-                class="seller-avatar me-3"
-                @click.stop="navigateToProfile(post.sellerId)"
-              />
-              <div>
-                <h6 class="seller-name mb-1">{{ post.sellerName }}</h6>
-                <small class="text-secondary">{{ post.date }}</small>
+          <div class="blog-card">
+            <!-- Image Carousel -->
+            <div id="carousel-${post.id}" class="carousel slide" data-bs-ride="carousel" @click="navigateToPost(post.id)">
+              <div class="carousel-inner">
+                <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
+                  :class="{ active: index === 0 }">
+                  <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
+                </div>
               </div>
+              <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
             </div>
-            <img :src="post.image" alt="Blog Post Image" class="blog-image mb-3">
-            <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
-            <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
+
+            <!-- Post Content -->
+            <div class="post-content p-4">
+              <div class="d-flex align-items-center mb-3" @click.stop="navigateToProfile(post.sellerId)">
+                <img 
+                  :src="post.sellerAvatar || '../assets/user.jpeg'" 
+                  alt="Seller Avatar" 
+                  class="seller-avatar me-3"
+                />
+                <div>
+                  <h6 class="seller-name mb-1">{{ post.sellerName }}</h6>
+                  <small class="text-secondary">{{ post.date }}</small>
+                </div>
+              </div>
+              <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
+              <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
@@ -42,9 +64,9 @@ import { collection, getDocs, doc, getDoc, type DocumentData } from 'firebase/fi
 import { db } from '@/lib/firebaseConfig';
 import Loading from '@/components/Loading.vue';
 import { gsap } from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger'; // Import ScrollTrigger
+import ScrollTrigger from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger); // Register the ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 interface Editorial extends DocumentData {
   id: string;
@@ -54,6 +76,7 @@ interface Editorial extends DocumentData {
   title: string;
   caption: string;
   image: string;
+  images?: string[]; // Add support for multiple images
   date: string;
 }
 
@@ -65,6 +88,14 @@ interface UserData {
 const router = useRouter();
 const blogPosts = ref<Editorial[]>([]);
 const isLoading = ref(true);
+
+// Helper function to get post images (either array or single image)
+const getPostImages = (post: Editorial) => {
+  if (post.images && post.images.length > 0) {
+    return post.images;
+  }
+  return [post.image];
+};
 
 const fetchEditorials = async () => {
   try {
@@ -106,21 +137,20 @@ const navigateToPost = (postId: string) => {
   });
 };
 
-// Animate the blog cards when they enter the viewport
 const animateCards = () => {
   ScrollTrigger.batch('.blog-card', {
     onEnter: (batch) => {
       gsap.fromTo(
         batch,
-        { opacity: 0, y: 50 }, // Start state when entering
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.15 } // End state when visible
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.15 }
       );
     },
     onLeaveBack: (batch) => {
-      gsap.to(batch, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out', stagger: 0.15 }); // Animation when scrolling back up
+      gsap.to(batch, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out', stagger: 0.15 });
     },
-    start: 'top 50%', // Trigger point
-    once: false,       // Allows it to trigger on both enter and leave
+    start: 'top 50%',
+    once: false,
   });
 };
 
@@ -135,23 +165,48 @@ onMounted(async () => {
 <style scoped>
 .container-fluid {
   margin: auto;
+  max-width: 1400px;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.row {
+  margin: -1.5rem;  /* Negative margin to offset card padding */
+}
+
+.col-12 {
+  padding: 1.5rem;  /* Uniform padding for grid spacing */
 }
 
 .blog-card {
   background-color: black;
-  border-radius: 4px;
-  /* border: 1px solid #e0e0e0; */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s, box-shadow 0.3s;
-  opacity: 0; /* Start fully transparent */
-  transform: translateY(50px); /* Start slightly offset */
-  padding: 50px !important;
-  margin-bottom: 70px;
+  opacity: 0;
+  transform: translateY(50px);
 }
 
 .blog-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.blog-image {
+  width: 100%;
+  aspect-ratio: 3/4;  /* Portrait aspect ratio */
+  object-fit: cover;
+}
+
+.carousel {
+  background: #000;
+}
+
+.carousel-item {
+  aspect-ratio: 4/3;
+}
+
+.post-content {
+  padding: 2rem !important;
 }
 
 .seller-avatar {
@@ -170,14 +225,6 @@ onMounted(async () => {
 .seller-name {
   font-weight: 500;
   color: hsla(160, 100%, 37%, 1)
-}
-
-.blog-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 4px;
-  margin-bottom: 1rem;
 }
 
 .text-truncate-2 {
@@ -199,9 +246,10 @@ onMounted(async () => {
 }
 
 h5.blog-title {
-  /* font-family: 'Georgia', serif; */
   font-weight: 400;
   color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .blog-caption {
