@@ -83,6 +83,12 @@ const navigateToCreatePost = () => {
 };
 
 const getPostImages = (post: Editorial): string[] => {
+  // First, check for 'images' array
+  if (post.images && Array.isArray(post.images)) {
+    return post.images;
+  }
+
+  // Fallback to previous checks
   if (post.image && typeof post.image === 'object') {
     return Object.values(post.image).filter(img => typeof img === 'string');
   }
