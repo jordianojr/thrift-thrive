@@ -30,7 +30,7 @@
       <div class="row">
         <!-- Left Column - Item Details -->
         <div class="col-12 col-lg-8 mb-4">
-          <h1 class="display-6 text-white mb-3">{{ itemName }}</h1>
+          <h1 class="display-6 text-black mb-3">{{ itemName }}</h1>
           <div class="price-text mb-4" style="color: hsla(160, 100%, 37%, 1)">
             S${{ itemPrice }}
           </div>
@@ -39,42 +39,42 @@
           <div class="row mb-4">
             <div class="col-6">
               <div class="detail-box">
-                <h3 class="h6 text-white-50">Condition</h3>
-                <p class="text-white">{{ condition }}</p>
+                <h3 class="h6 text-black-50">Condition</h3>
+                <p class="text-black">{{ condition }}</p>
               </div>
             </div>
             <div class="col-6">
               <div class="detail-box">
-                <h3 class="h6 text-white-50">Type</h3>
-                <p class="text-white">{{ type }}</p>
+                <h3 class="h6 text-black-50">Type</h3>
+                <p class="text-black">{{ type }}</p>
               </div>
             </div>
             <div class="col-6">
               <div class="detail-box">
-                <h3 class="h6 text-white-50">Listed</h3>
-                <p class="text-white">{{ listedTime }}</p>
+                <h3 class="h6 text-black-50">Listed</h3>
+                <p class="text-black">{{ listedTime }}</p>
               </div>
             </div>
             <div class="col-6">
               <div class="detail-box">
-                <h3 class="h6 text-white-50">Category</h3>
-                <p class="text-white">{{ category }}</p>
+                <h3 class="h6 text-black-50">Category</h3>
+                <p class="text-black">{{ category }}</p>
               </div>
             </div>
           </div>
   
           <!-- Deal Method -->
           <div class="deal-method p-4 mb-4 rounded">
-            <h3 class="h5 text-white mb-3">Deal Method</h3>
-            <p class="text-white mb-2">{{ dealMethod }}</p>
-            <p class="text-white-50 small">{{ location }}</p>
+            <h3 class="h5 text-black mb-3">Deal Method</h3>
+            <p class="text-black mb-2">{{ dealMethod }}</p>
+            <p class="text-black-50 small">{{ location }}</p>
           </div>
 
         <!-- Add to Cart Button -->
         <button 
           @click="addToCart" 
-          class="btn btn-danger w-100 mb-4">
-          Add to Cart
+          class="btn btn-danger mb-4 d-block mx-auto">
+          Buy Now!
         </button>
   
           <!-- Description -->
@@ -255,7 +255,16 @@
   :deep(body) {
     background-color: #000;
   }
-  
+  .carousel-control-prev, .carousel-control-next {
+  border-radius: 50%;
+  border: 1px solid black;
+  width: 50px;
+  height: 50px;
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%);
+  background-color: black;
+}
+
   .carousel-inner{
     height: 500px;
   }
@@ -266,7 +275,7 @@
     align-items: center;
     justify-content: center;
     background-color: #000;
-    color: #fff;
+    color: black;
   }
   .carousel-item {
   height: 100%; /* Ensure each carousel item takes full height */
@@ -298,5 +307,10 @@
   /* Custom rounded corners for seller card */
   .rounded-4 {
     border-radius: 1rem;
+  }
+  .container-fluid{
+    padding: 0 4.5rem ;
+    border: 1px solid lightgrey;
+    padding-top: 20px;
   }
   </style>

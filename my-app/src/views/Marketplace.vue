@@ -25,6 +25,6 @@ const parseData = (selectedCategory: string) => {
 .content {
   padding: 20px;
   text-align: center;
-  color: white;
+  color: black;
 }
 </style>

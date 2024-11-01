@@ -158,7 +158,7 @@ onMounted(async () => {
 
 .blog-card {
   background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
   transition: transform 0.3s, box-shadow 0.3s;
   opacity: 0;
   transform: translateY(50px);
@@ -166,7 +166,7 @@ onMounted(async () => {
 
 .blog-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px hsla(160, 100%, 37%, 1);
 }
 
 .blog-image {

@@ -3,10 +3,10 @@
     <h3>Thrift/Vintage Stores in Singapore</h3>
   </div>
   <div class="row">
-    <div class="col-12 col-lg-9 col-xl-9 col-xxl-9" style="margin-bottom: 20px;">
+    <div class="col-12 col-lg-8 col-xl-8 col-xxl-8" style="margin-bottom: 20px;">
       <div ref="mapContainer" class="map-container"></div>
     </div>
-    <div class="col-12 col-lg-3 col-xl-3 col-xxl-3" v-if="firstClick">
+    <div class="col-12 col-lg-4 col-xl-4 col-xxl-4" v-if="firstClick">
       <InfoCard 
         :placeChosen="placeChosen" 
         :latitude="lat" 
