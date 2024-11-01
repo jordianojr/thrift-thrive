@@ -1,10 +1,19 @@
 <template>
+  <div class="title">
+    <h3>Thrift/Vintage Stores in Singapore</h3>
+  </div>
   <div class="row">
     <div class="col-12 col-lg-9 col-xl-9 col-xxl-9" style="margin-bottom: 20px;">
       <div ref="mapContainer" class="map-container"></div>
     </div>
     <div class="col-12 col-lg-3 col-xl-3 col-xxl-3" v-if="firstClick">
-      <InfoCard :placeChosen="placeChosen" :latitude="lat" :longitude="lng" :events="events" />
+      <InfoCard 
+        :placeChosen="placeChosen" 
+        :latitude="lat" 
+        :longitude="lng" 
+        :locationId="locationId"
+        :events="events" 
+        />
     </div>
   </div>
 </template>
@@ -19,9 +28,9 @@ import { collection, getDocs } from 'firebase/firestore';
 const placeChosen = ref('');
 const lat = ref(0);
 const lng = ref(0);
+const locationId = ref('');
 const firstClick = ref(false);
 const events = ref([]);
-
 // Marker locations array to be populated with data from Firestore
 const markerLocations = ref([]);
 
@@ -47,7 +56,7 @@ const initMap = () => {
 
   const mapOptions: google.maps.MapOptions = {
     center: { lat: 1.2956, lng: 103.8542 },
-    zoom: 15,
+    zoom: 13,
   };
 
   const map = new google.maps.Map(mapContainer.value, mapOptions);
@@ -61,7 +70,7 @@ const initMap = () => {
     });
 
     const infoWindow = new google.maps.InfoWindow({
-      content: `<p style='color: black;'>${location.title}</p>`,
+      content: `<p style='color: black; font-weight: 500;'>${location.title}</p>`,
     });
 
     marker.addListener("click", () => {
@@ -77,6 +86,7 @@ const initMap = () => {
       placeChosen.value = location.title;
       lat.value = location.lat;
       lng.value = location.lng;
+      locationId.value = location.id;
       events.value = location.events || [];
     });
   });
@@ -102,5 +112,16 @@ onMounted(async () => {
 
 .row {
   height: 100vh;
+}
+.title{
+  margin-bottom: 20px;
+}
+
+@media screen and (max-width: 991px) {
+  .map-container {
+    width: 100%;
+    height: 400px;
+    margin: auto;
+  }
 }
 </style>
