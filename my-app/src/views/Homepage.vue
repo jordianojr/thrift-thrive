@@ -75,13 +75,13 @@ function hideSearchBar() {
 }
 
 onMounted(() => {
-  const tl_header = gsap.timeline({ease: "power1.easeInOut"});
+  // const tl_header = gsap.timeline({ease: "power1.easeInOut"});
 
-  tl_header.from(".constant", {
-    delay: 4.5,
-    duration: 0.75,
-    y: -80
-  });
+  // tl_header.from(".constant", {
+  //   delay: 4.5,
+  //   duration: 0.75,
+  //   y: -80
+  // });
 
   // Hide the search bar initially by positioning it off-screen
   gsap.set(searchBarContainer.value, { y: "-100%" });

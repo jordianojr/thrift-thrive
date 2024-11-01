@@ -42,8 +42,7 @@
           </div>
           <div class="form-group">
             <label for="photos">Photos</label>
-            <input type="file" class="form-control" id="photos" @change="handlePhotoUpload" multiple accept="image/*" required />
-  
+            <input type="file" class="form-control" id="photos" ref="fileInput" @change="handlePhotoUpload" multiple accept="image/*" required/>
             <div class="file-uploads mt-3">
               <div class="file-item" v-for="(file, index) in files" :key="index">
                 <img :src="getPreviewUrl(file)" alt="Preview" />
@@ -95,18 +94,42 @@
   };
   
   const handlePhotoUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files) {
-      // Clear previous files before adding new ones
-      files.value = [];
-      files.value.push(...Array.from(target.files));
-    }
-  };
+  const target = event.target as HTMLInputElement;
+  if (target.files) {
+    const filesArray = Array.from(target.files);
+    files.value = [...files.value, ...filesArray];
+    
+    // Create a new DataTransfer object
+    const dataTransfer = new DataTransfer();
+    
+    // Add all files to the DataTransfer object
+    files.value.forEach(file => {
+      dataTransfer.items.add(file);
+    });
+    
+    // Update the file input's files
+    target.files = dataTransfer.files;
+  }
+};
+
+const removeFile = (index: number) => {
+  files.value.splice(index, 1);
   
-  const removeFile = (index: number) => {
-    files.value.splice(index, 1);
-  };
+  // Create a new DataTransfer object
+  const dataTransfer = new DataTransfer();
   
+  // Add remaining files to the DataTransfer object
+  files.value.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  
+  // Update the file input's files
+  const fileInput = document.getElementById('photos') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+  }
+};
+
   
   const createPost = async () => {
   // Validate all form fields before submission
