@@ -19,8 +19,48 @@
   // Example array of marker locations
   const markerLocations = [
     { lat: 1.2956, lng: 103.8542, title: 'Haji Lane, Singapore' }, // Haji Lane
-    { lat: 1.2960, lng: 103.8530, title: 'Nearby Location 1' },
-    { lat: 1.2945, lng: 103.8560, title: 'Nearby Location 2' },
+
+    {lat: 1.3056, lng: 103.9043, title: "The Barn @ Katong"},
+
+    {lat: 1.2811, lng: 103.8458, title: "Function Five Thrift Shop"},
+
+    {lat: 1.2749, lng: 103.8418, title: "The Fashion Pulpit"},
+
+    {lat: 1.3042, lng: 103.8322, title: "LPB Thrift"},
+
+    {lat: 1.3039, lng: 103.8328, title: "Lucky Thrifty"},
+
+    {lat: 1.3155, lng: 103.8844, title: "Preloved Thrift Shop"},
+
+    {lat: 1.2927, lng: 103.8510, title: "Cherry Thrift Shop"},
+
+    {lat: 1.3135, lng: 103.8608, title: "Refash"},
+
+    {lat: 1.2929, lng: 103.8581, title: "Nightingale Thrift Shop"},
+
+    {lat: 1.3024, lng: 103.8398, title: "SSVP Shop"},
+
+    {lat: 1.3693, lng: 103.8494, title: "MINDS Shop"},
+
+    {lat: 1.2990, lng: 103.8547, title: "New2U Thrift Shop"},
+
+    {lat: 1.3015, lng: 103.8580, title: "Flame Vintage"},
+
+    {lat: 1.2931, lng: 103.8558, title: "Style Tribute"},
+
+    {lat: 1.2903, lng: 103.8048, title: "Daisy’s Yard"},
+
+    {lat: 1.3065, lng: 103.9029, title: "A Vintage Tale"},
+
+    {lat: 1.3138, lng: 103.8551, title: "Refash"},
+
+    {lat: 1.3483, lng: 103.9355, title: "Something Old, Something New"},
+
+    {lat: 1.3039, lng: 103.8345, title: "Shop+ (Red Cross)"},
+
+    {lat: 1.3070, lng: 103.8560, title: "Loop Garms"},
+
+    {lat: 1.3040, lng: 103.8315, title: "Lucky Plaza Bazaar"}
   ];
   
   const mapContainer = ref<HTMLElement | null>(null); // Create a ref for the map container
