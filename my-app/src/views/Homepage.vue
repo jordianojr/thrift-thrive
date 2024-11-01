@@ -9,16 +9,15 @@
         </div>
         <!-- <p>Searching for: {{ searchTerm }}</p> -->
       </section>
-
     </div>
+
     <div :class="['view', isHome ? 'home-view' : 'default-view']">
       <RouterView />
     </div>
 
-    <div class="floating-bot" style="z-index: 1000;" @click="toggleFashionBot">
+    <div class="floating-bot" @click="toggleFashionBot">
       <FashionBot /> <!-- You can use an emoji or an icon here -->
     </div>
-
   </div>
 </template>
 
@@ -119,7 +118,7 @@ onMounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 1000; /* Ensure the navbar is on top */
   background-color: white;
   width: 100%;
 }
@@ -130,10 +129,17 @@ onMounted(() => {
   top: 1; /* Will slide down from the top */
   left: 0;
   right: 0;
-  z-index: -1; /* Ensure it's above other content */
+  z-index: -1; /* Ensure it's below the navbar */
 }
 
 .constant:hover .search-bar-container {
-  z-index: 999;
+  z-index: 999; /* Bring the search bar on hover */
+}
+
+.floating-bot {
+  position: fixed; /* Make it fixed to stay in place */
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  z-index: 1001; /* Ensure it's above everything else */
 }
 </style>

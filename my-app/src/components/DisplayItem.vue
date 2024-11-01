@@ -125,6 +125,7 @@ function navigateToItem(product: any) {
   height: 50px;
   top: 50%; /* Center vertically */
   transform: translateY(-50%);
+  background-color: black;
 }
 #productCarousel {
   padding-top: 10px;
