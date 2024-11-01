@@ -6,6 +6,11 @@
     </div>
     <div v-else>
       <div class="row">
+        <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-white border-1" @click="navigateToCreatePost">
+          Create Post
+        </button>
+      </div>
         <div
           v-for="post in blogPosts"
           :key="post.id"
@@ -69,15 +74,20 @@ interface Editorial extends DocumentData {
 const router = useRouter();
 const blogPosts = ref<Editorial[]>([]);
 const isLoading = ref(true);
+const navigateToCreatePost = () => {
+  router.push({ name: 'CreatePost' });
+};
 
 const getPostImages = (post: Editorial): string[] => {
-  
-  if (post.images && post.images.length > 0) {
-    return post.images;
-    console.log(post.images);
+  if (post.image && typeof post.image === 'object') {
+    return Object.values(post.image).filter(img => typeof img === 'string');
   }
-  console.log(post.images);
-  return post.image ? [post.image] : [];
+
+  if (typeof post.image === 'string') {
+    return [post.image];
+  }
+
+  return [];
 };
 
 const fetchEditorials = async () => {
@@ -164,10 +174,10 @@ onMounted(async () => {
   transform: translateY(50px);
 }
 
-.blog-card:hover {
+/* .blog-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 12px hsla(160, 100%, 37%, 1);
-}
+} */
 
 .blog-image {
   width: 100%;

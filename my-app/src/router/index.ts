@@ -10,6 +10,7 @@ import ThriftMap from '../views/ThriftMap.vue';
 import Item from '../views/Item.vue';
 import Chat from '../views/Chat.vue';
 import Editorial from '../views/Editorial.vue';
+import CreatePost from '../components/createPost.vue';
 
 // Function to check if user is logged in
 const isLoggedIn = () => {
@@ -98,6 +99,12 @@ const router = createRouter({
       path: '/checkout/success',
       name: 'checkout-success',
       component: () => import('../views/CheckoutSuccess.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/create-post',
+      name: 'CreatePost',
+      component: CreatePost,
       meta: { requiresAuth: true },
     },
     
