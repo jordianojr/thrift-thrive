@@ -1,5 +1,5 @@
 <template>
-        <h2>You may like:</h2>
+        <h3 style="color: black !important">You may like:</h3>
         <Loading :isLoading="isLoading" message="Fetching your products..." />
         <div v-if="!isLoading">
         <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
