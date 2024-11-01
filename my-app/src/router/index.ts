@@ -103,7 +103,7 @@ const router = createRouter({
     },
     {
       path: '/create-post',
-      name: 'CreatePost',
+      name: 'createPost',
       component: CreatePost,
       meta: { requiresAuth: true },
     },

@@ -5,12 +5,16 @@
       <Loading :isLoading="isLoading" message="Loading blog details..." />
     </div>
     <div v-else>
-      <div class="row">
-        <div class="d-flex justify-content-center mt-4">
-        <button class="btn btn-white border-1" @click="navigateToCreatePost">
-          Create Post
-        </button>
-      </div>
+      <div class="row position-relative">
+        <div class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
+          <button 
+            id="createbtn" 
+            class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
+            @click="navigateToCreatePost"
+          >
+            Create Post
+          </button>
+        </div>
         <div
           v-for="post in blogPosts"
           :key="post.id"
@@ -51,7 +55,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { collection, getDocs, doc, getDoc, type DocumentData } from 'firebase/firestore';
+import { collection, getDocs, type DocumentData } from 'firebase/firestore';
 import { db } from '@/lib/firebaseConfig';
 import Loading from '@/components/Loading.vue';
 import { gsap } from 'gsap';
@@ -75,7 +79,7 @@ const router = useRouter();
 const blogPosts = ref<Editorial[]>([]);
 const isLoading = ref(true);
 const navigateToCreatePost = () => {
-  router.push({ name: 'CreatePost' });
+  router.push({ name: 'createPost' });
 };
 
 const getPostImages = (post: Editorial): string[] => {
@@ -103,7 +107,11 @@ const fetchEditorials = async () => {
       } as Editorial);
     }
     
-    blogPosts.value = posts;
+    // Sort posts by date in descending order (latest first)
+    blogPosts.value = posts.sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+    
     isLoading.value = false;
 
     // Initialize carousels after posts are loaded
@@ -228,4 +236,18 @@ h5.blog-title {
   font-size: 0.875rem;
   font-weight: 300;
 }
+
+.btn-outline-elegant {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-elegant:hover {
+
+  color: green;
+  transform: scale(1.05);
+}
+
 </style>
