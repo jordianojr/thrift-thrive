@@ -14,7 +14,7 @@
       Get Directions
     </button>
     
-    <div class="add-event">
+    <div v-if="userRole === 'admin'" class="add-event">
       <h5 class="modal-title">Know of an event here?</h5>
       <h6>Let us know!</h6><br>
         <form @submit.prevent="handleAddEvent">
@@ -48,8 +48,35 @@
 
 <script lang="ts" setup>
 import { defineProps, computed, ref } from 'vue';
-import { db } from '../lib/firebaseConfig'; // Adjust the path as necessary
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore'; // Import necessary Firestore functions
+import { db, auth } from '../lib/firebaseConfig'; // Adjust the path as necessary
+import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore'; // Import necessary Firestore functions
+import { onMounted } from 'vue';
+
+const userRole = ref('');
+const getUserRole = async () => {
+  try {
+    const userId = auth.currentUser?.uid; // Get the current user's ID
+
+    if (!userId) {
+      throw new Error("User is not authenticated.");
+    }
+
+    // Reference to the user document in the 'users' collection
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      console.log('User role:', userData.role);
+      userRole.value = userData.role; // Return the 'role' field
+    } else {
+      throw new Error("No user found in the database.");
+    }
+  } catch (error) {
+    console.error("Error fetching user role:", error);
+    return null; // Or handle the error as needed
+  }
+};
 
 const props = defineProps<{
   placeChosen: string;
@@ -128,6 +155,10 @@ const formatTime = (startTime: string, endTime: string) => {
 
   return `${formatHours(startTime)} - ${formatHours(endTime)}`;
 };
+
+onMounted(() => {
+  getUserRole();
+});
 </script>
 
 <style scoped>
