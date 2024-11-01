@@ -7,7 +7,7 @@
         @input="onSearch"
         placeholder="Search..."
       />
-      <button id = "buttonSearch" @click="clearSearch">Clear</button>
+      <button id = "buttonSearch" @click="submitSearch">Search</button>
     </div>
   </template>
   
@@ -22,7 +22,7 @@
       onSearch() {
         this.$emit('search', this.query);
       },
-      clearSearch() {
+      submitSearch() {
         this.query = '';
         this.onSearch();
       },

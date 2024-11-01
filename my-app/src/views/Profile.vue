@@ -20,6 +20,9 @@
       <Listing></Listing>
     </div>
   </div>
+  <div style="margin-top: 20px;">
+    <OrderHistory></OrderHistory>
+  </div>
   <!-- Modal -->
   <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -58,6 +61,7 @@ import { auth, db, storage } from '../lib/firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Listing from '../components/Listing.vue';
+import OrderHistory from '../components/OrderHistory.vue';
 
 const userEmail = ref('');
 const name = ref('');

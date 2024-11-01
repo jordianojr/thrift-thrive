@@ -1,7 +1,7 @@
 <template>
     <div class="loading-container" v-if="isLoading">
       <div class="loading-spinner"></div>
-      <p style="color: white" class="loading-text">{{ message }}</p>
+      <p style="color: black" class="loading-text">{{ message }}</p>
     </div>
   </template>
   
