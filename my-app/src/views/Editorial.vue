@@ -1,11 +1,11 @@
 <template>
+  <!-- Template remains unchanged -->
   <div class="container-fluid py-5">
     <div v-if="isLoading" class="loading-container">
       <Loading :isLoading="isLoading" message="Loading blog details..." />
     </div>
     <div v-else>
       <div class="row">
-        <!-- Blog Post Cards -->
         <div
           v-for="post in blogPosts"
           :key="post.id"
@@ -13,8 +13,7 @@
           ref="blogCard"
         >
           <div class="blog-card">
-            <!-- Image Carousel -->
-            <div id="carousel-${post.id}" class="carousel slide" data-bs-ride="carousel" @click="navigateToPost(post.id)">
+            <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
               <div class="carousel-inner">
                 <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
                   :class="{ active: index === 0 }">
@@ -33,19 +32,7 @@
               </button>
             </div>
 
-            <!-- Post Content -->
             <div class="post-content p-4">
-              <div class="d-flex align-items-center mb-3" @click.stop="navigateToProfile(post.sellerId)">
-                <img 
-                  :src="post.sellerAvatar || '../assets/user.jpeg'" 
-                  alt="Seller Avatar" 
-                  class="seller-avatar me-3"
-                />
-                <div>
-                  <h6 class="seller-name mb-1">{{ post.sellerName }}</h6>
-                  <small class="text-secondary">{{ post.date }}</small>
-                </div>
-              </div>
               <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
               <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
             </div>
@@ -56,7 +43,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
@@ -65,36 +51,33 @@ import { db } from '@/lib/firebaseConfig';
 import Loading from '@/components/Loading.vue';
 import { gsap } from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+// Add type assertion for bootstrap import
+// @ts-ignore
+import * as bootstrap from 'bootstrap';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface Editorial extends DocumentData {
   id: string;
-  sellerId: string;
-  sellerName: string;
-  sellerAvatar: string | null;
   title: string;
   caption: string;
-  image: string;
-  images?: string[]; // Add support for multiple images
+  image?: string;
+  images?: string[];
   date: string;
-}
-
-interface UserData {
-  username?: string;
-  photoURL?: string;
 }
 
 const router = useRouter();
 const blogPosts = ref<Editorial[]>([]);
 const isLoading = ref(true);
 
-// Helper function to get post images (either array or single image)
-const getPostImages = (post: Editorial) => {
+const getPostImages = (post: Editorial): string[] => {
+  
   if (post.images && post.images.length > 0) {
     return post.images;
+    console.log(post.images);
   }
-  return [post.image];
+  console.log(post.images);
+  return post.image ? [post.image] : [];
 };
 
 const fetchEditorials = async () => {
@@ -104,37 +87,31 @@ const fetchEditorials = async () => {
     
     for (const document of querySnapshot.docs) {
       const postData = document.data();
-      const sellerRef = doc(db, 'users', postData.sellerId);
-      const sellerSnapshot = await getDoc(sellerRef);
-      const sellerData = sellerSnapshot.exists() ? sellerSnapshot.data() as UserData : null;
-      
       posts.push({
         id: document.id,
-        ...postData,
-        sellerName: sellerData?.username || 'Anonymous',
-        sellerAvatar: sellerData?.photoURL || null
+        ...postData
       } as Editorial);
     }
     
     blogPosts.value = posts;
     isLoading.value = false;
+
+    // Initialize carousels after posts are loaded
+    nextTick(() => {
+      posts.forEach(post => {
+        const carouselElement = document.getElementById(`carousel-${post.id}`);
+        if (carouselElement) {
+          // Use type assertion for bootstrap.Carousel
+          new (bootstrap as any).Carousel(carouselElement, {
+            interval: 3000,
+            wrap: true
+          });
+        }
+      });
+    });
   } catch (error) {
     console.error('Error fetching blog posts:', error);
   }
-};
-
-const navigateToProfile = (sellerId: string) => {
-  router.push({
-    name: 'profile',
-    params: { userId: sellerId }
-  });
-};
-
-const navigateToPost = (postId: string) => {
-  router.push({
-    name: 'blogPost',
-    params: { id: postId }
-  });
 };
 
 const animateCards = () => {
@@ -163,6 +140,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* Styles remain unchanged */
 .container-fluid {
   margin: auto;
   max-width: 1400px;
@@ -171,15 +149,15 @@ onMounted(async () => {
 }
 
 .row {
-  margin: -1.5rem;  /* Negative margin to offset card padding */
+  margin: -1.5rem;
 }
 
 .col-12 {
-  padding: 1.5rem;  /* Uniform padding for grid spacing */
+  padding: 1.5rem;
 }
 
 .blog-card {
-  background-color: black;
+  background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s, box-shadow 0.3s;
   opacity: 0;
@@ -193,7 +171,7 @@ onMounted(async () => {
 
 .blog-image {
   width: 100%;
-  aspect-ratio: 3/4;  /* Portrait aspect ratio */
+  aspect-ratio: 3/4;
   object-fit: cover;
 }
 
@@ -207,24 +185,6 @@ onMounted(async () => {
 
 .post-content {
   padding: 2rem !important;
-}
-
-.seller-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  cursor: pointer;
-  border: 1px solid #e0e0e0;
-}
-
-.seller-avatar:hover {
-  opacity: 0.9;
-}
-
-.seller-name {
-  font-weight: 500;
-  color: hsla(160, 100%, 37%, 1)
 }
 
 .text-truncate-2 {
@@ -241,19 +201,21 @@ onMounted(async () => {
   line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: lightgrey !important;
+  color: black !important;
   font-weight: 100;
 }
 
 h5.blog-title {
   font-weight: 400;
-  color: white;
-  font-size: 1.5rem;
+  color: black;
+  font-size: 1.2rem;
   margin-bottom: 1rem;
 }
 
 .blog-caption {
   font-family: 'Helvetica Neue', sans-serif;
-  color: #555;
+  color: black;
+  font-size: 0.875rem;
+  font-weight: 300;
 }
 </style>

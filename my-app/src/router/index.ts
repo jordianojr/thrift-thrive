@@ -94,6 +94,12 @@ const router = createRouter({
       component: Chat,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/checkout/success',
+      name: 'checkout-success',
+      component: () => import('../views/CheckoutSuccess.vue'),
+      meta: { requiresAuth: true },
+    },
     
   ]
 });

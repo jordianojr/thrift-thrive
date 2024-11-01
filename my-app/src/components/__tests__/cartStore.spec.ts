@@ -111,4 +111,31 @@ describe('Cart Store', () => {
     expect(cart.totalQuantity).toBe(1)
     expect(cart.totalPrice).toBe(10)
   })
+
+  it('can clear the entire cart', () => {
+    const cart = useCartStore()
+    const testItem1 = {
+      id: '1',
+      name: 'Test Item 1',
+      price: 10,
+      quantity: 1,
+      image: 'test1.jpg'
+    }
+    const testItem2 = {
+      id: '2',
+      name: 'Test Item 2',
+      price: 20,
+      quantity: 1,
+      image: 'test2.jpg'
+    }
+    
+    cart.addItemToCart(testItem1)
+    cart.addItemToCart(testItem2)
+    expect(cart.items).toHaveLength(2)
+    
+    cart.clearCart()
+    expect(cart.items).toHaveLength(0)
+    expect(cart.totalQuantity).toBe(0)
+    expect(cart.totalPrice).toBe(0)
+  })
 })
