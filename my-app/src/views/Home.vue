@@ -138,7 +138,7 @@ template {
   padding: 20px;
   text-align: center;
   color: white;
-  background-color: black;
+  background-color: white;
 }
 
 .display {
@@ -166,8 +166,8 @@ template {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000;
-  z-index: 9;
+  background-color: white;
+  z-index: 1;
 }
 
 .text {

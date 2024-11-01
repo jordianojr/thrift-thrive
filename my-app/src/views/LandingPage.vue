@@ -49,7 +49,7 @@ onMounted(() => {
     height: 100vh; /* Full viewport height */
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
-    background-color: #000000; /* Optional background color */
+    background-color: white; /* Optional background color */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 </style>

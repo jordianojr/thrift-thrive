@@ -15,7 +15,7 @@
       <RouterView />
     </div>
 
-    <div class="floating-bot" @click="toggleFashionBot">
+    <div class="floating-bot" style="z-index: 1000;" @click="toggleFashionBot">
       <FashionBot /> <!-- You can use an emoji or an icon here -->
     </div>
 
@@ -89,7 +89,7 @@ onMounted(() => {
 
 <style scoped>
 .homepage {
-  background-color: black;
+  background-color: white;
   position: relative; /* Set to relative for absolute positioning of floating bot */
   width: 100%;
 }
@@ -120,7 +120,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background-color: black;
+  background-color: white;
   width: 100%;
 }
 

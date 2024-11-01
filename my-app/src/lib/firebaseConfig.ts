@@ -7,6 +7,13 @@ import { getStorage } from "firebase/storage"
 // https://firebase.google.com/docs/web/setup#available-libraries
 const firebaseURL = import.meta.env.VITE_FIREBASE_URL
 const firebaseKey = import.meta.env.VITE_FIREBASE_KEY
+
+// import dotenv from 'dotenv';
+
+// dotenv.config();
+// const firebaseURL = process.env.VITE_FIREBASE_URL
+// const firebaseKey = process.env.VITE_FIREBASE_KEY
+
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {

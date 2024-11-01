@@ -32,6 +32,6 @@ onMounted(async () => {
 
 <style scoped>
 .masterpage{
-  background-color: black;
+  background-color: white;
 }
 </style>
