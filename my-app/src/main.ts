@@ -8,7 +8,7 @@ import router from './router';
 
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import '../src/assets/main.css';
 
 const app = createApp(App);
 const pinia = createPinia();

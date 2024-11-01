@@ -1,5 +1,5 @@
 import { db, storage } from './firebaseConfig'; // Ensure Firebase is initialized in your project
-import { getDocs, collection, setDoc, doc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { getDownloadURL, ref, listAll } from "firebase/storage";
 
 const titles = [
@@ -39,6 +39,7 @@ async function populateFirestore() {
         const docId = `ed${i + 1}`;
         const title = titles[i];
         const caption = captions[i];
+        const date = "2024-11-01T16:04:32.166Z"
         
         // Fetch images from Firebase Storage folder (ed1, ed2, ...)
         const imageFolderRef = ref(storage, `editorial_photos/${docId}`);
@@ -54,7 +55,8 @@ async function populateFirestore() {
                 title,
                 caption,
                 sellerId,
-                image: imageUrls
+                image: imageUrls,
+                date
             };
 
             // Save to Firestore

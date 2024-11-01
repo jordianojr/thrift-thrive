@@ -1,6 +1,6 @@
 <template>
   <div class="category-section">
-    <h4 class="title">What are you looking for today?</h4>
+    <h5 class="title">What are you looking for today?</h5>
     
     <div class="row">
       <div v-if="isDropdown" class="dropdown-container">

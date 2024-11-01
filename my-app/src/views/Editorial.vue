@@ -251,7 +251,6 @@ h5.blog-title {
 }
 
 .btn-outline-elegant:hover {
-
   color: green;
   transform: scale(1.05);
 }
