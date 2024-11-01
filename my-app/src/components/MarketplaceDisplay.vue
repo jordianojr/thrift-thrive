@@ -1,131 +1,420 @@
 <template>
-  <div class="container-fluid">
-    <h3 class="category-title">{{ categoryChosen }}</h3>
+  <div class="products-container">
+    <header class="header-section">
+      <h3 class="category-title">{{ categoryChosen || 'All Products' }}</h3>
+      <div class="active-filters" v-if="hasActiveFilters">
+        <span class="filter-tag" v-if="activeFilters.searchTerm">
+          Search: {{ activeFilters.searchTerm }}
+          <button @click="clearFilter('searchTerm')" class="clear-filter">×</button>
+        </span>
+        <span class="filter-tag" v-if="activeFilters.priceRange">
+          Price: {{ formatPriceRange(activeFilters.priceRange) }}
+          <button @click="clearFilter('priceRange')" class="clear-filter">×</button>
+        </span>
+        <span class="filter-tag" v-if="activeFilters.condition">
+          Condition: {{ activeFilters.condition }}
+          <button @click="clearFilter('condition')" class="clear-filter">×</button>
+        </span>
+      </div>
+    </header>
+
     <Loading :isLoading="isLoading" message="Fetching products..." />
-    <div v-if="!isLoading">
-      <div class="row">
-        <div v-for="product in products" :key="product.id" class="col-lg-4 col-6">
-          <div class="card mb-4" @click="navigateToItem(product)">
-            <img :src="product.itemPhotoURLs[0] || product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image" />
-            <div class="card-body">
-              <h4 class="card-title product-title">{{ product.itemName }}</h4>
-              <h5 class="card-subtitle mb-2 text-muted product-price">${{ product.itemPrice }}</h5>
-              <h6 class="card-subtitle product-username">{{ product.userName }}</h6>
-              <p class="card-text">{{ product.description }}</p>
-            </div>
+
+    <div v-if="!isLoading" class="products-grid">
+      <div v-for="product in filteredProducts" 
+           :key="product.id" 
+           class="product-card"
+           @click="navigateToItem(product)">
+        <div class="product-image-container">
+          <img :src="getProductImage(product)" 
+               class="product-image" 
+               :alt="product.itemName"
+               loading="lazy" />
+          <div class="product-overlay">
+            <span class="view-details">View Details</span>
           </div>
         </div>
+        <div class="product-content">
+          <h4 class="product-title">{{ product.itemName }}</h4>
+          <div class="product-price">${{ formatPrice(product.itemPrice) }}</div>
+          <div class="product-seller">
+            <span class="seller-name">{{ product.userName }}</span>
+          </div>
+          <p style="color: black" class="product-description">{{ truncateDescription(product.description) }}</p>
+        </div>
       </div>
+    </div>
+
+    <div v-if="!isLoading && filteredProducts.length === 0" class="no-results">
+      <p>No products found matching your criteria</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, onMounted, watch } from 'vue';
+import { ref, defineProps, onMounted, watch, computed } from 'vue';
 import { db } from '@/lib/firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import Loading from '@/components/Loading.vue';
 import { useRouter } from 'vue-router';
+
+interface Product {
+  id: string;
+  itemName: string;
+  itemPrice: number;
+  itemPhotoURLs: string[] | string;
+  userName: string;
+  description: string;
+  size?: string;
+  condition?: string;
+  brand?: string;
+}
+
+interface Filters {
+  searchTerm: string;
+  priceRange: string;
+  condition: string;
+}
 
 const router = useRouter();
 
 const props = defineProps<{
   categoryChosen: string;
+  activeFilters: Filters;
 }>();
 
 const isLoading = ref(true);
-const products = ref<any[]>([]); // Adjust the type as needed
+const products = ref<Product[]>([]);
 
+// Computed property to check if any filters are active
+const hasActiveFilters = computed(() => {
+  return Object.values(props.activeFilters).some(value => value !== '');
+});
+
+// Computed property for filtered products
+const filteredProducts = computed(() => {
+  let filtered = [...products.value];
+
+  // Apply search term filter
+  if (props.activeFilters.searchTerm) {
+    const searchLower = props.activeFilters.searchTerm.toLowerCase();
+    filtered = filtered.filter(product => 
+      product.itemName.toLowerCase().includes(searchLower) ||
+      product.description.toLowerCase().includes(searchLower)
+    );
+  }
+  // Apply price range filter
+  if (props.activeFilters.priceRange) {
+    const [minStr, maxStr] = props.activeFilters.priceRange.split('-');
+    const min = parseInt(minStr);
+    const max = maxStr ? parseInt(maxStr) : Infinity;
+
+    filtered = filtered.filter(product => {
+      const price = Number(product.itemPrice);
+      return price >= min && price <= max;
+    });
+  }
+
+  // Apply condition filter
+  if (props.activeFilters.condition) {
+    filtered = filtered.filter(product => product.condition === props.activeFilters.condition);
+  }
+
+  return filtered;
+});
+
+// Function to fetch products from Firestore
 const fetchProducts = async () => {
-  const categorySelected = props.categoryChosen;
+  if (!props.categoryChosen) {
+    products.value = [];
+    isLoading.value = false;
+    return;
+  }
 
-  if (categorySelected) {
-    isLoading.value = true;
-    try {
-      const querySnapshot = await getDocs(collection(db, categorySelected));
-      const fetchedProducts: any[] = [];
-      querySnapshot.forEach((doc) => {
-        fetchedProducts.push({ id: doc.id, ...doc.data() });
-      });
-      products.value = fetchedProducts;
-      isLoading.value = false;
-      console.log(products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      isLoading.value = false;
-    }
-  } else {
+  isLoading.value = true;
+  try {
+    const querySnapshot = await getDocs(collection(db, props.categoryChosen));
+    products.value = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+      id: doc.id,
+      ...doc.data()
+    } as Product));
+    console.log(products.value);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    products.value = [];
+  } finally {
     isLoading.value = false;
   }
 };
 
-function navigateToItem(product: any) {
-  router.push({ name: 'item', params: { category: props.categoryChosen, id: product.id } });
-}
+// Helper functions
+const clearFilter = (filterName: keyof Filters) => {
+  // Emit event to parent to clear the filter
+  props.activeFilters[filterName] = '';
+  // Log the new state
+};
 
-// Watch for changes in the selected category and fetch products accordingly
+const formatPrice = (price: number) => {
+  return price.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
+const formatPriceRange = (range: string) => {
+  const [min, max] = range.split('-');
+  return max ? `$${min} - $${max}` : `$${min}+`;
+};
+
+const getProductImage = (product: Product) => {
+  if (Array.isArray(product.itemPhotoURLs)) {
+    return product.itemPhotoURLs[0] || '/placeholder-image.jpg';
+  }
+  return product.itemPhotoURLs || '/placeholder-image.jpg';
+};
+
+const truncateDescription = (description: string, maxLength = 100) => {
+  if (!description) return '';
+  return description.length <= maxLength 
+    ? description 
+    : `${description.slice(0, maxLength)}...`;
+};
+
+const navigateToItem = (product: Product) => {
+  router.push({ 
+    name: 'item', 
+    params: { 
+      category: props.categoryChosen, 
+      id: product.id 
+    } 
+  });
+};
+
+// Watch for changes in category or filters
 watch(() => props.categoryChosen, fetchProducts);
+watch(() => props.activeFilters, () => {}, { deep: true });
 
-// Fetch products when component is mounted
+// Initial fetch
 onMounted(fetchProducts);
+
+// Define emits
+const emit = defineEmits<{
+  (e: 'updateFilters', filters: Filters): void;
+}>();
 </script>
 
-  
 <style scoped>
-.container-fluid {
-  padding: 20px;
-  color: white;
+.products-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-/* Responsive font sizes using viewport units */
+.header-section {
+  margin-bottom: 2rem;
+}
+
 .category-title {
-  font-size: 2.5vw; /* Adjust as needed */
-  padding-bottom: 10px;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  color: #4a5568;
+  transition: background-color 0.2s ease;
+}
+
+.filter-tag:hover {
+  background-color: #cbd5e0;
+}
+
+.clear-filter {
+  background: none;
+  border: none;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  color: #718096;
+  transition: color 0.2s ease;
+}
+
+.clear-filter:hover {
+  color: #4a5568;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.product-card {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-image-container {
+  position: relative;
+  padding-top: 75%;
+  height: 400px;
+  overflow: hidden;
+}
+
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+}
+
+.view-details {
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 2px solid white;
+  border-radius: 2rem;
+  transform: translateY(10px);
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .view-details {
+  transform: translateY(0);
+}
+
+.product-content {
+  padding: 1.5rem;
 }
 
 .product-title {
-  font-size: 3vw; /* Adjust as needed */
+  font-size: 1.25rem;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .product-price {
-  font-size: 2.5vw; /* Adjust as needed */
+  font-size: 1.5rem;
+  color: #2c5282;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
-.product-username {
-  font-size: 2vw; /* Adjust as needed */
+.product-seller {
+  margin-bottom: 0.5rem;
 }
 
-.card-text {
-  color: black;
-  font-size: 1.5vw; /* Adjust as needed */
+.seller-name {
+  color: #718096;
+  font-size: 0.875rem;
 }
 
-.card {
-  /* Other styles for .card */
-  transition: transform 0.2s; /* Optional: adds a smooth scaling effect */
+.product-description {
+  color: #4a5568;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-.card:hover {
-  cursor: pointer; /* Changes cursor to a pointer when hovering */
-  transform: scale(1.05); /* Optional: scales up slightly on hover */
+.no-results {
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
+  font-size: 1.125rem;
 }
-/* Optionally add media queries for specific screen sizes */
+
+/* Loading state styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
 @media (max-width: 768px) {
+  .products-container {
+    padding: 1rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
   .category-title {
-    font-size: 4vw; /* Increase size for smaller screens */
+    font-size: 1.5rem;
   }
 
   .product-title {
-    font-size: 5vw;
+    font-size: 1.125rem;
   }
+
   .product-price {
-    font-size: 4vw;
+    font-size: 1.25rem;
   }
-  .product-username {
-    font-size: 3.5vw;
+  
+  .filter-tag {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.813rem;
   }
-  .card-text {
-    font-size: 2vw; /* Adjust for smaller screens */
+}
+
+@media (max-width: 480px) {
+  .products-container {
+    padding: 0.75rem;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 </style>

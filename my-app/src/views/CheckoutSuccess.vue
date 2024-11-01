@@ -1,7 +1,7 @@
 <template>
   <div class="success-container text-center">
-    <h2 class="text-white mb-4">Payment Successful!</h2>
-    <p class="text-white mb-4">Thank you for your purchase.</p>
+    <h2 class="text-black mb-4">Payment Successful!</h2>
+    <p class="text-black mb-4">Thank you for your purchase.</p>
     <router-link to="/marketplace" class="btn btn-success">
       Continue Shopping
     </router-link>

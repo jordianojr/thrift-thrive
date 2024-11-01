@@ -28,6 +28,7 @@ import gsap from "gsap";
 import Navbar from "../components/Navbar.vue";
 import SearchBar from '../components/SearchBar.vue';
 import FashionBot from '../components/FashionBot.vue';
+import router from "@/router";
 
 const searchTerm = ref('');
 const showProfile = ref(false);
@@ -42,6 +43,7 @@ const isHome = computed(() => route.path === '/home');
 
 function handleSearch(query: string) {
   searchTerm.value = query;
+  router.push({ name: 'search', params: { query } });
 }
 
 // Function to handle navbar selection
