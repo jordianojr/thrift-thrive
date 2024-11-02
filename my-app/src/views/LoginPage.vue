@@ -64,7 +64,8 @@ onMounted(() => {
   opacity: 0; /* Initially hidden for animation */
 }
 .green{
-  color: hsla(160, 100%, 37%, 1)
+  color: hsla(160, 100%, 37%, 1);
+  font-size: 100px;
 }
 h1 {
   font-weight: 500;
@@ -73,7 +74,7 @@ h1 {
 
 h3 {
   font-size: 1.2rem;
-  color: lightgray;
+  color: rgb(151, 151, 151);
 }
 
 nav {

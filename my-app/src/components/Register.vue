@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="header">Register</h1>
+    <h2 class="header">Register</h2>
     <p class="description">Create a new account!</p>
     <form class="row flex-center flex" @submit.prevent="handleRegister">
       <div class="form-widget">
@@ -102,7 +102,7 @@ const handleRegister = async () => {
   color: red; /* Style for error message */
   margin-top: 10px;
 }
-h1, p {
-  color: white;
+h2, p {
+  color: black;
 }
 </style>

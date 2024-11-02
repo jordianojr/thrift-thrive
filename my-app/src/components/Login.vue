@@ -1,12 +1,13 @@
 <template>
   <div>    
     <div v-if="!isLoggedIn">
-      <h1 class="header">Login</h1>
+      <h2 class="header">Login</h2>
       <p class="description">Sign in with your email and password</p>
       <form class="row flex-center flex" @submit.prevent="handleLogin">
         <div class="form-widget">
           <div>
             <input
+              style="background-color: white !important;"
               class="inputField"
               required
               type="email"
@@ -97,6 +98,14 @@ const handleLogin = async () => {
   float: inline-end;
   width: 80px;
   height: 30px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 30px;
+}
+
+.buttonBlock:hover {
+  scale: 1.1;
+  border: none;
 }
 
 .error {
@@ -104,7 +113,7 @@ const handleLogin = async () => {
   margin-top: 10px;
 }
 .header, .description {
-  color: white;
+  color: black;
 }
 
 
