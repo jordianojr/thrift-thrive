@@ -1,52 +1,47 @@
 <template>
   <!-- Template remains unchanged -->
   <div class="container-fluid py-5">
-    <div v-if="isLoading" class="loading-container">
-      <Loading :isLoading="isLoading" message="Loading blog details..." />
-    </div>
-    <div v-else>
-      <div class="row position-relative">
+    <div class="row position-relative">
 
-        <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
-          <button 
-            id="createbtn" 
-            class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
-            @click="navigateToCreatePost"
-          >
-            Create Post
-          </button>
-        </div>
-
-        <div
-          v-for="post in blogPosts"
-          :key="post.id"
-          class="col-12 col-md-6 col-lg-4"
-          ref="blogCard"
+      <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
+        <button 
+          id="createbtn" 
+          class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
+          @click="navigateToCreatePost"
         >
-          <div class="blog-card">
-            <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-inner">
-                <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
-                  :class="{ active: index === 0 }">
-                  <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
-                </div>
-              </div>
-              <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
-                data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-              </button>
-              <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
-                data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-              </button>
-            </div>
+          Create Post
+        </button>
+      </div>
 
-            <div class="post-content p-4">
-              <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
-              <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
+      <div
+        v-for="post in blogPosts"
+        :key="post.id"
+        class="col-12 col-md-6 col-lg-4"
+        ref="blogCard"
+      >
+        <div class="blog-card">
+          <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
+                :class="{ active: index === 0 }">
+                <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
+              </div>
             </div>
+            <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
+              data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
+              data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+          <div class="post-content p-4">
+            <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
+            <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
           </div>
         </div>
       </div>
@@ -59,7 +54,6 @@ import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { collection, doc, getDoc, getDocs, type DocumentData } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebaseConfig';
-import Loading from '@/components/Loading.vue';
 import { gsap } from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 // Add type assertion for bootstrap import
@@ -146,15 +140,12 @@ const fetchEditorials = async () => {
     blogPosts.value = posts.sort((a, b) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
-    
-    isLoading.value = false;
 
     // Initialize carousels after posts are loaded
     nextTick(() => {
       posts.forEach(post => {
         const carouselElement = document.getElementById(`carousel-${post.id}`);
         if (carouselElement) {
-          // Use type assertion for bootstrap.Carousel
           new (bootstrap as any).Carousel(carouselElement, {
             interval: 3000,
             wrap: true
@@ -164,6 +155,8 @@ const fetchEditorials = async () => {
     });
   } catch (error) {
     console.error('Error fetching blog posts:', error);
+  } finally {
+    isLoading.value = false;
   }
 };
 

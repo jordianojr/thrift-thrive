@@ -2,12 +2,12 @@
   <div class="homepage">
     <div class="constant" @mouseenter="showSearchBar" @mouseleave="hideSearchBar">
       <Navbar @select="handleSelect" />
+      <ProgressBar />
 
       <section class="hero">
         <div ref="searchBarContainer" class="search-bar-container">
           <SearchBar @search="handleSearch" />
         </div>
-        <!-- <p>Searching for: {{ searchTerm }}</p> -->
       </section>
     </div>
 
@@ -16,7 +16,7 @@
     </div>
 
     <div class="floating-bot" @click="toggleFashionBot">
-      <FashionBot /> <!-- You can use an emoji or an icon here -->
+      <FashionBot />
     </div>
   </div>
 </template>
@@ -29,6 +29,7 @@ import Navbar from "../components/Navbar.vue";
 import SearchBar from '../components/SearchBar.vue';
 import FashionBot from '../components/FashionBot.vue';
 import router from "@/router";
+import ProgressBar from '../components/ProgressBar.vue';
 
 const searchTerm = ref('');
 const showProfile = ref(false);
