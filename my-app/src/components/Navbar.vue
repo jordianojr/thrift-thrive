@@ -59,7 +59,7 @@ const router = useRouter();
 
 async function animateBrand() {
   gsap.to(".navbar-brand", { 
-    duration: 1,
+    duration: 5,
     color: '#ffffff',
     repeat: -1,
     yoyo: true,

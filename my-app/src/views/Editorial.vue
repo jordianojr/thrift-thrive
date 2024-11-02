@@ -178,6 +178,7 @@ const animateCards = () => {
 };
 
 onMounted(async () => {
+  await getUserRole();
   await fetchEditorials();
   nextTick(() => {
     animateCards();
