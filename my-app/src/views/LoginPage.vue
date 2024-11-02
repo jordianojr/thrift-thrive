@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div ref="greetingRef" class="greetings col-lg-6 col-md-6 col-12">
-      <h1 class="green">ThriftThrive</h1>
+      <h1 class="green">THRIVE</h1>
       <h3>A new way to shop sustainably</h3>
       <nav>
         <RouterLink to="/login">Login</RouterLink>

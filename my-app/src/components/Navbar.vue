@@ -25,10 +25,16 @@
             <i class="bi bi-pencil"></i> Editorial
           </router-link>
         </div>
+
         <div class="navbar-nav">
-          <router-link class="nav-link nav-elegant mx-2" to="/cart">
-            <i class="bi bi-cart"></i> Cart
+          <router-link class="nav-link mx-2" to="/sell">
+            <button class="btn btn-outline-elegant text-uppercase px-4 py-2 border-2 rounded-pill">
+              Sell
+            </button>
           </router-link>
+          <!-- <router-link class="nav-link nav-elegant mx-2" to="/cart">
+            <i class="bi bi-cart"></i> Cart
+          </router-link> -->
           <router-link class="nav-link nav-elegant mx-2" to="/chat">
             <i class="bi bi-chat"></i> Chat
           </router-link>
@@ -38,11 +44,6 @@
           <router-link class="nav-link nav-elegant mx-2" to="/profile">
             <i class="bi bi-person-gear custom-icon"></i>
           </router-link>
-          <router-link class="nav-link mx-2" to="/sell">
-            <button class="btn btn-outline-elegant text-uppercase px-4 py-2 border-2 rounded-pill">
-              Sell
-            </button>
-          </router-link>
         </div>
       </div>
     </div>
@@ -50,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue';
+import { defineEmits, onMounted } from 'vue';
 import { auth } from '../lib/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
@@ -58,9 +59,16 @@ import { useRouter } from 'vue-router';
 const emit = defineEmits(['select']);
 const router = useRouter();
 
-const select = (item: string) => {
-  emit('select', item);
-};
+async function animateBrand() {
+  gsap.to(".navbar-brand", { 
+    duration: 1,
+    color: '#ffffff',
+    repeat: -1,
+    yoyo: true,
+    ease: "power1.in",
+    scale: 1.1
+  });
+}
 
 const handleLogout = async () => {
   try {
@@ -71,6 +79,10 @@ const handleLogout = async () => {
     console.error("Logout error:", error);
   }
 };
+
+onMounted(() => {
+  animateBrand();
+});
 </script>
 
 <style scoped>
