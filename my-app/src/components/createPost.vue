@@ -32,11 +32,11 @@
       <div class="col-md-6 col-sm-12">
         <h3>Create Post</h3>
         <form @submit.prevent="createPost" class="create-post-form">
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" v-model="title" placeholder="Write a title" required />
+            <textarea class="form-control" id="title" v-model="title" placeholder="Write a title" required></textarea>
           </div>
-          <div class="form-group">
+          <div class="form-group mb-3">
             <label for="caption">Caption</label>
             <textarea class="form-control" id="caption" v-model="caption" rows="4" placeholder="Write a caption" required></textarea>
           </div>
@@ -52,10 +52,10 @@
           </div>
           <button 
             type="submit" 
-            class="btn btn-primary mt-3 submit-btn"
+            class="btn btn-outline-elegant text-uppercase px-4 py-2 mt-3 border-2 rounded-pill submit-btn"
             :disabled="!isFormValid || isSubmitting"
           >
-            {{ isSubmitting ? 'Submitting...' : 'Create Post' }}
+            {{ isSubmitting ? 'Posting...' : 'Post' }}
           </button>
         </form>
       </div>
@@ -205,12 +205,19 @@ const removeFile = (index: number) => {
   </script>
   
   <style scoped>
+
+h3{
+  text-transform: uppercase;
+  color: black;
+  font-size: 1.2rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
 .create-post-form {
   background-color: white;
-  border: 1px solid #e6e6e6;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 2rem;
 }
 
 .preview-card {
@@ -333,10 +340,6 @@ h5.blog-title {
   overflow: hidden;
 }
 
-.submit-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
 
 .submit-btn:disabled {
   opacity: 0.6;
@@ -361,5 +364,19 @@ h5.blog-title {
 
 .submit-btn:hover:before {
   left: 100%;
+}
+
+.btn-outline-elegant {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  border-color: currentColor;
+  font-size: 85%;
+}
+
+.btn-outline-elegant:hover {
+  color: green;
+  transform: scale(1.05);
 }
 </style>

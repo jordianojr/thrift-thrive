@@ -7,11 +7,11 @@
             <div class="img-overlay"></div>
           </div>
           <div class="text">
-            <h2>Men</h2>
+            <h2>Just</h2>
             <h5>Fashion</h5>
           </div>
           <div class="btn">
-            <a href="/">Shop Now</a>
+            <a href="./marketplace">Shop Now</a>
           </div>
         </div>
         <div class="women common">
@@ -24,7 +24,7 @@
             <h5>Fashion</h5>
           </div>
           <div class="btn">
-            <a href="/">Shop Now</a>
+            <a href="./marketplace">Shop Now</a>
           </div>
         </div>
       </section>

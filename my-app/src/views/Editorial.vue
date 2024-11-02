@@ -6,7 +6,8 @@
     </div>
     <div v-else>
       <div class="row position-relative">
-        <div class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
+
+        <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
           <button 
             id="createbtn" 
             class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
@@ -15,6 +16,7 @@
             Create Post
           </button>
         </div>
+
         <div
           v-for="post in blogPosts"
           :key="post.id"
@@ -55,8 +57,8 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { collection, getDocs, type DocumentData } from 'firebase/firestore';
-import { db } from '@/lib/firebaseConfig';
+import { collection, doc, getDoc, getDocs, type DocumentData } from 'firebase/firestore';
+import { db, auth } from '@/lib/firebaseConfig';
 import Loading from '@/components/Loading.vue';
 import { gsap } from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -75,11 +77,38 @@ interface Editorial extends DocumentData {
   date: string;
 }
 
-const router = useRouter();
+
 const blogPosts = ref<Editorial[]>([]);
 const isLoading = ref(true);
+const router = useRouter();
 const navigateToCreatePost = () => {
   router.push({ name: 'createPost' });
+};
+
+const userRole = ref('');
+const getUserRole = async () => {
+  try {
+    const userId = auth.currentUser?.uid; // Get the current user's ID
+
+    if (!userId) {
+      throw new Error("User is not authenticated.");
+    }
+
+    // Reference to the user document in the 'users' collection
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      console.log('User role:', userData.role);
+      userRole.value = userData.role; // Return the 'role' field
+    } else {
+      throw new Error("No user found in the database.");
+    }
+  } catch (error) {
+    console.error("Error fetching user role:", error);
+    return null; // Or handle the error as needed
+  }
 };
 
 const getPostImages = (post: Editorial): string[] => {
@@ -231,6 +260,7 @@ onMounted(async () => {
 
 h5.blog-title {
   font-weight: 400;
+  text-transform: uppercase;
   color: black;
   font-size: 1.2rem;
   margin-bottom: 1rem;
