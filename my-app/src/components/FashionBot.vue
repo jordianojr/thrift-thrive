@@ -1,14 +1,14 @@
 <template>
   <div>
     <button
-      class="floating-bot"
+      class="floating-bot d-flex text-align-center justify-content-center"
       type="button"
       data-bs-toggle="offcanvas"
       data-bs-target="#fashionBotOffcanvas"
       aria-controls="fashionBotOffcanvas"
       :class="{ bouncing: isBouncing }" 
     >
-      <span class="bot-emoji">🤖👗</span>
+      <span class="bi bi-robot fs-4"></span>
     </button>
 
     <div
@@ -17,20 +17,18 @@
       tabindex="-1"
       id="fashionBotOffcanvas"
       aria-labelledby="fashionBotOffcanvasLabel"
+      @show.bs.offcanvas="handleOffcanvasShow"
+      @hide.bs.offcanvas="handleOffcanvasHide"
     >
-      <!-- Header -->
-      <div class="offcanvas-header">
+      <div style="border-bottom: 1px solid #e5e5e5;">
         <div class="header-content">
-          <h5 class="offcanvas-title" id="fashionBotOffcanvasLabel">🤖👗 StyleBot</h5>
+          <h5 id="fashionBotOffcanvasLabel">STYLEBOT</h5>
         </div>
-        <button type="button" class="close-button" data-bs-dismiss="offcanvas" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
-
+      <!-- Rest of your template code remains same -->
       <!-- Messages Body -->
-      <div class="offcanvas-body">
-        <div class="fashion-bot">
+      <div>
+        <div>
           <div class="messages-wrapper" ref="messageContainer">
             <div 
               v-for="(message, index) in messages" 
@@ -44,15 +42,14 @@
                 class="message-image"
                 @click="openImageModal(message.image)"
               />
-              <p style="color: black">{{ message.text }}</p>
+              <p>{{ message.text }}</p>
             </div>
-            <!-- Typing indicator -->
             <div v-if="isTyping" class="bot-message typing-indicator">
               <div class="dot"></div>
               <div class="dot"></div>
               <div class="dot"></div>
             </div>
-          <div id="bottom"></div>
+            <div id="bottom"></div>
           </div>
         </div>
       </div>
@@ -61,41 +58,33 @@
       <div class="input-container">
         <div v-if="previewImage" class="image-preview">
           <img :src="previewImage" alt="Preview" />
-          <button @click="clearImage" class="clear-image-btn">
-            <span>&times;</span>
-          </button>
+          <button @click="clearImage" class="clear-image-btn">×</button>
         </div>
-        <div class="input-wrapper row">
-          <div class="col-8 type">
-            <input 
+        <div class="input-wrapper">
+          <input 
             v-model="userInput" 
             @keydown.enter="sendMessage" 
             placeholder="Ask about fashion advice..." 
             class="message-input"
           />
-          </div>
-          <div class="col-2 send">
-            <button @click="sendMessage" class="send-button" style="margin-left: 5px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-          </div>
-          <div class="col-2 upload">
+          <div class="button-group">
             <label class="upload-button">
-            <input 
-              type="file" 
-              @change="handleImageUpload" 
-              accept="image/*"
-              class="hidden-input"
-            />
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
-            </svg>
-          </label>
+              <input 
+                type="file" 
+                @change="handleImageUpload" 
+                accept="image/*"
+                class="hidden-input"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
+              </svg>
+            </label>
+            <button @click="sendMessage" class="send-button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -114,6 +103,12 @@ import { openai } from '../lib/openAi'; // Ensure you have the OpenAI package
 import { storage } from "../lib/firebaseConfig"; // Adjust path as needed
 import { ref as storageRef, uploadString, getDownloadURL } from "firebase/storage";
 
+interface Message {
+  from: 'user' | 'bot';
+  text: string;
+  image?: string | null;
+}
+
 const userInput = ref('');
 const messages = ref<any[]>([]);
 const isBouncing = ref(false);
@@ -122,6 +117,25 @@ const messageContainer = ref<HTMLElement | null>(null);
 const previewImage = ref('');
 const modalImage = ref('');
 const currentImage = ref<File | null>(null);
+  const isOffcanvasOpen = ref(false);
+
+const handleOffcanvasShow = () => {
+  isOffcanvasOpen.value = true;
+};
+
+const handleOffcanvasHide = () => {
+  isOffcanvasOpen.value = false;
+};
+
+const handleOverlayClick = () => {
+  const offcanvas = document.getElementById('fashionBotOffcanvas');
+  if (offcanvas) {
+    offcanvas.classList.remove('show');
+    document.body.classList.remove('offcanvas-open');
+    // Trigger the hide.bs.offcanvas event handler
+    handleOffcanvasHide();
+  }
+};
 
 const scrollToBottom = () => {
       const bottomAnchor = document.getElementById('bottom');
@@ -154,6 +168,11 @@ const startBouncing = () => {
   }, 1000); // Duration of the animation
 };
 
+onMounted(() => {
+  loadMessages();
+  setInterval(startBouncing, 5000);
+});
+
 const handleImageUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
@@ -180,302 +199,334 @@ const closeImageModal = () => {
   modalImage.value = '';
 };
 
+
 const sendMessage = async () => {
-  // Check if there's input or an image to send
   if (userInput.value.trim() === '' && !previewImage.value) return;
 
-  // Construct the user's message content
-  const messageContent = {
+  const messageContent: Message = {
     from: 'user',
     text: userInput.value.trim(),
     image: previewImage.value || null,
   };
 
-  // Push the user's message to the messages array and reset input
   messages.value.push(messageContent);
   saveMessages();
-  await nextTick(); // Wait for the DOM to update
+  await nextTick();
   scrollToBottom();
 
-  userInput.value = ""; // Clear text input
-
+  userInput.value = "";
   isTyping.value = true;
 
   try {
     let response;
 
-    // If there's an image, upload it first
     if (previewImage.value) {
       const base64Image = previewImage.value.split(',')[1];
       const imageRef = storageRef(storage, `stylebot_uploads/${Date.now()}.jpg`);
       await uploadString(imageRef, base64Image, 'base64');
 
       const imageUrl = await getDownloadURL(imageRef);
-      clearImage(); // Clear preview image after processing
+      clearImage();
 
-      const promptMessages = messages.value.map(message => ({
-        role: message.from === 'user' ? 'user' : 'assistant',
-        content: message.text,
-      }));
-
-      // Create a request including the image URL and the desired output format
+      // Properly typed messages for OpenAI
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
           {
             role: 'system',
-            content: "You are a fashion expert bot. Analyze the uploaded image and provide detailed fashion advice, style suggestions, and outfit recommendations in this format:\n\nThis is a [description of the outfit].\n\n### Outfit Inspiration:\n#### For a Casual Look:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]\n\n#### For a Sporty Outfit:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]\n\n#### For a Fashion-Forward Edge:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]",
+            content: "You are a fashion expert bot. Analyze the uploaded image and provide detailed fashion advice, style suggestions, and outfit recommendations..."
           },
           {
             role: 'user',
             content: [
               { type: 'text', text: messageContent.text || "What is this clothing item? Please suggest some outfits for me" },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageUrl,
-                },
-              },
-            ],
+              { type: 'image_url', image_url: { url: imageUrl } }
+            ]
           },
-          ...promptMessages,
+          ...messages.value.map(msg => ({
+            role: msg.from === 'user' ? 'user' as const : 'assistant' as const,
+            content: msg.text
+          }))
         ],
-        max_tokens: 500,
+        max_tokens: 500
       });
     } else {
-      // Handle text-only messages
-      const promptMessages = messages.value.map(message => ({
-        role: message.from === 'user' ? 'user' : 'assistant',
-        content: message.text,
-      }));
-
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
           {
             role: 'system',
-            content: "You are a fashion bot. Provide tailored fashion advice based on user input in this format:\n\nThe image shows [description of the outfit].\n\n### Outfit Inspiration:\n#### For a Casual Look:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]\n\n#### For a Sporty Outfit:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]\n\n#### For a Fashion-Forward Edge:\n- **Top**: [suggestions]\n- **Bottom**: [suggestions]\n- **Accessories**: [suggestions]",
+            content: "You are a fashion bot. Provide tailored fashion advice..."
           },
-          ...promptMessages,
-        ],
+          ...messages.value.map(msg => ({
+            role: msg.from === 'user' ? 'user' as const : 'assistant' as const,
+            content: msg.text
+          }))
+        ]
       });
     }
 
-    // Check if the response has choices and content
-    if (response.choices && response.choices.length > 0) {
-      const botMessage = { from: 'bot', text: response.choices[0].message.content };
+    if (response.choices && response.choices[0]?.message?.content) {
+      const botMessage: Message = {
+        from: 'bot',
+        text: response.choices[0].message.content
+      };
       messages.value.push(botMessage);
+      saveMessages();
+      await nextTick();
+      scrollToBottom();
     } else {
       throw new Error("No response from the model");
     }
-
-    saveMessages();
-    await nextTick(); // Wait for the DOM to update
-    scrollToBottom();
   } catch (error) {
-    // Error handling if API call fails
     console.error('Error:', error);
     isTyping.value = false;
-    messages.value.push({ from: 'bot', text: 'Sorry, I encountered an error. Please try again.' });
+    messages.value.push({
+      from: 'bot',
+      text: 'Sorry, I encountered an error. Please try again.'
+    });
     saveMessages();
   } finally {
-    isTyping.value = false; // Ensure typing indicator is reset in any case
+    isTyping.value = false;
   }
 };
 
-onMounted(() => {
-  loadMessages();
-  // Start bouncing every 10 seconds
-  setInterval(startBouncing, 5000);
-});
+
 </script>
 
 <style scoped>
-.fashion-bot {
-  max-height: 300px; /* Limit height to fit in the offcanvas */
-  padding: 10px;
+.offcanvas {
+  top: 75px !important;
+  width: 33.33% !important;
+  height: calc(100vh - 75px) !important;
+  border-radius: 0 !important;
+  border-top: 1px solid black !important;
+  border-right: 1px solid black !important;
+  transform: translateX(-100%);
+  transition: transform 0.2s ease-in-out !important;
 }
 
-.messages {
-  max-height: 200px; /* Limit height for messages */
+.offcanvas.show {
+  transform: translateX(10);
+  transition: transform 0.2s ease-in-out !important;
+}
+
+.click-overlay {
+  position: fixed;
+  top: 75px;
+  left: 33.33%;
+  right: 0;
+  bottom: 0;
+  z-index: 1045;
+  background: transparent;
+}
+
+.header-content {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  
+}
+
+#fashionBotOffcanvasLabel{
+font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 100%;
+}
+
+h5 {
+  font-weight: 400;
+  text-transform: uppercase;
+  color: black;
+  font-size: 1.2rem;
+  margin: 0;
+  line-height: 80px;
+}
+
+.floating-bot {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  padding: 12px 12px;
+  background-color: black;
+  color: white;
+  border: none;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1040;
+  border: 1px black solid;
+  border-radius: 100%;
+  width: 65px;
+  height: 65px;
+}
+
+.floating-bot:hover {
+  background-color: white;
+  border: 1px black solid;
+  color: black;
+}
+
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.jumping {
+  animation: jump 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.messages-wrapper {
+  height: calc(100vh - 235px); /* 75px top + 80px header + 80px input */
   overflow-y: auto;
-  margin-bottom: 10px;
+  padding: 20px;
+}
+
+.message {
+  margin-bottom: 15px;
+  max-width: 85%;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 0.875rem;
 }
 
 .bot-message {
-  background-color: lightgrey;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 5px 0;
-  max-width: 80%;
-  border: 1px solid #ccc;
+  background-color: #f8f8f8;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-right: auto;
 }
 
 .user-message {
-  background-color: #007bff;
+  background-color: #4CAF50;
   color: white;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 5px 0px;
+  padding: 12px 15px;
+  border-radius: 4px;
   margin-left: auto;
-  max-width: 80%;
-  border: 1px solid #ccc;
 }
 
-.input-group {
+.input-container {
+  height: 80px;
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e5e5e5;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.input-wrapper {
   display: flex;
   align-items: center;
-  padding: 10px; /* Add padding around input group */
-  background-color: lightgrey; /* Ensure the input group stands out */
-  border-top: 1px solid black; /* Optional: border on top for separation */
-  border-radius: 5px;
+  gap: 10px;
 }
 
-input {
-  flex-grow: 1; /* Allow input to grow */
-  padding: 10px;
-  border: 1px solid #ccc;
+.message-input {
+  flex-grow: 1;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 0.875rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.upload-button, .send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-button:hover, .send-button:hover {
+  background: #f8f8f8;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.image-preview {
+  margin-bottom: 10px;
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview img {
+  max-height: 100px;
   border-radius: 4px;
 }
 
-button {
-  padding: 10px;
-  margin-left: 15px;
+.clear-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: black;
+  color: white;
   border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-/* Floating bot styles */
-.floating-bot {
-  position: fixed; /* Fixed position to float over the content */
-  bottom: 5%; /* Distance from the bottom as a percentage of the viewport height */
-  right: 5%; /* Distance from the right as a percentage of the viewport width */
-  width: 30%; /* Width relative to viewport width */
-  max-width: 60px; /* Maximum width to ensure it doesn't get too large */
-  height: auto; /* Auto height to maintain aspect ratio */
-  aspect-ratio: 1; /* Ensure it stays circular */
-  background-color: black; /* Change as needed */
-  color: white;
-  border-radius: 50%; /* Makes it circular */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
-  transition: background-color 0.3s; /* Smooth transition */
 }
 
-.floating-bot:hover {
-  background-color: white; /* Darker green on hover */
-  border: 1px solid grey; /* Add border on hover */
-}
-
-.offcanvas {
-  background-color: white;
-  border-radius: 10px;
-  border: 1px solid black;
-}
-
-.offcanvas-header {
+.typing-indicator {
   display: flex;
-  justify-content: space-between; /* Space between title and button */
-  align-items: center; /* Center vertically */
-  padding: 10px; /* Add some padding for aesthetics */
-  background-color: white; 
-  border-bottom: 1px solid #ccc; 
+  gap: 4px;
+  padding: 12px;
 }
 
-.offcanvas-body {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  background-color: white;
-  padding-top: 5px;
+.dot {
+  width: 6px;
+  height: 6px;
+  background: #666;
+  border-radius: 50%;
+  animation: blink 1.4s infinite both;
 }
 
-/* Bounce animation styles */
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% {
     transform: translateY(0);
   }
   40% {
-    transform: translateY(-15px); /* Change the height of the bounce */
+    transform: translateY(-20px);
   }
   60% {
-    transform: translateY(-10px); /* Change the height of the bounce */
+    transform: translateY(-10px);
   }
+
 }
 
 .bouncing {
-  animation: bounce 1s infinite; /* Animation lasts 1 second and repeats infinitely */
-}
-.hidden-input {
-  display: none;
-}
-
-.upload-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #f0f0f0;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.upload-button:hover {
-  background: #e0e0e0;
-}
-
-.image-preview {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background: #f8f9fa;
-  position: relative;
-  margin-bottom: 0.5rem;
-}
-
-.image-preview img {
-  max-height: 100px;
-  border-radius: 0.25rem;
-  display: block;
-}
-
-.clear-image-btn {
-  position: absolute;
-  top: 0;
-  right: 13px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transform: translate(50%, -50%);
-}
-
-.message-image {
-  max-width: 200px;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.message-image:hover {
-  transform: scale(1.05);
+  animation: bounce 1s ease;
 }
 
 .image-modal {
@@ -484,7 +535,7 @@ button:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -494,59 +545,8 @@ button:hover {
 .image-modal img {
   max-width: 90%;
   max-height: 90vh;
-  border-radius: 0.5rem;
-}
-.typing-indicator {
-  display: flex;
-  align-items: center;
-}
-
-.dot {
-  height: 8px;
-  width: 8px;
-  margin: 0 2px;
-  border-radius: 50%;
-  background-color: gray;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.message-input{
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.type{
-  padding-right: 0px;
-}
-
-.send{
-  padding-left: 0px;
-}
-.upload{
-  padding-left: 0px;
-}
-.close-button{
-  background-color: white !important;
-  color: black !important;
-  border: none;
-  font-size: larger !important;
-  font-weight: 500;
-}
-.messages-wrapper {
-  max-height: 100%; /* or your desired height */
-  overflow-y: auto;  /* Enable scrolling */
-  scroll-behavior: smooth;
-}
 
 </style>

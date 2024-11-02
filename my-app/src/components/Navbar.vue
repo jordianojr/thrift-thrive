@@ -27,10 +27,8 @@
         </div>
 
         <div class="navbar-nav">
-          <router-link class="nav-link mx-2" to="/sell">
-            <button class="btn btn-outline-elegant text-uppercase px-4 py-2 border-2 rounded-pill">
-              Sell
-            </button>
+          <router-link class="nav-link nav-elegant mx-2" to="/sell">
+            <i class="bi bi-box-seam"></i> Sell
           </router-link>
           <!-- <router-link class="nav-link nav-elegant mx-2" to="/cart">
             <i class="bi bi-cart"></i> Cart

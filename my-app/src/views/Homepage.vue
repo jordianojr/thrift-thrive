@@ -25,11 +25,11 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from 'vue-router';
 import gsap from "gsap";
-import Navbar from "../components/Navbar.vue";
-import SearchBar from '../components/SearchBar.vue';
-import FashionBot from '../components/FashionBot.vue';
+import Navbar from "@/components/Navbar.vue";
+import SearchBar from '@/components/SearchBar.vue';
+import FashionBot from '@/components/FashionBot.vue';
 import router from "@/router";
-import ProgressBar from '../components/ProgressBar.vue';
+import ProgressBar from '@/components/ProgressBar.vue';
 
 const searchTerm = ref('');
 const showProfile = ref(false);
