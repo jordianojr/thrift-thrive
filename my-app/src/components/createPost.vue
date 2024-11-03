@@ -45,8 +45,8 @@
             <input type="file" class="form-control" id="photos" ref="fileInput" @change="handlePhotoUpload" multiple accept="image/*" required/>
             <div class="file-uploads mt-3">
               <div class="file-item" v-for="(file, index) in files" :key="index">
-                <img :src="getPreviewUrl(file)" alt="Preview" />
-                <button class="remove-btn" @click.prevent="removeFile(index)">x</button>
+                <img :src="getPreviewUrl(file)" alt="Preview" class="preview-image" />
+                <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
               </div>
             </div>
           </div>
@@ -310,30 +310,47 @@ h5.blog-title {
 
 .file-item {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 3/4;
+  margin-bottom: 1rem;
 }
 
-.file-item img {
+.file-item img.preview-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .file-item .remove-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: rgba(255, 255, 255, 0.8);
+  top: -8px;
+  right: -8px;
+  background: black;
+  color: white;
   border: none;
   border-radius: 50%;
   width: 20px;
   height: 20px;
+  font-size: 14px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
+
+.file-item .remove-btn:hover {
+  transform: scale(1.1);
+  background: #333;
+}
+
+.file-uploads {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
 .submit-btn {
   position: relative;
   transition: all 0.3s ease;
