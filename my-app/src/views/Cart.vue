@@ -85,7 +85,7 @@ const handleCheckout = async () => {
     }))
 
     // Call your backend endpoint to create a Stripe session
-    const response = await fetch('/api/create-checkout-session', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

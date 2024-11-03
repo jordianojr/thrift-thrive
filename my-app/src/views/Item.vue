@@ -148,7 +148,6 @@
 
   const isProcessing = ref(false);
 
-  
   const itemImages = ref<string[]>([]);
   const itemName = ref('');
   const itemPrice = ref(0);
@@ -223,13 +222,15 @@
     }
 
     isProcessing.value = true;
+    console.log(itemPrice.value, itemName.value);
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-checkout-session`, {
       price: itemPrice.value,
       name: itemName.value,
     });
-
+    console.log(response.data);
     const { sessionId } = response.data;
     const stripe = await stripePromise;
+    console.log('Redirecting to checkout:', sessionId);
     const { error } = await stripe.redirectToCheckout({
       sessionId
     });

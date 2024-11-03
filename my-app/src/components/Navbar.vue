@@ -36,9 +36,9 @@
           <router-link class="nav-link nav-elegant mx-2" to="/chat">
             <i class="bi bi-chat"></i> Chat
           </router-link>
-          <a class="nav-link nav-elegant mx-2" href="#" @click.prevent="handleLogout">
+          <router-link class="nav-link nav-elegant mx-2" to="/login" @click.prevent="handleLogout">
             <i class="bi bi-box-arrow-right"></i> Log out
-          </a>
+          </router-link>
           <router-link class="nav-link nav-elegant mx-2" to="/profile">
             <i class="bi bi-person-gear custom-icon"></i>
           </router-link>

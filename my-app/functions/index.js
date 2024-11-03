@@ -1,7 +1,8 @@
-const functions = require("firebase-functions");
-const express = require("express");
-const cors = require("cors");
-const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
+const functions = require("firebase-functions"); // Changed to double quotes
+const express = require("express"); // Changed to double quotes
+const cors = require("cors"); // Changed to double quotes
+const {SecretManagerServiceClient} = require(
+    "@google-cloud/secret-manager"); // Changed to double quotes
 
 const app = express();
 
@@ -10,25 +11,28 @@ app.use(express.json());
 app.use(cors());
 
 const client = new SecretManagerServiceClient();
-
+/**
+ * Retrieves the Stripe secret key from Google Cloud Secret Manager.
+ * @return {Promise<string>} The Stripe secret key.
+ */
 async function getStripeSecretKey() {
   const [version] = await client.accessSecretVersion({
-    name: 'projects/1072129347623/secrets/stripe-secret-key/versions/2',
+    name:
+    "projects/1072129347623/secrets/stripe-secret-key/versions/2",
   });
-  return version.payload.data.toString('utf8');
+  return version.payload.data.toString("utf8");
 }
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
-    const { price, name } = req.body;
+    const {price, name} = req.body;
     const stripeSecretKey = await getStripeSecretKey();
     const stripe = require("stripe")(stripeSecretKey);
-
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card"], // Changed to double quotes
       line_items: [{
         price_data: {
-          currency: "sgd",
+          currency: "sgd", // Changed to double quotes
           product_data: {
             name: name,
           },
@@ -36,15 +40,15 @@ app.post("/create-checkout-session", async (req, res) => {
         },
         quantity: 1,
       }],
-      mode: "payment",
+      mode: "payment", // Changed to double quotes
       success_url: `https://thriftthrive-a28e7.web.app/checkout/success`,
       cancel_url: `https://thriftthrive-a28e7.web.app/marketplace`,
     });
 
-    res.json({ sessionId: session.id });
+    res.json({sessionId: session.id}); // Changed to double quotes
   } catch (error) {
     console.error("Error creating checkout session:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({error: "Internal Server Error"});
   }
 });
 
