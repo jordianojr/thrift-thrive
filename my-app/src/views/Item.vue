@@ -73,8 +73,9 @@
         <!-- Add to Cart Button -->
         <button 
           @click="addToCart" 
+          :disabled="isProcessing"
           class="btn btn-danger mb-4 d-block mx-auto">
-          Buy Now!
+          {{ isProcessing ? 'Processing...' : 'Buy Now!' }}
         </button>
   
           <!-- Description -->
@@ -134,17 +135,18 @@
   <script setup lang="ts">
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { useCartStore } from '@/stores/cartStore';
+  import axios from 'axios';
   import { db } from '@/lib/firebaseConfig';
   import { doc, getDoc } from 'firebase/firestore';
   import Loading from "@/components/LoadingOverlay.vue";
-  
+  import { stripePromise } from '@/lib/stripeConfig'; // Import stripePromise from your config
+
   const router = useRouter();
   const route = useRoute();
   const itemId = route.params.id as string;
   const category = route.params.category as string;
 
-  const cartStore = useCartStore(); // Use the cart store
+  const isProcessing = ref(false);
 
   
   const itemImages = ref<string[]>([]);
@@ -212,30 +214,35 @@
   
   onMounted(fetchItem);
 
-  const addToCart = () => {
+  const addToCart = async () => {
   try {
     if (!itemId || !itemName.value || !itemPrice.value) {
       console.error('Missing required item data');
-      alert('Error: Could not add item to cart');
+      alert('Error: Could not process payment');
       return;
     }
-    
-    cartStore.addItemToCart({
-      id: itemId,
-      name: itemName.value,
+
+    isProcessing.value = true;
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-checkout-session`, {
       price: itemPrice.value,
-      quantity: 1,
-      image: itemImages.value[0] || '',
-    });
-    console.log('Item added to cart:', {
-      id: itemId,
       name: itemName.value,
-      price: itemPrice.value
     });
-    alert('Item added to cart!');
+
+    const { sessionId } = response.data;
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({
+      sessionId
+    });
+
+    if (error) {
+      console.error('Error:', error);
+      alert('Payment failed. Please try again.');
+    }
   } catch (error) {
-    console.error('Error adding item to cart:', error);
-    alert('Error: Could not add item to cart');
+    console.error('Error processing payment:', error);
+    alert('Error: Could not process payment');
+  } finally {
+    isProcessing.value = false;
   }
 };
   
