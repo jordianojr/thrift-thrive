@@ -2,7 +2,7 @@
   <div class="products-container">
     <header class="header-section">
       <h3 class="category-title">{{ categoryChosen || 'All Products' }}</h3>
-      <div class="active-filters" v-if="hasActiveFilters">
+      <!-- <div class="active-filters" v-if="hasActiveFilters">
         <span class="filter-tag" v-if="activeFilters.searchTerm">
           Search: {{ activeFilters.searchTerm }}
           <button @click="clearFilter('searchTerm')" class="clear-filter">×</button>
@@ -19,10 +19,8 @@
           Condition: {{ activeFilters.condition }}
           <button @click="clearFilter('condition')" class="clear-filter">×</button>
         </span>
-      </div>
+      </div> -->
     </header>
-
-    <Loading :isLoading="isLoading" message="Fetching products..." />
 
     <div v-if="!isLoading" class="products-grid">
       <div v-for="product in filteredProducts" 
@@ -34,23 +32,20 @@
                class="product-image" 
                :alt="product.itemName"
                loading="lazy" />
-          <div class="product-overlay">
+          <!-- <div class="product-overlay">
             <span class="view-details">View Details</span>
-          </div>
+          </div> -->
         </div>
         <div class="product-content">
           <h4 class="product-title">{{ product.itemName }}</h4>
           <div class="product-price">${{ formatPrice(product.itemPrice) }}</div>
-          <div class="product-seller">
-            <span class="seller-name">{{ product.userName }}</span>
-          </div>
-          <p style="color: black" class="product-description">{{ truncateDescription(product.description) }}</p>
+          <div class="seller-name">{{ product.userName }}</div>
         </div>
       </div>
     </div>
 
     <div v-if="!isLoading && filteredProducts.length === 0" class="no-results">
-      <p>No products found matching your criteria</p>
+      <p class="noproducts">No matching results. Please try a different search.</p>
     </div>
   </div>
 </template>
@@ -158,11 +153,11 @@ const fetchProducts = async () => {
 };
 
 // Helper functions
-const clearFilter = (filterName: keyof Filters) => {
-  // Emit event to parent to clear the filter
-  props.activeFilters[filterName] = '';
-  // Log the new state
-};
+// const clearFilter = (filterName: keyof Filters) => {
+//   // Emit event to parent to clear the filter
+//   props.activeFilters[filterName] = '';
+//   // Log the new state
+// };
 
 const formatPrice = (price: number) => {
   return price.toLocaleString('en-US', {
@@ -225,19 +220,32 @@ const emit = defineEmits<{
 }
 
 .category-title {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 1rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.9rem;
+  color: black;
+  margin-bottom: 1.1rem;
 }
 
-.active-filters {
+.noproducts{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  /* text-transform: uppercase; */
+  text-align: center;
+  font-size: 0.95rem;
+  color: black;
+}
+
+/* .active-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 1rem;
-}
+} */
 
-.filter-tag {
+/* .filter-tag {
   display: inline-flex;
   align-items: center;
   background-color: #e2e8f0;
@@ -264,7 +272,7 @@ const emit = defineEmits<{
 
 .clear-filter:hover {
   color: #4a5568;
-}
+} */
 
 .products-grid {
   display: grid;
@@ -346,32 +354,31 @@ const emit = defineEmits<{
 }
 
 .product-title {
-  font-size: 1.25rem;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.8rem;
+  color: black;
 }
 
 .product-price {
-  font-size: 1.5rem;
-  color: #2c5282;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.product-seller {
-  margin-bottom: 0.5rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.8rem;
+  color: black;
 }
 
 .seller-name {
   color: #718096;
-  font-size: 0.875rem;
-}
-
-.product-description {
-  color: #4a5568;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.8rem;
+  margin-top: 1rem;
 }
 
 .no-results {
@@ -411,10 +418,10 @@ const emit = defineEmits<{
     font-size: 1.25rem;
   }
   
-  .filter-tag {
+  /* .filter-tag {
     padding: 0.375rem 0.75rem;
     font-size: 0.813rem;
-  }
+  } */
 }
 
 @media (max-width: 480px) {
