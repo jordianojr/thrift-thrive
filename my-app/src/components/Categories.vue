@@ -52,6 +52,17 @@
         </select>
       </div>
 
+      <div class="filter-group">
+        <select 
+          v-model="filters.gender" 
+          class="filter-select"
+        >
+          <option disabled value="">Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Unisex">Unisex</option>
+        </select>
+      </div>
       <!-- Size Filter -->
       <div class="filter-group">
         <select 
@@ -80,6 +91,7 @@ import { ref, computed, defineEmits, reactive } from 'vue';
 interface Filters {
   searchTerm: string;
   priceRange: string;
+  gender: string;
   condition: string;
 }
 
@@ -96,6 +108,7 @@ const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavi
 const filters = reactive<Filters>({
   searchTerm: '',
   priceRange: '',
+  gender: '',
   condition: '',
 });
 
@@ -107,6 +120,7 @@ const emitFilters = () => {
   emit('filtersChanged', { ...filters });
   filters.searchTerm = ''; // Clear search term after emitting
   filters.priceRange = ''; // Clear price range after emitting
+  filters.gender = ''; // Clear
   filters.condition = ''; // Clear condition after emitting
 };
 

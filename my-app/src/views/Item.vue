@@ -93,7 +93,7 @@
               <img v-if="sellerAvatar" :src="sellerAvatar" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <img v-else src="../assets/user.jpeg" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <div>
-                <h3 class="h5 mb-1">{{ sellerName }}</h3>
+                <h3 class="h5 mb-1" style="cursor: pointer;" @click="goToSeller">{{ sellerName }}</h3>
                 <div class="d-flex align-items-center">
                   <span class="text-warning me-1">★</span>
                   <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
@@ -102,7 +102,7 @@
             </div>
   
             <!-- Action Buttons -->
-            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3 disabled">
+            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3">
               Chat with Seller
             </button>
   
@@ -248,11 +248,19 @@
   
   const redirectToChat = () => {
     router.push({
-      name: 'Chat',
+      name: 'chat',
       params: { 
         sellerId: sellerId.value, 
-        itemId: itemId
+        itemId: itemId,
+        category: category 
       }
+    });
+  };
+
+  const goToSeller = () => {
+    router.push({
+      name: 'sellerprofile',
+      params: { sellerId: sellerId.value }
     });
   };
   </script>

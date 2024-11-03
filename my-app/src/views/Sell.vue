@@ -84,9 +84,18 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
-        <label for="brand">Brand:</label>
-        <input type="text" id="brand" v-model="brand" placeholder="Brand of item" required />
+      <div class="form-group row">
+        <div class="col-6">
+          <label for="brand">Brand:</label>
+          <input type="text" id="brand" v-model="brand" placeholder="Brand of item" required />
+        </div>
+        <div class="col-6">
+          <label for="gender">Gender:</label>
+          <select v-model="gender" id="gender" required>
+            <option disabled value="">Gender suitable for:</option>
+            <option v-for="g in genders" :key="g">{{ g }}</option>
+          </select>
+        </div>
       </div>
       <div class="form-group">
         <label>Deal Method:</label>
@@ -120,6 +129,7 @@ import LoadingOverlay from '@/components/LoadingOverlay.vue';
 const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavily used'];
 const sizes = ['XXS / EU 44 / UK 34 / US 34','XS / EU 46 / UK 36 / US 36','S / EU 48 / UK 38 / US 38','M / EU 50 / UK 40 / US 40','L / EU 52 / UK 42 / US 42','XL / EU 54 / UK 44 / US 44','XXL / EU 56 / UK 46 / US 46','XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+const genders = ['Male', 'Female', 'Unisex'];
 
 const isLoading = ref(false);
 const itemName = ref('');
@@ -131,6 +141,7 @@ const previewImages = ref({ front: '', back: '', tag: '' }); // Reactive object 
 const userName = ref('');
 
 // Additional Fields
+const gender = ref('');
 const brand = ref('');
 const size = ref('');
 const condition = ref('');
@@ -186,6 +197,7 @@ const handleUpload = async () => {
       listedDate: listedDate,
       brand: brand.value,
       size: size.value,
+      gender: gender.value,
     };
 
     await setDoc(itemDocRef, sellData, { merge: true });
@@ -251,6 +263,7 @@ const updateUpload = async (itemUID: string, itemPhotoURLs: unknown) => {
     location.value = '';
     brand.value = '';
     size.value = '';
+    gender.value = '';
     previewImages.value = { front: '', back: '', tag: '' }; // Clear image previews
   } else {
     alert('User is not logged in.');

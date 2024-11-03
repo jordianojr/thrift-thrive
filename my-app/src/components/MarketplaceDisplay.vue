@@ -11,6 +11,10 @@
           Price: {{ formatPriceRange(activeFilters.priceRange) }}
           <button @click="clearFilter('priceRange')" class="clear-filter">×</button>
         </span>
+        <span class="filter-tag" v-if="activeFilters.gender">
+          Gender: {{ activeFilters.gender }}
+          <button @click="clearFilter('gender')" class="clear-filter">×</button>
+        </span>
         <span class="filter-tag" v-if="activeFilters.condition">
           Condition: {{ activeFilters.condition }}
           <button @click="clearFilter('condition')" class="clear-filter">×</button>
@@ -68,11 +72,13 @@ interface Product {
   size?: string;
   condition?: string;
   brand?: string;
+  gender?: string;
 }
 
 interface Filters {
   searchTerm: string;
   priceRange: string;
+  gender: string;
   condition: string;
 }
 
@@ -118,6 +124,10 @@ const filteredProducts = computed(() => {
   // Apply condition filter
   if (props.activeFilters.condition) {
     filtered = filtered.filter(product => product.condition === props.activeFilters.condition);
+  }
+
+  if (props.activeFilters.gender) {
+    filtered = filtered.filter(product => product.gender === props.activeFilters.gender);
   }
 
   return filtered;

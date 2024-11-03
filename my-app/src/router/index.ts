@@ -11,6 +11,7 @@ import Item from '../views/Item.vue';
 import Chat from '../views/Chat.vue';
 import Editorial from '../views/Editorial.vue';
 import CreatePost from '../components/createPost.vue';
+import SellerProfile from '../views/SellerProfile.vue';
 
 // Function to check if user is logged in
 const isLoggedIn = () => {
@@ -60,9 +61,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/chat',
+      path: '/chat:/:sellerId?/:itemId?/:category?',
       name: 'chat',
-      component: Marketplace,
+      component: Chat,
       meta: { requiresAuth: true },
     },
     {
@@ -76,6 +77,11 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/sellerprofile/:sellerId',
+      name: 'sellerprofile',
+      component: SellerProfile,
     },
     {
       path: '/sell',

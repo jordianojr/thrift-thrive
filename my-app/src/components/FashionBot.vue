@@ -12,7 +12,7 @@
     </button>
 
     <div
-      class="offcanvas offcanvas-start"
+      class="offcanvas offcanvas-end"
       data-bs-backdrop="false"
       tabindex="-1"
       id="fashionBotOffcanvas"
@@ -22,7 +22,11 @@
     >
       <div style="border-bottom: 1px solid #e5e5e5;">
         <div class="header-content">
+          <p style="opacity: 0;">ab</p>
           <h5 id="fashionBotOffcanvasLabel">STYLEBOT</h5>
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16" @click="handleOverlayClick" style="cursor: pointer;">
+          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+          </svg>
         </div>
       </div>
       <!-- Rest of your template code remains same -->
@@ -42,7 +46,8 @@
                 class="message-image"
                 @click="openImageModal(message.image)"
               />
-              <p>{{ message.text }}</p>
+              <p v-if="message.from === 'bot'" v-html="message.text"></p>
+              <p v-else>{{ message.text }}</p>
             </div>
             <div v-if="isTyping" class="bot-message typing-indicator">
               <div class="dot"></div>
@@ -64,7 +69,7 @@
           <input 
             v-model="userInput" 
             @keydown.enter="sendMessage" 
-            placeholder="Ask about fashion advice..." 
+            placeholder="Ask about fashion, style, or outfits..." 
             class="message-input"
           />
           <div class="button-group">
@@ -72,9 +77,9 @@
               <input 
                 type="file" 
                 @change="handleImageUpload" 
-                accept="image/*"
+                accept="image/png, image/jpeg, image/gif, image/webp"
                 class="hidden-input"
-              />
+              />              
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
               </svg>
@@ -117,7 +122,7 @@ const messageContainer = ref<HTMLElement | null>(null);
 const previewImage = ref('');
 const modalImage = ref('');
 const currentImage = ref<File | null>(null);
-  const isOffcanvasOpen = ref(false);
+const isOffcanvasOpen = ref(false);
 
 const handleOffcanvasShow = () => {
   isOffcanvasOpen.value = true;
@@ -217,87 +222,153 @@ const sendMessage = async () => {
   userInput.value = "";
   isTyping.value = true;
 
+  await nextTick();
+  scrollToBottom();
+
   try {
     let response;
 
     if (previewImage.value) {
       const base64Image = previewImage.value.split(',')[1];
+      clearImage();
       const imageRef = storageRef(storage, `stylebot_uploads/${Date.now()}.jpg`);
       await uploadString(imageRef, base64Image, 'base64');
 
       const imageUrl = await getDownloadURL(imageRef);
-      clearImage();
 
+      const promptMessages = messages.value.map(message => ({
+        role: message.from === 'user' ? 'user' : 'assistant',
+        content: message.text,
+      }));
       // Properly typed messages for OpenAI
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
           {
             role: 'system',
-            content: "You are a fashion expert bot. Analyze the uploaded image and provide detailed fashion advice, style suggestions, and outfit recommendations..."
+            content: `
+            You are a fashion bot. Provide tailored fashion advice based on user input in this format:
+            Compliment the user's choice of clothing and then provide outfit suggestions in this format:
+
+            <p>Your image is likely a [description of the image]. Here are some suggestions for you:</p>
+            <h4>Outfit Inspiration:</h4>
+            <h6>For a Casual Look:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+
+            <h6>For a Sporty Outfit:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+
+            <h6>For a Fashion-Forward Edge:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+          `,
           },
           {
             role: 'user',
             content: [
-              { type: 'text', text: messageContent.text || "What is this clothing item? Please suggest some outfits for me" },
-              { type: 'image_url', image_url: { url: imageUrl } }
-            ]
+              { type: 'text', text: "What is this clothing item? Please suggest some outfits for me" },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageUrl,
+                },
+              },
+            ],
           },
-          ...messages.value.map(msg => ({
-            role: msg.from === 'user' ? 'user' as const : 'assistant' as const,
-            content: msg.text
-          }))
+          ...promptMessages,
         ],
-        max_tokens: 500
+        max_tokens: 500,
       });
     } else {
+      // Handle text-only messages
+      const promptMessages = messages.value.map(message => ({
+        role: message.from === 'user' ? 'user' : 'assistant',
+        content: message.text,
+      }));
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
           {
             role: 'system',
-            content: "You are a fashion bot. Provide tailored fashion advice..."
+            content: `
+            You are a fashion bot. Provide tailored fashion advice based on user input in this format:
+
+            Compliment the user's choice of clothing and then provide outfit suggestions in this format:
+            <h4>Outfit Inspiration:</h4>
+            <h6>For a Casual Look:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+
+            <h6>For a Sporty Outfit:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+
+            <h6>For a Fashion-Forward Edge:</h6>
+            <ul>
+              <li><strong>Top:</strong> [suggestions]</li>
+              <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
+              <li><strong>Accessories:</strong> [suggestions]</li>
+            </ul>
+          `,
           },
-          ...messages.value.map(msg => ({
-            role: msg.from === 'user' ? 'user' as const : 'assistant' as const,
-            content: msg.text
-          }))
-        ]
+          {
+            role: 'user',
+            content: userInput.value.trim(),
+          },
+          ...promptMessages,
+        ],
       });
     }
-
-    if (response.choices && response.choices[0]?.message?.content) {
-      const botMessage: Message = {
-        from: 'bot',
-        text: response.choices[0].message.content
-      };
+    // Check if the response has choices and content
+    if (response.choices && response.choices.length > 0) {
+      const botMessage = { from: 'bot', text: response.choices[0].message.content };
       messages.value.push(botMessage);
-      saveMessages();
-      await nextTick();
-      scrollToBottom();
     } else {
       throw new Error("No response from the model");
     }
+    saveMessages();
+    await nextTick(); // Wait for the DOM to update
+    scrollToBottom();
   } catch (error) {
+    // Error handling if API call fails
     console.error('Error:', error);
     isTyping.value = false;
-    messages.value.push({
-      from: 'bot',
-      text: 'Sorry, I encountered an error. Please try again.'
-    });
+    messages.value.push({ from: 'bot', text: 'Sorry, I encountered an error. Please try again.' });
     saveMessages();
   } finally {
-    isTyping.value = false;
+    isTyping.value = false; // Ensure typing indicator is reset in any case
   }
 };
-
 
 </script>
 
 <style scoped>
 .offcanvas {
   top: 75px !important;
-  width: 33.33% !important;
+  /* width: 33.33% !important; */
   height: calc(100vh - 75px) !important;
   border-radius: 0 !important;
   border-top: 1px solid black !important;
@@ -327,7 +398,7 @@ const sendMessage = async () => {
   align-items: center;
   justify-content: center;
   padding: 0 20px;
-  
+  justify-content: space-between;
 }
 
 #fashionBotOffcanvasLabel{
@@ -390,6 +461,7 @@ h5 {
   height: calc(100vh - 235px); /* 75px top + 80px header + 80px input */
   overflow-y: auto;
   padding: 20px;
+  padding-bottom: 10px
 }
 
 .message {
@@ -402,15 +474,15 @@ h5 {
 .bot-message {
   background-color: #f8f8f8;
   padding: 12px 15px;
-  border-radius: 4px;
+  border-radius: 20px;
   margin-right: auto;
 }
 
 .user-message {
-  background-color: #4CAF50;
+  background-color: #58ea5d;
   color: white;
   padding: 12px 15px;
-  border-radius: 4px;
+  border-radius: 20px;
   margin-left: auto;
 }
 
@@ -468,13 +540,15 @@ h5 {
 }
 
 .image-preview {
-  margin-bottom: 10px;
-  position: relative;
-  display: inline-block;
+  position: absolute;
+  top: -60px; /* Adjust based on the height of your image preview */
+  left: 90%;
+  transform: translateX(-50%);
+  z-index: 1001;
 }
 
 .image-preview img {
-  max-height: 100px;
+  max-height: 50px;
   border-radius: 4px;
 }
 
@@ -507,6 +581,15 @@ h5 {
   background: #666;
   border-radius: 50%;
   animation: blink 1.4s infinite both;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .dot:nth-child(2) { animation-delay: 0.2s; }
@@ -547,6 +630,15 @@ h5 {
   max-height: 90vh;
   border-radius: 4px;
 }
+.message-image {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
 
-
+.message-image:hover {
+  transform: scale(1.05);
+}
 </style>
