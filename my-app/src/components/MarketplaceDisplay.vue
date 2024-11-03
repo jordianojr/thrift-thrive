@@ -22,8 +22,6 @@
       </div>
     </header>
 
-    <Loading :isLoading="isLoading" message="Fetching products..." />
-
     <div v-if="!isLoading" class="products-grid">
       <div v-for="product in filteredProducts" 
            :key="product.id" 
