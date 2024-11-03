@@ -74,7 +74,7 @@ const handleCheckout = async () => {
     // Create a line items array for Stripe
     const lineItems = cartStore.items.map(item => ({
       price_data: {
-        currency: 'usd',
+        currency: 'sgd',
         product_data: {
           name: item.name,
           images: [item.image]
