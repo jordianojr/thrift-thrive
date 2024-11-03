@@ -5,7 +5,7 @@
       <div class="card-body">
         <h5 class="card-title">More of a touchy buyer?</h5>
         <p class="card-text">Check out upcoming thrift events in Singapore!</p>
-        <a href="#" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Thrift Events</a>
+        <a href="/thrift-stores" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Thrift Events</a>
       </div>
     </div>
   </div>
