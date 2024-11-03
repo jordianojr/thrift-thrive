@@ -12,7 +12,7 @@
     </button>
 
     <div
-      class="offcanvas offcanvas-start"
+      class="offcanvas offcanvas-end"
       data-bs-backdrop="false"
       tabindex="-1"
       id="fashionBotOffcanvas"
@@ -77,9 +77,9 @@
               <input 
                 type="file" 
                 @change="handleImageUpload" 
-                accept="image/*"
+                accept="image/png, image/jpeg, image/gif, image/webp"
                 class="hidden-input"
-              />
+              />              
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path>
               </svg>
@@ -122,7 +122,7 @@ const messageContainer = ref<HTMLElement | null>(null);
 const previewImage = ref('');
 const modalImage = ref('');
 const currentImage = ref<File | null>(null);
-  const isOffcanvasOpen = ref(false);
+const isOffcanvasOpen = ref(false);
 
 const handleOffcanvasShow = () => {
   isOffcanvasOpen.value = true;
@@ -230,11 +230,11 @@ const sendMessage = async () => {
 
     if (previewImage.value) {
       const base64Image = previewImage.value.split(',')[1];
+      clearImage();
       const imageRef = storageRef(storage, `stylebot_uploads/${Date.now()}.jpg`);
       await uploadString(imageRef, base64Image, 'base64');
 
       const imageUrl = await getDownloadURL(imageRef);
-      clearImage();
 
       const promptMessages = messages.value.map(message => ({
         role: message.from === 'user' ? 'user' : 'assistant',
@@ -248,14 +248,15 @@ const sendMessage = async () => {
             role: 'system',
             content: `
             You are a fashion bot. Provide tailored fashion advice based on user input in this format:
+            Compliment the user's choice of clothing and then provide outfit suggestions in this format:
 
             <p>Your image is likely a [description of the image]. Here are some suggestions for you:</p>
-
             <h4>Outfit Inspiration:</h4>
             <h6>For a Casual Look:</h6>
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
 
@@ -263,6 +264,7 @@ const sendMessage = async () => {
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
 
@@ -270,6 +272,7 @@ const sendMessage = async () => {
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
           `,
@@ -305,12 +308,12 @@ const sendMessage = async () => {
             You are a fashion bot. Provide tailored fashion advice based on user input in this format:
 
             Compliment the user's choice of clothing and then provide outfit suggestions in this format:
-            <br>
             <h4>Outfit Inspiration:</h4>
             <h6>For a Casual Look:</h6>
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
 
@@ -318,6 +321,7 @@ const sendMessage = async () => {
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
 
@@ -325,6 +329,7 @@ const sendMessage = async () => {
             <ul>
               <li><strong>Top:</strong> [suggestions]</li>
               <li><strong>Bottom:</strong> [suggestions]</li>
+              <li><strong>Shoes:</strong> [suggestions]</li>
               <li><strong>Accessories:</strong> [suggestions]</li>
             </ul>
           `,
@@ -456,7 +461,7 @@ h5 {
   height: calc(100vh - 235px); /* 75px top + 80px header + 80px input */
   overflow-y: auto;
   padding: 20px;
-  padding-bottom: 0px
+  padding-bottom: 10px
 }
 
 .message {
@@ -536,14 +541,14 @@ h5 {
 
 .image-preview {
   position: absolute;
-  top: -110px; /* Adjust based on the height of your image preview */
-  left: 15%;
+  top: -60px; /* Adjust based on the height of your image preview */
+  left: 90%;
   transform: translateX(-50%);
   z-index: 1001;
 }
 
 .image-preview img {
-  max-height: 100px;
+  max-height: 50px;
   border-radius: 4px;
 }
 

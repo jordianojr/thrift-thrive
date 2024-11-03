@@ -101,7 +101,7 @@
             </div>
   
             <!-- Action Buttons -->
-            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3 disabled">
+            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3">
               Chat with Seller
             </button>
   
@@ -244,7 +244,8 @@
       name: 'chat',
       params: { 
         sellerId: sellerId.value, 
-        itemId: itemId
+        itemId: itemId,
+        category: category 
       }
     });
   };
