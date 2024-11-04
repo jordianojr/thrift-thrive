@@ -1,8 +1,8 @@
 <template>
   <div class="info-card">
     <h2 class="section-title">{{ placeChosen }}</h2>
-      <div class="formblock">
-        <ul class="events-list">
+      <div class="formblock" v-if="filteredEvents.length > 0">
+        <ul class="events-list" >
           <li v-for="(event, index) in filteredEvents" :key="index" class="event-item">
             <h6 class="event-name">{{ event.name }}</h6>
             <h6 class="event-details">{{ event.date }}</h6>
@@ -14,6 +14,7 @@
           Get Directions
         </button>
       </div>
+      <p v-else class="no-events">Click on an event</p>
     
     <div v-if="userRole === 'admin'" class="add-event">
       <h3 class="section-title">Submit Event</h3>
@@ -165,7 +166,10 @@ onMounted(() => {
 .info-card {
   padding: 20px;
   font-family: 'Helvetica Neue', sans-serif;
-
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 
 .events-list{
@@ -180,7 +184,7 @@ onMounted(() => {
 }
 
 
-.event-name, .event-details{
+.event-name, .event-details, .no-events{
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
@@ -229,7 +233,6 @@ onMounted(() => {
 .add-event {
   margin-top: 40px;
 }
-
 
 @media screen and (max-width: 991px) {
   .info-card {
