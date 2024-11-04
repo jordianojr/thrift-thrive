@@ -35,7 +35,8 @@
 <script lang="ts" setup>
 import { ref, defineProps, onMounted, watch, computed } from 'vue';
 import { db } from '@/lib/firebaseConfig';
-import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
+import type { DocumentData } from 'firebase/firestore';
 import { useRouter } from 'vue-router';
 
 interface Product {
@@ -88,25 +89,38 @@ const filteredProducts = computed(() => {
   }
   // Apply price range filter
   if (props.activeFilters.priceRange) {
-    const [minStr, maxStr] = props.activeFilters.priceRange.split('-');
-    const min = parseInt(minStr);
-    const max = maxStr ? parseInt(maxStr) : Infinity;
+  const range = props.activeFilters.priceRange;
+  let min = 0;
+  let max = Infinity;
 
-    filtered = filtered.filter(product => {
-      const price = Number(product.itemPrice);
-      return price >= min && price <= max;
-    });
+  if (range === '$201+') {
+    min = 201;
+  } else {
+    // Remove '$' symbols and split by '-'
+    const [minStr, maxStr] = range.split('-')
+      .map(str => str.trim().replace('$', ''));
+    
+    min = parseInt(minStr);
+    max = parseInt(maxStr);
   }
+
+  filtered = filtered.filter(product => {
+    const price = Number(product.itemPrice);
+    return price >= min && price <= max;
+  });
+}
 
   // Apply condition filter
   if (props.activeFilters.condition) {
     filtered = filtered.filter(product => product.condition === props.activeFilters.condition);
   }
 
+  // Apply gender filter
   if (props.activeFilters.gender) {
     filtered = filtered.filter(product => product.gender === props.activeFilters.gender);
   }
 
+  // Apply size filter
   if (props.activeFilters.size) {
     filtered = filtered.filter(product => product.size === props.activeFilters.size);
   }

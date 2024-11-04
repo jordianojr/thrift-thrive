@@ -310,7 +310,7 @@ const filters = reactive<Filters>({
 const filteredCategories = computed(() => categories);
 
 const hasActiveFilters = computed(() => {
-  return filters.priceRange || filters.gender || filters.condition || filters.searchTerm;
+  return filters.priceRange || filters.gender || filters.condition || filters.searchTerm || filters.size;
 });
 
 const toggleFilter = (filterType: string) => {
