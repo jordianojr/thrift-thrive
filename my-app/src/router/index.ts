@@ -82,6 +82,7 @@ const router = createRouter({
       path: '/sellerprofile/:sellerId',
       name: 'sellerprofile',
       component: SellerProfile,
+      meta: { requiresAuth: true },
     },
     {
       path: '/sell',

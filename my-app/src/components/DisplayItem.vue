@@ -8,7 +8,7 @@
                 <div class="row justify-content-center">
                     <div v-for="product in item" :key="product.id" class="col-lg-3 col-md-4 col-sm-6">
                         <div class="card mb-4" @click="navigateToItem(product)">
-                            <img :src="product.itemPhotoURLs[0]" class="card-img-top" alt="Product Image">
+                            <img :src="product.itemPhotoURLs" class="card-img-top" alt="Product Image">
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.itemName }}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">${{ product.itemPrice }}</h6>

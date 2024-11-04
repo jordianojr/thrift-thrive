@@ -6,7 +6,7 @@
         <div class="row">
           <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
             <div class="card mb-4">
-              <img :src="product.itemPhotoURLs[0]" class="card-img-top img-fluid" alt="Product Image">
+              <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">
               <div class="card-body">
                 <h4 class="card-title">{{ product.itemName }}</h4>
                 <h5 class="card-subtitle mb-2 text-muted">${{ product.itemPrice }}</h5>
@@ -35,6 +35,7 @@
   
   const fetchProducts = async () => {
     const uid = getUserUID();
+    console.log(uid);
     const cachedProducts = localStorage.getItem('listing');
   
     if (cachedProducts) {
@@ -64,8 +65,13 @@
   };
   
   const getUserUID = () => {
-    return auth.currentUser ? auth.currentUser.uid : null;
-  };
+  if (auth.currentUser) {
+    return auth.currentUser.uid;
+  } else {
+    alert('User is not logged in!');
+    return null;
+  }
+};
   
   const deleteItem = async (itemId: string) => {
     const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];

@@ -60,6 +60,11 @@ const handleRegister = async () => {
       email: user.email,
       username: '', // Get the username from the input
       photoURL: '', // You can leave this empty or set a default
+      orderHistory: [], // Initialize an empty order history
+      rating: 0, // Initialize the rating to 0
+      reviews: [], // Initialize an empty reviews array
+      role: 'user', // Set the role to 'user'
+      likedItems: [], // Initialize an empty liked items array
     }
     alert("Registration is successful!");
     router.push('/home');
