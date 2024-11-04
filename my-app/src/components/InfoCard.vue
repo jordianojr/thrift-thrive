@@ -1,46 +1,46 @@
 <template>
   <div class="info-card">
-    <h2>{{ placeChosen }}</h2>
-    <ul class="events-list">
-      <li v-for="(event, index) in filteredEvents" :key="index" class="event-item">
-        <h4 style="color: hsla(160, 100%, 37%, 1);">{{ event.name }}</h4>
-        <p><strong>Date:</strong> {{ event.date }}</p>
-        <p><strong>Time:</strong> {{ event.time }}</p>
-        <p>{{ event.description }}</p>
-      </li>
-    </ul>
-
-    <button @click="openGoogleMapsDirections" class="btn btn-primary">
-      Get Directions
-    </button>
+    <h2 class="section-title">{{ placeChosen }}</h2>
+      <div class="formblock">
+        <ul class="events-list">
+          <li v-for="(event, index) in filteredEvents" :key="index" class="event-item">
+            <h6 class="event-name">{{ event.name }}</h6>
+            <h6 class="event-details">{{ event.date }}</h6>
+            <h6 class="event-details">{{ event.time }}</h6>
+            <p class="event-description">{{ event.description }}</p>
+          </li>
+        </ul>
+        <button @click="openGoogleMapsDirections" class="submit-btn btn text-uppercase py-2 border-2">
+          Get Directions
+        </button>
+      </div>
     
     <div v-if="userRole === 'admin'" class="add-event">
-      <h5 class="modal-title">Know of an event here?</h5>
-      <h6>Let us know!</h6><br>
-        <form @submit.prevent="handleAddEvent">
+      <h3 class="section-title">Submit Event</h3>
+        <form class="formblock event-description" @submit.prevent="handleAddEvent">
           <div class="form-group">
-            <label for="eventName">Event Name</label>
+            <label for="eventName" class="form-label">Event Name</label>
             <input v-model="newEvent.name" type="text" class="form-control" id="eventName" required />
           </div>
-          <div class="form-group">
-            <label for="eventDate">Date</label>
+          <div class="form-group mb-3">
+            <label for="eventDate" class="form-label">Date</label>
             <input v-model="newEvent.date" type="date" class="form-control" id="eventDate" required />
           </div>
           <div class="form-group row">
             <div class="col">
-              <label for="eventTime">Start Time</label>
+              <label for="eventTime" class="form-label">Start Time</label>
               <input v-model="newEvent.startTime" type="time" class="form-control" id="eventStartTime" required />
             </div>
-            <div class="col">
-              <label for="eventTime">End Time</label>
+            <div class="col mb-3">
+              <label for="eventTime" class="form-label">End Time</label>
               <input v-model="newEvent.endTime" type="time" class="form-control" id="eventEndTime" required />
             </div>
           </div>
           <div class="form-group">
-            <label for="eventDescription">Description</label>
+            <label for="eventDescription" class="form-label">Description</label>
             <textarea v-model="newEvent.description" class="form-control" id="eventDescription" required></textarea>
           </div>
-          <button type="submit" class="btn btn-success">Add Event</button>
+          <button type="submit" class="submit-btn btn text-uppercase py-2 border-2">Add Event</button>
         </form>
     </div>
   </div>
@@ -162,45 +162,74 @@ onMounted(() => {
 </script>
 
 <style scoped>
-p {
-  color: black !important;
-}
 .info-card {
   padding: 20px;
+  font-family: 'Helvetica Neue', sans-serif;
+
 }
 
-.events-list {
+.events-list{
   list-style-type: none;
-  padding: 0;
   margin-top: 10px;
+  padding: 0rem;
+
 }
 
 .event-item {
-  margin-bottom: 15px;
+  margin-top: 45px;
 }
 
-.directions-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #4285f4;
+
+.event-name, .event-details{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.2rem;
+  font-size: 0.875rem;
+}
+
+.event-name{
+  color: hsla(160, 100%, 37%, 1);
+}
+
+.event-description, .section-subtitle{
+  margin-top: 1.4rem;
+  color: rgb(25, 25, 25);
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.submit-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black;
+  letter-spacing: 1px;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.875rem;
 }
 
-.directions-btn:hover {
-  background-color: #3367d6;
+.submit-btn:hover {
+  color: black;
+  background-color: white;
+  border: black 1px solid;
+}
+
+.formblock {
+  padding: 0rem 1rem;
 }
 
 .add-event {
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
-.btn-success {
-  margin-top: 20px;
-}
 
 @media screen and (max-width: 991px) {
   .info-card {

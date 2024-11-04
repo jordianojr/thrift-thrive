@@ -1,6 +1,6 @@
 <template>
-  <div class="title">
-    <h3>Thrift/Vintage Stores in Singapore</h3>
+  <div style="margin-bottom: 43px">
+      <h3 class="title">Thrift & Vintage Stores in Singapore</h3>
   </div>
   <div class="row">
     <div class="col-12 col-lg-8 col-xl-8 col-xxl-8" style="margin-bottom: 20px;">
@@ -57,6 +57,60 @@ const initMap = () => {
   const mapOptions: google.maps.MapOptions = {
     center: { lat: 1.2956, lng: 103.8542 },
     zoom: 13,
+    styles: [
+        {
+          // Apply your custom styles here
+          featureType: 'all',
+          elementType: 'all',
+          stylers: [
+            { saturation: -20 },
+            { lightness: 20 },
+            { visibility: 'simplified' },
+          ],
+        },
+        {
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [
+          { color: "#595959" },
+          { lightness: 80 }
+        ],
+      },
+      {
+        featureType: "road.arterial",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#757575" }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "geometry",
+        stylers: [{ color: "#dadada" }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#616161" }],
+      },
+      {
+        featureType: "road.local",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#9e9e9e" }],
+      },
+        {
+          featureType: 'all',
+          elementType: 'labels.text.fill',
+          stylers: [
+            { color: '#464646' } // Set label text color to white
+          ]
+        },
+        {
+          featureType: 'poi',
+          elementType: 'all',
+          stylers: [
+            { visibility: 'off' } // Hide all points of interest
+          ]
+        },
+      ],
   };
 
   const map = new google.maps.Map(mapContainer.value, mapOptions);
@@ -113,9 +167,16 @@ onMounted(async () => {
 .row {
   height: 100vh;
 }
-.title{
-  margin-bottom: 20px;
-}
+
+.title {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.9rem;
+    color: black;
+    margin-bottom: 1.1rem;
+  }
 
 @media screen and (max-width: 991px) {
   .map-container {
@@ -124,4 +185,14 @@ onMounted(async () => {
     margin: auto;
   }
 }
+
+.title {
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 1.9rem;
+    color: black;
+    margin-bottom: 1.1rem;
+  }
 </style>
