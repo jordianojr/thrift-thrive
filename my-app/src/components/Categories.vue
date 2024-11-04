@@ -357,14 +357,14 @@ const handleChoice = (category: string) => {
 
 <style scoped>
 .search-input::placeholder {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: var(--animation-opacity);
   transform: translateY(var(--animation-transform));
 }
 
 /* Desktop Styles */
 .category-section {
-  padding: 1rem;
+  padding: 0rem;
   background-color: white;
 }
 
@@ -377,7 +377,7 @@ const handleChoice = (category: string) => {
 }
 
 .search-container {
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.1em;
 }
 
 .search-input {

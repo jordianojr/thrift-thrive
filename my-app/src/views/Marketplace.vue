@@ -68,14 +68,26 @@ const handleFilters = (filters: Filters) => {
 </script>
 
 <style scoped>
+
 .marketplace-layout {
   display: flex;
   min-height: 100vh;
-  color: white;
 }
 
 .sidebar-section {
-  flex: 0 0 220px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 20%; /* Adjust the width as needed */
+  height: 100vh;
+  background-color: white;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar-section::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .display-section {
@@ -114,7 +126,7 @@ const handleFilters = (filters: Filters) => {
 
   .sticky-categories {
     position: sticky;
-    top: 75px;
+    top: 70px;
     background: inherit; /* Ensures background matches your theme */
     width: 100%;
     z-index:10;

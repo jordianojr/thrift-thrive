@@ -196,11 +196,11 @@ const emit = defineEmits<{
 .products-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0rem;
 }
 
 .header-section {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .category-title {
