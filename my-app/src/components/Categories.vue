@@ -108,6 +108,29 @@
             </button>
           </div>
         </div>
+
+        <!-- Size Filter -->
+        <div class="filter-group">
+          <button 
+            class="sidebar-button"
+            :class="{ 'active': openFilters.includes('size') }"
+            @click="toggleFilter('size')"
+          >
+            Size
+          </button>
+          <div v-if="openFilters.includes('size')" class="filter-options">
+            <button 
+              v-for="size in sizes"
+              :key="size"
+              class="option-button"
+              :class="{ 'selected': filters.size === size }"
+              @click="toggleSubFilter('size', size)"
+            >
+              {{ size }}
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -196,6 +219,17 @@
             {{ option }}
           </button>
         </div>
+        <div v-if="openFilters.includes('size')" class="sub-filters-group">
+          <button 
+            v-for="size in sizes"
+            :key="size"
+            class="sub-filter-button"
+            :class="{ 'selected': filters.condition === size }"
+            @click="toggleSubFilter('size', size)"
+          >
+            {{ size }}
+          </button>
+        </div>
         </div>
       </div>
     </div>
@@ -241,6 +275,7 @@ interface Filters {
   priceRange: string;
   gender: string;
   condition: string;
+  size: string;
 }
 
 const emit = defineEmits<{
@@ -252,11 +287,13 @@ const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwe
 const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavily used'];
 const priceRanges = ['$0 - $50', '$51 - $100', '$101 - $200', '$201+'];
 const genderOptions = ['Male', 'Female', 'Unisex'];
+const sizes = ['Free Size', 'XS', 'S', 'M', 'L', 'XL'];
 
 const filterTypes = [
   { id: 'price', label: 'Price Range' },
   { id: 'condition', label: 'Condition' },
-  { id: 'gender', label: 'Gender' }
+  { id: 'gender', label: 'Gender' },
+  { id: 'size', label: 'Size' },
 ];
 
 const openFilters = ref<string[]>([]);
@@ -267,6 +304,7 @@ const filters = reactive<Filters>({
   priceRange: '',
   gender: '',
   condition: '',
+  size: ''
 });
 
 const filteredCategories = computed(() => categories);
@@ -298,6 +336,7 @@ const resetFilters = () => {
   filters.gender = '';
   filters.condition = '';
   filters.searchTerm = '';
+  filters.size = '';
   openFilters.value = [];
   emitFilters();
 };

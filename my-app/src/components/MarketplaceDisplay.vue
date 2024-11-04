@@ -2,24 +2,6 @@
   <div class="products-container">
     <header class="header-section">
       <h3 class="category-title">{{ categoryChosen || 'All Products' }}</h3>
-      <!-- <div class="active-filters" v-if="hasActiveFilters">
-        <span class="filter-tag" v-if="activeFilters.searchTerm">
-          Search: {{ activeFilters.searchTerm }}
-          <button @click="clearFilter('searchTerm')" class="clear-filter">×</button>
-        </span>
-        <span class="filter-tag" v-if="activeFilters.priceRange">
-          Price: {{ formatPriceRange(activeFilters.priceRange) }}
-          <button @click="clearFilter('priceRange')" class="clear-filter">×</button>
-        </span>
-        <span class="filter-tag" v-if="activeFilters.gender">
-          Gender: {{ activeFilters.gender }}
-          <button @click="clearFilter('gender')" class="clear-filter">×</button>
-        </span>
-        <span class="filter-tag" v-if="activeFilters.condition">
-          Condition: {{ activeFilters.condition }}
-          <button @click="clearFilter('condition')" class="clear-filter">×</button>
-        </span>
-      </div> -->
     </header>
 
     <div v-if="!isLoading" class="products-grid">
@@ -54,7 +36,6 @@
 import { ref, defineProps, onMounted, watch, computed } from 'vue';
 import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
-import Loading from '@/components/Loading.vue';
 import { useRouter } from 'vue-router';
 
 interface Product {
@@ -73,6 +54,7 @@ interface Product {
 interface Filters {
   searchTerm: string;
   priceRange: string;
+  size: string;
   gender: string;
   condition: string;
 }
@@ -125,6 +107,10 @@ const filteredProducts = computed(() => {
     filtered = filtered.filter(product => product.gender === props.activeFilters.gender);
   }
 
+  if (props.activeFilters.size) {
+    filtered = filtered.filter(product => product.size === props.activeFilters.size);
+  }
+
   return filtered;
 });
 
@@ -152,12 +138,6 @@ const fetchProducts = async () => {
   }
 };
 
-// Helper functions
-// const clearFilter = (filterName: keyof Filters) => {
-//   // Emit event to parent to clear the filter
-//   props.activeFilters[filterName] = '';
-//   // Log the new state
-// };
 
 const formatPrice = (price: number) => {
   return price.toLocaleString('en-US', {
@@ -166,10 +146,6 @@ const formatPrice = (price: number) => {
   });
 };
 
-const formatPriceRange = (range: string) => {
-  const [min, max] = range.split('-');
-  return max ? `$${min} - $${max}` : `$${min}+`;
-};
 
 const getProductImage = (product: Product) => {
   if (Array.isArray(product.itemPhotoURLs)) {
@@ -178,12 +154,6 @@ const getProductImage = (product: Product) => {
   return product.itemPhotoURLs || '/placeholder-image.jpg';
 };
 
-const truncateDescription = (description: string, maxLength = 100) => {
-  if (!description) return '';
-  return description.length <= maxLength 
-    ? description 
-    : `${description.slice(0, maxLength)}...`;
-};
 
 const navigateToItem = (product: Product) => {
   router.push({ 
@@ -372,7 +342,7 @@ const emit = defineEmits<{
 }
 
 .seller-name {
-  color: #718096;
+  color: rgb(79, 79, 79);
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 400;
   text-transform: uppercase;
@@ -384,7 +354,7 @@ const emit = defineEmits<{
 .no-results {
   text-align: center;
   padding: 3rem;
-  color: #718096;
+  color: rgb(79, 79, 79);
   font-size: 1.125rem;
 }
 

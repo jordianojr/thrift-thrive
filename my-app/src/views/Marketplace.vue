@@ -44,13 +44,17 @@ interface Filters {
   searchTerm: string;
   priceRange: string;
   size: string;
+  gender: string;
+  condition: string;
 }
 
 const categoryChosen = ref('');
 const activeFilters = ref<Filters>({
   searchTerm: '',
   priceRange: '',
-  size: ''
+  size: '',
+  gender: '',
+  condition: ''
 });
 
 const parseData = (selectedCategory: string) => {

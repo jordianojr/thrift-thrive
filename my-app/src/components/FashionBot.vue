@@ -372,7 +372,7 @@ const sendMessage = async () => {
   height: calc(100vh - 75px) !important;
   border-radius: 0 !important;
   border-top: 1px solid black !important;
-  border-right: 1px solid black !important;
+  border-left: 1px solid black !important;
   transform: translateX(-100%);
   transition: transform 0.2s ease-in-out !important;
 }

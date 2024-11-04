@@ -85,12 +85,14 @@ onMounted(() => {
 
 <style scoped>
 .nav-elegant {
+  transition: all 0.3s ease;
+  font-size: 85%;
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
   text-transform: uppercase;
-  font-size: 85%;
+  text-align: center;
+  font-size: 0.8rem;
+  color: black;
 }
 
 .nav-elegant:hover {
