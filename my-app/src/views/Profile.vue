@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div ref="profileRef" class="card col-lg-3 col-12 profile mx-auto" style="width: 18rem;">
-      <div class="card-body">
+      <div class="card-body" style="padding-bottom: 10px;">
         <h4 class="card-title">Your Profile</h4>
         <div v-if="photoURL" class="profile-photo">
           <img :src="photoURL" alt="Profile Photo" />
@@ -11,25 +11,31 @@
         </div>
         <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
         <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
-        <button style="width: 80%; float: inline-end;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-          <i class="bi bi-pencil-square"> Edit Profile </i>
-        </button>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+          <button style="width: 48%;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="bi bi-pencil-square"></i> Edit Profile
+          </button>
+          <button style="width: 48%; margin-left: 10px;" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+            <i class="bi bi-trash"></i> Delete Account
+          </button>
+        </div>
       </div>
     </div>
     <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
-      <Listing></Listing>
+      <Listing />
     </div>
   </div>
   <div style="margin-top: 20px;">
-    <OrderHistory></OrderHistory>
+    <OrderHistory />
   </div>
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">
-            <i class="bi bi-pencil-square"> Edit Profile </i>
+          <h1 class="modal-title fs-5" id="editProfileModalLabel">
+            <i class="bi bi-pencil-square"></i> Edit Profile
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -52,22 +58,57 @@
       </div>
     </div>
   </div>
+
+  <!-- Delete Account Modal -->
+  <div class="modal fade" id="deleteAccountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deleteAccountModalLabel">
+            <i class="bi bi-trash"></i> Delete Account
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          <div class="form-group">
+            <p>Please confirm your email and password for account deletion:</p>
+            <label for="confirmEmail">Email:</label>
+            <input type="email" id="confirmEmail" v-model="confirmEmail" placeholder="Enter your email" required />
+          </div>
+          <div class="form-group">
+            <label for="confirmEmail">Password:</label>
+            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" @click="confirmDeleteAccount">Delete Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import gsap from 'gsap'
+import gsap from 'gsap';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { auth, db, storage } from '../lib/firebaseConfig'; 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'vue-router';
 import Listing from '../components/Listing.vue';
 import OrderHistory from '../components/OrderHistory.vue';
 
+const router = useRouter();
 const userEmail = ref('');
 const name = ref('');
 const photoURL = ref('');
 const profileRef = ref<HTMLElement | null>(null);
 const customColRef = ref<HTMLElement | null>(null);
+const confirmEmail = ref('');
+const confirmPassword = ref('');
 
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -160,32 +201,40 @@ const updateProfile = async () => {
     const userDoc = doc(db, 'users', currentUser.uid);
     const userData = {
       username: name.value,
-      photoURL: photoURL.value,
     };
     await setDoc(userDoc, userData, { merge: true });
-
-    localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify({
-      email: userEmail.value,
-      name: name.value,
-      photoURL: photoURL.value,
-    }));
-
-    alert('Profile updated successfully!');
+    alert('Profile name updated successfully!');
   }
 };
 
+const confirmDeleteAccount = async () => {
+  if (confirmEmail && confirmPassword) {
+    try {
+      await signInWithEmailAndPassword(auth, confirmEmail.value, confirmPassword.value);
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await deleteDoc(doc(db, 'users', currentUser.uid)); // Delete user data from Firestore
+        await currentUser.delete(); // Delete user account
+        localStorage.removeItem(`user_${currentUser.uid}`); // Clear local storage
+        alert('Account deleted successfully. We are sad to see you go!');
+        router.push('/login'); // Redirect to home page
+        location.reload(); // Reload the page
+      }
+    } catch (error) {
+      alert('Error deleting account: ' + error.message);
+    }
+  }
+};
+
+const tl = gsap.timeline({ defaults: { duration: 0.5 } });
 onMounted(() => {
-  gsap.fromTo(profileRef.value, 
-    { x: '-100%', opacity: 0 }, 
-    { x: '0%', opacity: 1, duration: 1, ease: 'power2.out' }
-  );
-
-  gsap.fromTo(customColRef.value, 
-    { x: '100%', opacity: 0 }, 
-    { x: '0%', opacity: 1, duration: 1, ease: 'power2.out' }
-  );
+  if (profileRef.value) {
+    tl.fromTo(profileRef.value, { opacity: 0 }, { opacity: 1 });
+  }
+  if (customColRef.value) {
+    tl.fromTo(customColRef.value, { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, "<");
+  }
 });
-
 </script>
 
 <style scoped>
@@ -207,6 +256,8 @@ h4 {
 }
 
 input[type="text"],
+input[type="email"],
+input[type="password"],
 input[type="file"] {
   width: 100%;
   padding: 10px;
