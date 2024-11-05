@@ -36,11 +36,6 @@
   const fetchProducts = async () => {
     const uid = getUserUID();
     console.log(uid);
-    const cachedProducts = localStorage.getItem('listing');
-  
-    if (cachedProducts) {
-      products.value = JSON.parse(cachedProducts);
-    } else {
       const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
       const fetchedProducts: any[] = [];
   
@@ -56,11 +51,9 @@
         }
   
         products.value = fetchedProducts;
-        localStorage.setItem('listing', JSON.stringify(fetchedProducts));
       } catch (error) {
         console.error('Error fetching products:', error);
       }
-    }
     isLoading.value = false;
   };
   

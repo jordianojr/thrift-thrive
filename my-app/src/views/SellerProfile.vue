@@ -11,9 +11,6 @@
           </div>
           <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
           <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
-          <button style="width: 80%; float: inline-end;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            <i class="bi bi-pencil-square"> Edit Profile </i>
-          </button>
         </div>
       </div>
       <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
@@ -87,7 +84,6 @@
         }
   
         products.value = fetchedProducts;
-        localStorage.setItem('listing', JSON.stringify(fetchedProducts));
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -137,7 +133,7 @@
   }
   
   .profile {
-    height: 470px;
+    height: 100%;
   }
   
   .profile-photo {

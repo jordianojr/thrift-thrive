@@ -11,7 +11,7 @@
         </div>
         <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
         <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
-        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <button style="width: 48%;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             <i class="bi bi-pencil-square"></i> Edit Profile
           </button>
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
-      <Listing />
+      <Listing></Listing>
     </div>
   </div>
   <div style="margin-top: 20px;">
@@ -266,7 +266,7 @@ input[type="file"] {
 }
 
 .profile {
-  height: 470px;
+  height: 100%;
 }
 
 .profile-photo {
