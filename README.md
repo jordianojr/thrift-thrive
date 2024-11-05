@@ -20,5 +20,3 @@ npm start
 ```
 
 You should be able to view this application on localhost:5173
-
-testing testinggggsususujs
