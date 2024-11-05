@@ -52,7 +52,7 @@
           </div>
           <button 
             type="submit" 
-            class="btn btn-outline-elegant text-uppercase px-4 py-2 mt-3 border-2 rounded-pill submit-btn"
+            class="btn btn-outline-elegant text-uppercase px-4 py-2 mt-3 border-2 submit-btn"
             :disabled="!isFormValid || isSubmitting"
           >
             {{ isSubmitting ? 'Posting...' : 'Post' }}
@@ -218,6 +218,12 @@ h3{
 
 .create-post-form {
   background-color: white;
+  margin-top: 1.4rem;
+  color: rgb(25, 25, 25);
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-align: left;
+  font-size: 0.875rem;
 }
 
 .preview-card {
@@ -363,37 +369,24 @@ h5.blog-title {
   cursor: not-allowed;
 }
 
-.submit-btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    120deg, 
-    transparent, 
-    rgba(255,255,255,0.3), 
-    transparent
-  );
-  transition: all 0.6s;
-}
-
-.submit-btn:hover:before {
-  left: 100%;
-}
-
-.btn-outline-elegant {
+.submit-btn {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
+  background-color: black;
   letter-spacing: 1px;
+  color: white;
   transition: all 0.3s ease;
-  border-color: currentColor;
-  font-size: 85%;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.875rem;
 }
 
-.btn-outline-elegant:hover {
-  color: green;
-  transform: scale(1.05);
+.submit-btn:hover {
+  color: black;
+  background-color: white;
+  border: black 1px solid;
 }
+
 </style>
