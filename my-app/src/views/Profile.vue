@@ -270,14 +270,24 @@ input[type="file"] {
 }
 
 .profile-photo {
+  display: flex;
+  justify-content: center; /* Horizontally center the image */
+  align-items: center; /* Vertically center the image (if necessary) */
   margin-top: 15px;
   margin-bottom: 15px;
-  text-align: center;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  margin-left: auto; /* Center the container horizontally */
+  margin-right: auto; /* Center the container horizontally */
 }
 
 .profile-photo img {
-  max-width: 100%;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 50%;
 }
 
@@ -287,12 +297,6 @@ input[type="file"] {
 .card {
   margin-bottom: 20px;
   width: 400px;
-}
-
-.profile-photo img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 50%;
 }
 
 @media (max-width: 1228px) {
