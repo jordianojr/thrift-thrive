@@ -19,4 +19,9 @@ npm install
 npm start
 ```
 
+Open a new terminal to run Stripe API
+```console
+node server.js
+```
+
 You should be able to view this application on localhost:5173
