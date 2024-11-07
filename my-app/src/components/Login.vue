@@ -11,7 +11,7 @@
               class="inputField"
               required
               type="email"
-              placeholder="Your email"
+              placeholder="Email"
               v-model="email"
             />
           </div>
@@ -20,7 +20,7 @@
               class="inputField"
               required
               type="password"
-              placeholder="Your password"
+              placeholder="Password"
               v-model="password"
             />
           </div>
@@ -86,14 +86,19 @@ const handleLogin = async () => {
 
 <style>
 .inputField {
-  width: 100%;   
-  height: 35px;      
-  padding: 12px;      
-  font-size: 16px;    
-  border: 1px solid #000; 
-  border-radius: 4px; 
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 35px;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 0.5px solid #000;
+  border-radius: 0;
   margin: 5px 0;
+}
+
+.inputField:focus {
+  outline: none;
+  border-bottom: 1px solid green;
 }
 
 .buttonBlock {
@@ -101,13 +106,14 @@ const handleLogin = async () => {
   width: 80px;
   height: 30px;
   background-color: white;
-  border: 2px solid black;
+  border: 1px solid black;
   border-radius: 30px;
 }
 
 .buttonBlock:hover {
   scale: 1.1;
   border: none;
+  color: green;
 }
 
 .error {

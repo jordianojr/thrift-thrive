@@ -1,6 +1,6 @@
 <template>
   <div id="top"></div>
-  <div class="row">
+  <div class="row" style="border: 0.5px solid black; padding: 20px;">
     <div ref="greetingRef" class="greetings col-lg-6 col-12">
       <h1 class="green">THRIVE</h1>
       <h3>A new way to shop sustainably</h3>
@@ -115,12 +115,11 @@ const scrollToTop = () => {
   padding-bottom: 20px;
 }
 .green{
-  /* color: hsla(160, 100%, 37%, 1); */
+  /* color: green; */
   font-size: 100px;
 }
 h1 {
-  font-weight: 500;
-  font-size: 2.6rem !important;
+  font-size: 3.6rem !important;
 }
 
 h3 {
@@ -137,6 +136,7 @@ nav a {
   display: inline-block;
   padding: 0 1rem;
   border-left: 1px solid var(--color-border);
+  color: black;
 }
 
 nav a:first-of-type {
@@ -144,7 +144,7 @@ nav a:first-of-type {
 }
 
 nav a.router-link-active {
-  color: var(--color-text) !important;
+  color: green !important;
 }
 
 nav a.router-link-active:hover {
@@ -155,7 +155,7 @@ nav a.router-link-active:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 50px;
+  margin: 30px;
 }
 
 @media (max-width: 768px) {

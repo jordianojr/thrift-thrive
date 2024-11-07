@@ -113,7 +113,7 @@
         <label for="location">Location:</label>
         <input type="text" id="location" v-model="location" placeholder="Enter item location" required />
       </div>
-      <button type="submit" class="btn btn-primary">Sell!</button>
+      <button type="submit" class="btn btn-primary" style="background-color: black;">Sell</button>
     </form>
   </section>
 </template>

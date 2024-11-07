@@ -28,8 +28,8 @@
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
   import { db, auth, storage } from "@/lib/firebaseConfig"; // Adjust the path as necessary
   import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
-  import { ref as storageRef, deleteObject } from 'firebase/storage';
-  
+  import { getStorage, ref as storageRef, listAll, deleteObject } from 'firebase/storage';
+
   const products = ref<any[]>([]);
   const isLoading = ref(true);
   
@@ -66,36 +66,63 @@
   }
 };
   
-  const deleteItem = async (itemId: string) => {
-    const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
-  
-    try {
-      for (const collectionName of collectionsToCheck) {
-        const itemRef = doc(db, collectionName, itemId);
-        await deleteDoc(itemRef);
-      }
-  
-      const photoPath = `item_photos/${itemId}`;
-      const photoRef = storageRef(storage, photoPath);
-      await deleteObject(photoRef);
-  
-      products.value = products.value.filter(product => product.id !== itemId);
-      localStorage.setItem('listing', JSON.stringify(products.value));
-      alert('Item deleted successfully');
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      alert('Error deleting item');
+const deleteItem = async (itemId: string) => {
+  const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+
+  try {
+    // Delete the item from Firestore
+    for (const collectionName of collectionsToCheck) {
+      const itemRef = doc(db, collectionName, itemId);
+      await deleteDoc(itemRef);
     }
-  };
-  
+
+    // Delete the item's photos from Firebase Storage
+    const photoPath = `item_photos/${itemId}`;
+    // const folderRef = storageRef(storage, photoPath);
+
+    // Delete the folder and all its contents
+    await deleteFolder(photoPath);
+
+    // Remove the item from the local products array
+    products.value = products.value.filter(product => product.id !== itemId);
+    localStorage.setItem('listing', JSON.stringify(products.value));
+
+    alert('Item deleted successfully');
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    alert('Error deleting item');
+  }
+};
+
+async function deleteFolder(folderPath: string | undefined) {
+  const storage = getStorage();
+  const folderRef = storageRef(storage, folderPath);
+
+  try {
+    // List all the files in the folder
+    const { items } = await listAll(folderRef);
+
+    // Delete each file in the folder
+    for (const fileRef of items) {
+      await deleteObject(fileRef);
+    }
+
+    // Delete the folder itself
+    // await deleteObject(folderRef);
+
+    console.log(`Folder ${folderPath} and all its contents have been deleted.`);
+  } catch (error) {
+    console.error('Error deleting folder:', error);
+  }
+}  
   onMounted(fetchProducts);
   </script>
   
   <style scoped>
   .container-fluid {
     color: black;
-    background-color: whitesmoke;
-    border-radius: 20px;
+    background-color: #fbfbfb;
+    border-radius: 10px;
     padding-top: 15px;
   }
   .card-subtitle, .card-text {

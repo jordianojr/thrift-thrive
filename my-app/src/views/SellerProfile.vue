@@ -2,7 +2,7 @@
     <div class="row">
       <div ref="profileRef" class="card col-lg-3 col-12 profile mx-auto" style="width: 18rem;">
         <div class="card-body">
-          <h4 class="card-title">Your Profile</h4>
+          <h4 class="card-title">Profile</h4>
           <div v-if="photoURL" class="profile-photo">
             <img :src="photoURL" alt="Profile Photo" />
           </div>
@@ -15,7 +15,7 @@
       </div>
       <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
         <div class="container-fluid">
-        <h3 style="padding-bottom: 10px">Your Listings</h3>
+        <h3 style="padding-bottom: 10px">Listings</h3>
         <Loading :isLoading="isLoading" message="Fetching your products..." />
         <div v-if="!isLoading">
             <div class="row">
@@ -153,7 +153,7 @@
   }
   .card {
     margin-bottom: 20px;
-    width: 400px;
+    width: 100%;
   }
   
   .profile-photo img {
@@ -170,8 +170,8 @@
   }
   .container-fluid {
     color: black;
-    background-color: whitesmoke;
-    border-radius: 20px;
+    background-color: #fbfbfb;
+    border-radius: 10px;
     padding-top: 15px;
   }
   .card-subtitle, .card-text {

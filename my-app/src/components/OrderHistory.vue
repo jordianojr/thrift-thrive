@@ -1,14 +1,14 @@
 <template>
   <div class="container-fluid">
-    <h3 style="padding-bottom: 10px">Order History</h3>
+    <h3 style="padding-bottom: 10px;">Order History</h3>
     <Loading :isLoading="isLoading" message="Fetching your products..." />
     <div v-if="!isLoading">
       <div class="row">
         <div class="col-lg-4 col-md-6 col-sm-12">
           <ul v-for="product in products" :key="product.id">
             <li>
-              <h4 class="card-title">{{ product.itemName }}</h4>
-              <h6 class="card-subtitle text-muted">Sold by: {{ product.userId }}</h6>
+              <h4 class="card-title" style="font-size: 1.2rem;">{{ product.itemName }}</h4>
+              <h6 class="card-subtitle text-muted" style="font-size: 1rem;">Sold by: {{ product.userId }}</h6>
             </li>
           </ul>
         </div>
@@ -109,8 +109,8 @@ onMounted(fetchProducts);
   <style scoped>
   .container-fluid {
     color: black;
-    background-color: whitesmoke;
-    border-radius: 20px;
+    background-color: #fbfbfb;
+    border-radius: 10px;
     padding-top: 15px;
   }
   .card-subtitle, .card-text {

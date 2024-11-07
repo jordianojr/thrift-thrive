@@ -172,7 +172,7 @@ const animateCards = () => {
     onLeaveBack: (batch) => {
       gsap.to(batch, { opacity: 0, y: 50, duration: 0.5, ease: 'power2.out', stagger: 0.15 });
     },
-    start: 'top 50%',
+    start: 'top 60%',
     once: false,
   });
 };
