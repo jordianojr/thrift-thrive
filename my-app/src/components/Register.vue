@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2 class="header">Register</h2>
-    <p class="description">Create a new account!</p>
+    <h2 class="header" style="font-size: 1.6rem;">Register</h2>
+    <p class="description" style="font-size: 1rem !important;">Create a new account!</p>
     <form class="row flex-center flex" @submit.prevent="handleRegister">
       <div class="form-widget">
         <div>
@@ -27,6 +27,7 @@
           <input
             type="submit"
             class="buttonBlock"
+            style="font-size: 0.8rem !important;"
             :value="loading ? 'Loading' : 'Register'"
             :disabled="loading"
           />
@@ -88,10 +89,11 @@ const handleRegister = async () => {
 
 <style>
 .inputField {
-  width: 100%;         
+  width: 100%;   
+  height: 35px;      
   padding: 12px;      
-  font-size: 16px;    
-  border: 1px solid #ccc; 
+  font-size: 1rem;    
+  border: 1px solid #000; 
   border-radius: 4px; 
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   margin: 5px 0;

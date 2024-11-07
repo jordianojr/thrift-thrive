@@ -1,8 +1,8 @@
 <template>
   <div>    
     <div v-if="!isLoggedIn">
-      <h2 class="header">Login</h2>
-      <p class="description">Sign in with your email and password</p>
+      <h2 class="header" style="font-size: 1.6rem;">Login</h2>
+      <p class="description" style="font-size: 1rem !important;">Sign in with your email and password</p>
       <form class="row flex-center flex" @submit.prevent="handleLogin">
         <div class="form-widget">
           <div>
@@ -30,6 +30,7 @@
               v-if="!loading && !isLoggedIn"
               type="submit"
               class="buttonBlock"
+              style="font-size: 0.8rem !important;"
             >
             Sign in!
             </button>
@@ -85,10 +86,11 @@ const handleLogin = async () => {
 
 <style>
 .inputField {
-  width: 100%;         
+  width: 100%;   
+  height: 35px;      
   padding: 12px;      
   font-size: 16px;    
-  border: 1px solid #ccc; 
+  border: 1px solid #000; 
   border-radius: 4px; 
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   margin: 5px 0;
