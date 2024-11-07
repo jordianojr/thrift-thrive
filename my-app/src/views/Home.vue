@@ -1,9 +1,9 @@
 <template>
     <div class="home">
       <section class="display">
-        <div class="men common">
+        <div class="home common">
           <div class="img">
-            <img src="../assets/1.png">
+            <img src="../assets/home.png">
             <div class="img-overlay"></div>
           </div>
           <div class="text">
@@ -14,7 +14,7 @@
             <a href="./marketplace">Shop Now</a>
           </div>
         </div>
-        <div class="women common">
+        <!-- <div class="women common">
           <div class="img">
             <img src="../assets/3.png">
             <div class="img-overlay"></div>
@@ -24,9 +24,9 @@
             <h5>Fashion</h5>
           </div>
           <div class="btn">
-            <a href="./marketplace">Shop Now</a>
+            <a href="./marketplace/Female">Shop Now</a>
           </div>
-        </div>
+        </div> -->
       </section>
       <section class="content">
           <SuggestionPanel />
@@ -87,14 +87,14 @@ const fetchUserData = async () => {
 onMounted(async () => {
   const tl_img = gsap.timeline({ease: "power1.easeInOut"})
 
-  .to(".men .img-overlay", {
+  .to(".home .img-overlay", {
     duration: 1,
     y: "100%"
   })
-  .to(".women .img-overlay", {
-    duration: 1,
-    y: "100%"
-  }, "-=.7")
+  // .to(".women .img-overlay", {
+  //   duration: 1,
+  //   y: "100%"
+  // }, "-=.7")
   .from(".img img", {
     opacity: 0,
     duration: 1,
@@ -148,11 +148,17 @@ template {
 
 .display img {
   width: 100%;
+  height: 700px;
+  object-fit: cover;
+  transition: height 0.3s ease;
 }
 
 .common {
-  width: 50%;
+  width: 100%;
+  height: 700px;
+  object-fit: cover;
   position: relative;
+  transition: height 0.3s ease;
 }
 
 .img {
@@ -217,7 +223,8 @@ template {
 
 /* Media queries for more control */
 @media (max-width: 1200px) {
-  .text h2 {
+  /* You can enable font scaling if desired for smoother typography */
+  /* .text h2 {
     font-size: 3.5vw;
   }
   .text h5 {
@@ -226,11 +233,20 @@ template {
   .btn a {
     font-size: 1.8vw;
     padding: 1.4vw 2.5vw;
+  } */
+  
+  .display img {
+    height: 50vw; /* Adjusted for smoother scaling */
+  }
+
+  .common {
+    height: 50vw;
   }
 }
 
 @media (max-width: 768px) {
-  .text h2 {
+  /* Enable font scaling as needed */
+  /* .text h2 {
     font-size: 3vw;
   }
   .text h5 {
@@ -239,11 +255,20 @@ template {
   .btn a {
     font-size: 1.6vw;
     padding: 1.2vw 2.2vw;
+  } */
+  
+  .display img {
+    height: 60vw;
+  }
+
+  .common {
+    height: 60vw;
   }
 }
 
 @media (max-width: 480px) {
-  .text h2 {
+  /* Enable font scaling as needed */
+  /* .text h2 {
     font-size: 2.5vw;
   }
   .text h5 {
@@ -252,6 +277,13 @@ template {
   .btn a {
     font-size: 1.4vw;
     padding: 1vw 2vw;
+  } */
+  
+  .display img {
+    height: 80vw;
   }
-}
-</style>
+
+  .common {
+    height: 80vw;
+  }
+}</style>

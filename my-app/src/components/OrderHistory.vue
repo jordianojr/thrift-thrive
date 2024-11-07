@@ -1,8 +1,13 @@
 <template>
   <div class="container-fluid">
     <h3 style="padding-bottom: 10px;">Order History</h3>
-    <Loading :isLoading="isLoading" message="Fetching your products..." />
-    <div v-if="!isLoading">
+    <div style="padding-bottom: 20px;">
+        <Loading :isLoading="isLoading" message="Fetching your products..." />
+      </div>
+      <div v-if="!isLoading">
+        <div v-if="products.length === 0" style="padding-bottom: 20px;">
+          <p>You have no purchases yet.</p>
+        </div>
       <div class="row">
         <div class="col-lg-4 col-md-6 col-sm-12">
           <ul v-for="product in products" :key="product.id">

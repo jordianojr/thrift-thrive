@@ -43,7 +43,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/marketplace',
+      path: '/marketplace/:gender?/:searchTerm?',
       name: 'marketplace',
       component: Marketplace,
       meta: { requiresAuth: true },

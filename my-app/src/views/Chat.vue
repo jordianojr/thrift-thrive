@@ -1,14 +1,14 @@
 <template>
-  <div class="container-fluid vh-100 bg-black">
+  <div class="container-fluid vh-100">
     <div class="row h-100">
       <!-- Left Column - Inbox -->
       <div class="col-md-4 col-lg-3 border-end border-secondary p-0">
         <div class="d-flex align-items-center p-3 border-bottom border-secondary">
-          <h5 class="mb-0 text-white">Inbox</h5>
+          <h5 class="mb-0 text-black">Inbox</h5>
           <span class="text-secondary ms-2">({{ unreadCount }} unread)</span>
         </div>
         
-        <div class="chat-list overflow-auto" style="height: calc(100vh - 60px);">
+        <div class="chat-list overflow-auto" style="height: calc(100vh - 60px); background-color: white;">
           <div v-for="chat in chats" :key="chat.id" 
                @click="selectChat(chat)"
                :class="['chat-item p-3 border-bottom border-secondary', 
@@ -18,10 +18,10 @@
                    class="rounded-circle" style="width: 48px; height: 48px;">
               <div class="ms-3 flex-grow-1">
                 <div class="d-flex justify-content-between">
-                  <h6 class="mb-1 text-white">{{ chat.sellerName }}</h6>
+                  <h6 class="mb-1" style="color:black !important">{{ chat.sellerName }} woi</h6>
                   <small class="text-secondary">{{ formatDate(chat.lastMessageTime) }}</small>
                 </div>
-                <p class="mb-1 text-truncate text-white-50">{{ chat.lastMessage }}</p>
+                <p class="mb-1 text-truncate text-black-50">{{ chat.lastMessage }}</p>
                 <div class="d-flex align-items-center">
                   <img :src="chat.itemImage" :alt="chat.itemName" 
                        class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
@@ -41,7 +41,7 @@
             <img :src="selectedChat?.sellerAvatar" alt="" 
                  class="rounded-circle" style="width: 40px; height: 40px;">
             <div class="ms-3">
-              <h6 class="mb-0 text-white">{{ selectedChat?.sellerName || 'Select a chat' }}</h6>
+              <h6 class="mb-0 text-black">{{ selectedChat?.sellerName || 'Select a chat' }}</h6>
               <small class="text-secondary">{{ selectedChat?.itemName }}</small>
             </div>
           </div>
@@ -67,7 +67,7 @@
         <!-- Message Input -->
         <div class="p-3 border-top border-secondary">
           <div class="input-group">
-            <input type="text" class="form-control bg-dark text-white border-secondary" 
+            <input type="text" class="form-control text-white border-secondary" 
                    v-model="newMessage" 
                    @keyup.enter="sendMessage"
                    placeholder="Type a message...">
@@ -234,9 +234,6 @@ watch(messages, () => {
 </script>
 
   <style scoped>
-  .chat-list {
-    background-color: #121212;
-  }
   
   .chat-item {
     cursor: pointer;
@@ -244,11 +241,11 @@ watch(messages, () => {
   }
   
   .chat-item:hover {
-    background-color: #1a1a1a;
+    background-color: rgb(66, 232, 66);
   }
   
   .chat-item.selected {
-    background-color: #1a1a1a;
+    background-color: rgb(66, 232, 66);
   }
   
   .message-content {

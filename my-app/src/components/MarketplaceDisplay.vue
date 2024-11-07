@@ -4,7 +4,10 @@
       <h3 class="category-title">{{ categoryChosen || 'All Products' }}</h3>
     </header>
 
-    <div v-if="!isLoading" class="products-grid">
+    <div v-if="isLoading">
+      <Loading :isLoading="isLoading" message="Fetching drip..." />
+    </div>
+    <div v-else-if="filteredProducts.length > 0" class="products-grid">
       <div v-for="product in filteredProducts" 
            :key="product.id" 
            class="product-card"
@@ -14,9 +17,6 @@
                class="product-image" 
                :alt="product.itemName"
                loading="lazy" />
-          <!-- <div class="product-overlay">
-            <span class="view-details">View Details</span>
-          </div> -->
         </div>
         <div class="product-content">
           <h4 class="product-title">{{ product.itemName }}</h4>
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div v-if="!isLoading && filteredProducts.length === 0" class="no-results">
+    <div v-else-if="!isLoading" class="no-results">
       <p class="noproducts">No matching results. Please try a different search.</p>
     </div>
   </div>
@@ -37,7 +37,8 @@ import { ref, defineProps, onMounted, watch, computed } from 'vue';
 import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { DocumentData } from 'firebase/firestore';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import Loading from '@/components/Loading.vue';
 
 interface Product {
   id: string;
@@ -59,9 +60,10 @@ interface Filters {
   gender: string;
   condition: string;
 }
-
+const route = useRoute();
 const router = useRouter();
-
+const searchBarTerm = route.params.searchTerm as string || '';
+const routeGender = route.params.gender as string || '';
 const props = defineProps<{
   categoryChosen: string;
   activeFilters: Filters;
@@ -69,6 +71,7 @@ const props = defineProps<{
 
 const isLoading = ref(true);
 const products = ref<Product[]>([]);
+const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 
 // Computed property to check if any filters are active
 const hasActiveFilters = computed(() => {
@@ -79,6 +82,13 @@ const hasActiveFilters = computed(() => {
 const filteredProducts = computed(() => {
   let filtered = [...products.value];
 
+  if (searchBarTerm) {
+    const searchLower = searchBarTerm.toLowerCase();
+    filtered = filtered.filter(product => 
+      product.itemName.toLowerCase().includes(searchLower) ||
+      product.description.toLowerCase().includes(searchLower)
+    );
+  }
   // Apply search term filter
   if (props.activeFilters.searchTerm) {
     const searchLower = props.activeFilters.searchTerm.toLowerCase();
@@ -130,25 +140,43 @@ const filteredProducts = computed(() => {
 
 // Function to fetch products from Firestore
 const fetchProducts = async () => {
-  if (!props.categoryChosen) {
+  if (props.categoryChosen) {
+    isLoading.value = true;
+    try {
+      const querySnapshot = await getDocs(collection(db, props.categoryChosen));
+      products.value = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+        id: doc.id,
+        ...doc.data()
+      } as Product));
+      console.log(products.value);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      products.value = [];
+    } finally {
+      isLoading.value = false;
+    }
+  } else {
     products.value = [];
-    isLoading.value = false;
-    return;
-  }
+    isLoading.value = true;
+    console.log(routeGender, searchBarTerm);
 
-  isLoading.value = true;
-  try {
-    const querySnapshot = await getDocs(collection(db, props.categoryChosen));
-    products.value = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-      id: doc.id,
-      ...doc.data()
-    } as Product));
-    console.log(products.value);
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    products.value = [];
-  } finally {
-    isLoading.value = false;
+    try {
+      const allProducts: Product[] = [];
+      for (const category of categories) {
+        const querySnapshot = await getDocs(collection(db, category));
+        const categoryProducts = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+          id: doc.id,
+          ...doc.data()
+        } as Product));
+        allProducts.push(...categoryProducts);
+      }
+      products.value = allProducts;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      products.value = [];
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 

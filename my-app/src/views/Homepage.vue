@@ -4,11 +4,11 @@
       <Navbar @select="handleSelect" />
       <ProgressBar />
 
-      <section class="hero">
+      <!-- <section class="hero">
         <div ref="searchBarContainer" class="search-bar-container">
           <SearchBar @search="handleSearch" />
         </div>
-      </section>
+      </section> -->
     </div>
 
     <div :class="['view', isHome ? 'home-view' : 'default-view']">

@@ -1,9 +1,15 @@
 <template>
     <div class="container-fluid">
       <h3 style="padding-bottom: 10px">Your Listings</h3>
-      <Loading :isLoading="isLoading" message="Fetching your products..." />
+      <div style="padding-bottom: 20px;">
+        <Loading :isLoading="isLoading" message="Fetching your products..." />
+      </div>
       <div v-if="!isLoading">
-        <div class="row">
+        <div v-if="products.length === 0" style="padding-bottom: 20px;">
+          <p>You have no listing yet.</p>
+          <router-link to="/sell" class="btn btn-dark">Sell Item</router-link>
+        </div>
+        <div v-else class="row">
           <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
             <div class="card mb-4">
               <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">

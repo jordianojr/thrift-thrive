@@ -4,7 +4,6 @@
         class = "inputBar"
         type="text"
         v-model="query"
-        @input="onSearch"
         placeholder="Search..."
       />
       <button id = "buttonSearch" @click="submitSearch">Search</button>
@@ -12,23 +11,27 @@
   </template>
   
   <script lang="ts">
-  export default {
+  import { useRouter } from 'vue-router';
+  import { defineComponent } from 'vue';
+  
+  export default defineComponent({
     data() {
       return {
         query: '',
       };
     },
+    setup() {
+      const router = useRouter();
+      return { router };
+    },
     methods: {
-      onSearch() {
-        this.$emit('search', this.query);
-      },
       submitSearch() {
-        this.query = '';
-        this.onSearch();
+        this.router.push({ name: 'marketplace', params: { searchTerm: this.query } });
       },
     },
-  };
+  });
   </script>
+  
   
   <style scoped>
   .container-fluid{

@@ -1,6 +1,6 @@
 <template>
   <div id="top"></div>
-  <div class="row" style="border: 0.5px solid black; padding: 20px;">
+  <div class="row" style="border-bottom: 1px solid #333; padding: 20px;">
     <div ref="greetingRef" class="greetings col-lg-6 col-12">
       <h1 class="green">THRIVE</h1>
       <h3>A new way to shop sustainably</h3>

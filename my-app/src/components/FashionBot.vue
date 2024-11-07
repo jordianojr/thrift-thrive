@@ -24,7 +24,11 @@
         <div class="header-content">
           <p style="opacity: 0;">ab</p>
           <h5 id="fashionBotOffcanvasLabel">STYLEBOT</h5>
-          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16" @click="handleOverlayClick" style="cursor: pointer;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16" 
+          type="button"      
+          data-bs-toggle="offcanvas"
+          data-bs-target="#fashionBotOffcanvas"
+          aria-controls="fashionBotOffcanvas">
           <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
           </svg>
         </div>
@@ -130,16 +134,6 @@ const handleOffcanvasShow = () => {
 
 const handleOffcanvasHide = () => {
   isOffcanvasOpen.value = false;
-};
-
-const handleOverlayClick = () => {
-  const offcanvas = document.getElementById('fashionBotOffcanvas');
-  if (offcanvas) {
-    offcanvas.classList.remove('show');
-    document.body.classList.remove('offcanvas-open');
-    // Trigger the hide.bs.offcanvas event handler
-    handleOffcanvasHide();
-  }
 };
 
 const scrollToBottom = () => {
