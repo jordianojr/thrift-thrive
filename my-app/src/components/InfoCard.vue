@@ -10,7 +10,7 @@
             <p class="event-description">{{ event.description }}</p>
           </li>
         </ul>
-        <button @click="openGoogleMapsDirections" class="submit-btn btn text-uppercase py-2 border-2">
+        <button @click="openGoogleMapsDirections" class="submit-btn btn text-uppercase py-2">
           Get Directions
         </button>
       </div>
@@ -41,7 +41,7 @@
             <label for="eventDescription" class="form-label">Description</label>
             <textarea v-model="newEvent.description" class="form-control" id="eventDescription" required></textarea>
           </div>
-          <button type="submit" class="submit-btn btn text-uppercase py-2 border-2">Add Event</button>
+          <button type="submit" class="submit-btn btn text-uppercase py-2">Add Event</button>
         </form>
     </div>
   </div>

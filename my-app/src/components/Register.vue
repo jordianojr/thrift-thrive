@@ -1,7 +1,6 @@
 <template>
   <div>
-    <h2 class="header" style="font-size: 1.6rem;">Register</h2>
-    <p class="description" style="font-size: 1rem !important;">Create a new account!</p>
+    <h2 class="header">Register</h2>
     <form class="row flex-center flex" @submit.prevent="handleRegister">
       <div class="form-widget">
         <div>
@@ -26,8 +25,7 @@
         <div>
           <input
             type="submit"
-            class="buttonBlock"
-            style="font-size: 0.8rem !important;"
+            class="btn submit-btn py-2"
             :value="loading ? 'Loading' : 'Register'"
             :disabled="loading"
           />
@@ -104,26 +102,37 @@ const handleRegister = async () => {
   border-bottom: 1px solid green;
 }
 
-.buttonBlock {
-  float: inline-end;
-  width: 80px;
-  height: 30px;
-  background-color: white;
-  border: 1px solid black;
-  border-radius: 30px;
+.submit-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black !important;
+  letter-spacing: 1px;
+  color: white !important;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
 }
 
-.buttonBlock:hover {
-  scale: 1.1;
-  border: none;
-  color: green;
+.submit-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
 }
 
 .error {
   color: red; /* Style for error message */
   margin-top: 10px;
 }
-h2, p {
+.header{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 1.2rem !important;
   color: black;
 }
 </style>

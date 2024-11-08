@@ -3,10 +3,10 @@
   <div class="row" style="border-bottom: 1px solid #333; padding: 20px;">
     <div ref="greetingRef" class="greetings col-lg-6 col-12">
       <h1 class="green">THRIVE</h1>
-      <h3>A new way to shop sustainably</h3>
+      <h3>A new way to thrift</h3>
       <nav>
-        <RouterLink to="/login" style="font-size: 0.9rem;">Login</RouterLink>
-        <RouterLink to="/register" style="font-size: 0.9rem;">Register</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
+        <RouterLink to="/register">Register</RouterLink>
       </nav>
     </div>
     
@@ -16,8 +16,8 @@
   </div>
   <div>
     <div style="text-align: center;">
-      <h2>Timeless Style, Reimagined: Curated Thrift Fashion</h2>
-      <p>Scroll down to discover a curated collection of secondhand fashion that tells its own story.</p> 
+      <!-- <h2>Curated Thrift Fashion</h2> -->
+      <h2 class="desc">Secondhand Fashion<br> curated by thrive.</h2> 
     </div> 
     <Editorial />
     <div style="text-align: center; padding-bottom: 20px;">
@@ -118,18 +118,49 @@ const scrollToTop = () => {
   /* color: green; */
   font-size: 100px;
 }
+
+
 h1 {
-  font-size: 3.6rem !important;
+  background: none;
+  border: none;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 3.6rem !important; 
 }
 
 h3 {
-  font-size: 1rem;
-  color: rgb(151, 151, 151);
+  background: none;
+  border: none;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 1rem !important; 
+}
+
+p{
+  background: none;
+  border: none;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.desc{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 1.2rem !important;
+  color: black;
+  margin-top: 60px;
 }
 
 nav {
-  margin-top: 2rem;
-  font-size: 1rem;
+  margin-top: 1.6rem;
+  font-size: 0.9rem;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
 }
 
 nav a {

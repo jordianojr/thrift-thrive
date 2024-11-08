@@ -26,7 +26,6 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute } from 'vue-router';
 import gsap from "gsap";
 import Navbar from "@/components/Navbar.vue";
-import SearchBar from '@/components/SearchBar.vue';
 import FashionBot from '@/components/FashionBot.vue';
 import router from "@/router";
 import ProgressBar from '@/components/ProgressBar.vue';
@@ -113,7 +112,7 @@ onMounted(() => {
 
 /* Style for other routes */
 .default-view {
-  padding: 130px 50px 50px 50px;
+  padding: 130px 20px 50px 20px;
 }
 
 .constant {
@@ -124,19 +123,6 @@ onMounted(() => {
   z-index: 1000; /* Ensure the navbar is on top */
   background-color: white;
   width: 100%;
-}
-
-.search-bar-container {
-  position: absolute;
-  width: 100%;
-  top: 1; /* Will slide down from the top */
-  left: 0;
-  right: 0;
-  z-index: -1; /* Ensure it's below the navbar */
-}
-
-.constant:hover .search-bar-container {
-  z-index: 999; /* Bring the search bar on hover */
 }
 
 .floating-bot {

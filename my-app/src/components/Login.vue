@@ -1,8 +1,7 @@
 <template>
   <div>    
     <div v-if="!isLoggedIn">
-      <h2 class="header" style="font-size: 1.6rem;">Login</h2>
-      <p class="description" style="font-size: 1rem !important;">Sign in with your email and password</p>
+      <h2 class="header">Login</h2>
       <form class="row flex-center flex" @submit.prevent="handleLogin">
         <div class="form-widget">
           <div>
@@ -29,14 +28,13 @@
             <button
               v-if="!loading && !isLoggedIn"
               type="submit"
-              class="buttonBlock"
-              style="font-size: 0.8rem !important;"
+              class="btn submit-btn py-2"
             >
             Sign in!
             </button>
             <router-link
               v-else-if="isLoggedIn"
-              class="buttonBlock"
+              class="btn submit-btn py-2"
               :to="{ name: 'home' }"
             >
               Go to Home
@@ -94,6 +92,9 @@ const handleLogin = async () => {
   border-bottom: 0.5px solid #000;
   border-radius: 0;
   margin: 5px 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  color: black;
 }
 
 .inputField:focus {
@@ -101,26 +102,38 @@ const handleLogin = async () => {
   border-bottom: 1px solid green;
 }
 
-.buttonBlock {
-  float: inline-end;
-  width: 80px;
-  height: 30px;
-  background-color: white;
-  border: 1px solid black;
-  border-radius: 30px;
+.submit-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black !important;
+  letter-spacing: 1px;
+  color: white !important;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
 }
 
-.buttonBlock:hover {
-  scale: 1.1;
-  border: none;
-  color: green;
+.submit-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
 }
 
 .error {
   color: red; /* Style for error message */
   margin-top: 10px;
 }
-.header, .description {
+
+.header{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 1.2rem !important;
   color: black;
 }
 
