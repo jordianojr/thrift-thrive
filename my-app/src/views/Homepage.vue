@@ -11,7 +11,7 @@
       </section> -->
     </div>
 
-    <div :class="['view', isHome ? 'home-view' : 'default-view']">
+    <div style="margin-top: 74px;":class="['view', isHome ? 'home-view' : 'default-view']">
       <RouterView />
     </div>
 
@@ -105,15 +105,6 @@ onMounted(() => {
   width: 100%;
 }
 
-/* Style for '/home' route */
-.home-view {
-  padding: 0px;
-}
-
-/* Style for other routes */
-.default-view {
-  padding: 130px 20px 50px 20px;
-}
 
 .constant {
   position: fixed;
@@ -130,5 +121,11 @@ onMounted(() => {
   bottom: 20px; /* Adjust as needed */
   right: 20px; /* Adjust as needed */
   z-index: 1001; /* Ensure it's above everything else */
+}
+
+@media (max-width: 480px) {
+  .default-view {
+  padding: 0px 0px 50px 0px;
+}
 }
 </style>

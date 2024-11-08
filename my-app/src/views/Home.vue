@@ -1,7 +1,7 @@
 <template>
-    <div class="home">
+    <div>
       <section class="display">
-        <div class="home common">
+        <div class="common">
           <div class="img">
             <img src="../assets/home.png">
             <div class="img-overlay"></div>

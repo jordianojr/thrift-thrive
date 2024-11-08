@@ -74,9 +74,10 @@ const handleFilters = (filters: Filters) => {
   min-height: 100vh;
 }
 
+
 .sidebar-section {
   position: sticky;
-  top: 0;
+  top: -22px;
   left: 0;
   width: 20%; /* Adjust the width as needed */
   height: 100vh;
@@ -93,6 +94,7 @@ const handleFilters = (filters: Filters) => {
 .display-section {
   flex: 1;
   padding: 0rem;
+  overflow-y: auto; /* Add this to enable independent scrolling */
 }
 
 .desktop-layout {
@@ -102,6 +104,7 @@ const handleFilters = (filters: Filters) => {
 .mobile-layout {
   display: none;
 }
+
 
 @media (max-width: 480px) {
   .desktop-layout {

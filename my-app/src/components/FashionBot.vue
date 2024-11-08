@@ -473,7 +473,7 @@ h5 {
 }
 
 .user-message {
-  background-color: #58ea5d;
+  background-color: black;
   color: white;
   padding: 12px 15px;
   border-radius: 20px;

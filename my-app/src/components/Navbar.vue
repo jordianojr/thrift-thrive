@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom border-secondary">
     <div class="container-fluid">
       <router-link class="navbar-brand mx-3" to="/">Thrive</router-link>
       <button 

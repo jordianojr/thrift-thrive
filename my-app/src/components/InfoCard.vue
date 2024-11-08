@@ -166,9 +166,8 @@ onMounted(() => {
 .info-card {
   padding: 20px;
   font-family: 'Helvetica Neue', sans-serif;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 1px black solid;
   background: white;
-  border-radius: 1rem;
   overflow: hidden;
 }
 
@@ -176,7 +175,6 @@ onMounted(() => {
   list-style-type: none;
   margin-top: 10px;
   padding: 0rem;
-
 }
 
 .event-item {

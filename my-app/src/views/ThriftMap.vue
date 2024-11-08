@@ -1,9 +1,9 @@
 <template>
-  <div style="margin-bottom: 43px">
+  <div style="padding-top: 45px; padding-bottom: 45px; border-bottom: black solid 1px;">
       <h3 class="title">Thrift & Vintage Stores in Singapore</h3>
   </div>
-  <div class="row">
-    <div class="col-12 col-lg-8 col-xl-8 col-xxl-8" style="margin-bottom: 20px;">
+  <div class="row g-0">
+    <div class="col-12 col-lg-8 col-xl-8 col-xxl-8">
       <div ref="mapContainer" class="map-container"></div>
     </div>
     <div class="col-12 col-lg-4 col-xl-4 col-xxl-4" v-if="firstClick">
@@ -58,62 +58,78 @@ const initMap = () => {
     center: { lat: 1.2956, lng: 103.8542 },
     zoom: 13,
     styles: [
-        {
-          // Apply your custom styles here
-          featureType: 'all',
-          elementType: 'all',
-          stylers: [
-            { saturation: -20 },
-            { lightness: 20 },
-            { visibility: 'simplified' },
-          ],
-        },
-        {
+      {
+        elementType: "geometry",
+        stylers: [{ color: "#f5f5f5" }]
+      },
+      {
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#616161" }]
+      },
+      {
+        elementType: "labels.text.stroke",
+        stylers: [{ color: "#f5f5f5" }]
+      },
+      {
+        featureType: "administrative.land_parcel",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#bdbdbd" }]
+      },
+      {
+        featureType: "poi",
+        elementType: "geometry",
+        stylers: [{ color: "#eeeeee" }]
+      },
+      {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }]
+      },
+      {
         featureType: "road",
         elementType: "geometry",
-        stylers: [
-          { color: "#595959" },
-          { lightness: 80 }
-        ],
+        stylers: [{ color: "#ffffff" }]
       },
       {
         featureType: "road.arterial",
         elementType: "labels.text.fill",
-        stylers: [{ color: "#757575" }],
+        stylers: [{ color: "#757575" }]
       },
       {
         featureType: "road.highway",
         elementType: "geometry",
-        stylers: [{ color: "#dadada" }],
+        stylers: [{ color: "#dadada" }]
       },
       {
         featureType: "road.highway",
         elementType: "labels.text.fill",
-        stylers: [{ color: "#616161" }],
+        stylers: [{ color: "#616161" }]
       },
       {
         featureType: "road.local",
         elementType: "labels.text.fill",
-        stylers: [{ color: "#9e9e9e" }],
+        stylers: [{ color: "#9e9e9e" }]
       },
-        {
-          featureType: 'all',
-          elementType: 'labels.text.fill',
-          stylers: [
-            { color: '#464646' } // Set label text color to white
-          ]
-        },
-        {
-          featureType: 'poi',
-          elementType: 'all',
-          stylers: [
-            { visibility: 'off' } // Hide all points of interest
-          ]
-        },
-      ],
+      {
+        featureType: "transit.line",
+        elementType: "geometry",
+        stylers: [{ color: "#e5e5e5" }]
+      },
+      {
+        featureType: "water",
+        elementType: "geometry",
+        stylers: [{ color: "#e9e9e9" }]
+      },
+      {
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#9e9e9e" }]
+      }
+    ]
   };
 
   const map = new google.maps.Map(mapContainer.value, mapOptions);
+  let activeMarker: google.maps.Marker | null = null;
 
   // Place markers on the map using locations from Firestore
   markerLocations.value.forEach((location) => {
@@ -121,6 +137,14 @@ const initMap = () => {
       position: { lat: location.lat, lng: location.lng },
       map: map,
       title: location.title,
+      icon: {
+      path: "M7.5 0C5.068 0 2.23 1.486 2.23 5.27c0 2.568 4.054 7.95 5.27 9.408c.162.196.413.322.697.322c.283 0 .534-.126.696-.322c1.216-1.458 5.27-6.84 5.27-9.408C14.163 1.487 11.327 0 8.893 0H7.5z",
+      scale: 1.5,
+      fillColor: '#000000',
+      fillOpacity: 1,
+      strokeWeight: 1,
+      strokeColor: '#000000',
+      }
     });
 
     const infoWindow = new google.maps.InfoWindow({
@@ -129,6 +153,27 @@ const initMap = () => {
 
     marker.addListener("click", () => {
       firstClick.value = true;
+
+      if (activeMarker) {
+        activeMarker.setIcon({
+          path: "M7.5 0C5.068 0 2.23 1.486 2.23 5.27c0 2.568 4.054 7.95 5.27 9.408c.162.196.413.322.697.322c.283 0 .534-.126.696-.322c1.216-1.458 5.27-6.84 5.27-9.408C14.163 1.487 11.327 0 8.893 0H7.5z",
+          scale: 1.5,
+          fillColor: '#000000',
+          fillOpacity: 1,
+          strokeWeight: 1,
+          strokeColor: '#000000',
+        });
+      }
+      marker.setIcon({
+        path: "M7.5 0C5.068 0 2.23 1.486 2.23 5.27c0 2.568 4.054 7.95 5.27 9.408c.162.196.413.322.697.322c.283 0 .534-.126.696-.322c1.216-1.458 5.27-6.84 5.27-9.408C14.163 1.487 11.327 0 8.893 0H7.5z",
+        scale: 1.5,
+        fillColor: '#FF0000',
+        fillOpacity: 1,
+        strokeWeight: 1,
+        strokeColor: '#FF0000',
+      });
+      activeMarker = marker;
+
       if (currentInfoWindow) {
         currentInfoWindow.close();
       }
@@ -161,11 +206,11 @@ onMounted(async () => {
 .map-container {
   height: 100%;
   width: 100%;
-  border-radius: 15px;
 }
 
 .row {
   height: 100vh;
+  margin: 0;
 }
 
 .title {
@@ -175,24 +220,14 @@ onMounted(async () => {
     text-align: center;
     font-size: 1.9rem;
     color: black;
-    margin-bottom: 1.1rem;
+    margin: 0;
   }
 
 @media screen and (max-width: 991px) {
   .map-container {
     width: 100%;
     height: 400px;
-    margin: auto;
+    margin: 0;
   }
 }
-
-.title {
-    font-family: 'Helvetica Neue', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 1.9rem;
-    color: black;
-    margin-bottom: 1.1rem;
-  }
 </style>

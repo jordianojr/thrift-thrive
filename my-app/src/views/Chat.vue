@@ -1,25 +1,25 @@
 <template>
   <div class="chat-container">
-    <div class="container-fluid vh-100">
+    <div class="container-fluid h-100">
       <div class="row h-100 chat-wrapper">
         <!-- Left Column - Inbox -->
-        <div class="col-md-4 col-lg-3 border-end border-secondary p-0">
-          <div class="d-flex align-items-center p-3 border-bottom border-secondary">
-            <h5 class="mb-0 text-black">Inbox</h5>
-            <span class="text-secondary ms-2">({{ unreadCount }} unread)</span>
+        <div class="col-md-4 col-lg-3 p-0 border-end border-secondary">
+          <div class="d-flex align-items-center p-3 border-bottom border-secondary topbar">
+            <h5 class="chat-header m-0">Inbox</h5>
+            <span class="chat-header text-secondary ms-2">({{ unreadCount }} unread)</span>
           </div>
           
           <div class="chat-list">
             <div v-for="chat in chatsWithSellerInfo" :key="chat.id" 
                 @click="selectChat(chat)"
                 :class="['chat-item p-3 border-bottom border-secondary', 
-                          selectedChatId === chat.id ? 'selected' : '']">
+                          selectedChatId === chat.id ? 'bg-black text-white' : '']">
               <div class="d-flex">
                 <img :src="chat.sellerAvatar" :alt="chat.sellerName" 
                     class="rounded-circle" style="width: 48px; height: 48px;">
                 <div class="ms-3 flex-grow-1">
                   <div class="d-flex justify-content-between">
-                    <h6 class="mb-1" style="color:black !important">{{ chat.sellerName }}</h6>
+                    <h6 class="mb-1 text-black">{{ chat.sellerName }}</h6>
                     <small class="text-secondary">{{ formatDate(chat.lastMessageTime) }}</small>
                   </div>
                   <p class="mb-1 text-truncate text-black-50" style="width: 100%">{{ chat.lastMessage }}</p>
@@ -37,12 +37,12 @@
         <!-- Right Column - Chat -->
         <div class="col-md-8 col-lg-9 p-0 d-flex flex-column">
           <!-- Chat Header -->
-          <div class="p-3 border-bottom border-secondary chat-header">
+          <div class="p-3 border-bottom border-secondary chat-header topbar">
             <div class="d-flex align-items-center">
               <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt="" 
                   class="rounded-circle" style="width: 40px; height: 40px;">
               <div class="ms-3">
-                <h6 class="mb-0 text-black">{{ selectedChat?.sellerName || 'Select a chat' }}</h6>
+                <h5 class="mb-0 text-black">{{ selectedChat?.sellerName || 'Select a chat' }}</h5>
                 <small class="text-secondary">{{ selectedChat?.itemName }}</small>
               </div>
             </div>
@@ -54,13 +54,12 @@
               No messages yet. Start the conversation!
             </div>
             <div v-for="message in messages" :key="message.id" 
-                :class="['message mb-3 d-flex', 
+                :class="['message mb-3', 
                           message.senderId === userId ? 'justify-content-end' : 'justify-content-start']">
               <div :class="['message-content p-3 rounded', 
-                          message.senderId === userId ? 'bg-primary' : 'bg-secondary']"
-                  style="max-width: 70%;">
-                <p class="mb-1 text-white">{{ message.content }}</p>
-                <small class="text-white-50">{{ formatDate(message.timestamp) }}</small>
+                          message.senderId === userId ? 'bg-58ea5d text-white' : 'bg-f8f8f8']">
+                <p class="mb-1">{{ message.content }}</p>
+                <small class="text-secondary">{{ formatDate(message.timestamp) }}</small>
               </div>
             </div>
           </div>
@@ -285,24 +284,26 @@ watch(messages, () => {
 <style scoped>
 .chat-container {
   background-color: #f5f5f5;
-  min-height: 100vh;
-  max-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.topbar{
+  height: 70px;
+}
+
 .chat-wrapper {
   background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
-  height: calc(100vh - 32px);
+  height: 90%;
   overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .chat-list {
-  height: calc(100vh - 76px);
+  height: calc(100% - 70px);
   overflow-y: auto;
   background-color: white;
 }
@@ -311,11 +312,20 @@ watch(messages, () => {
   padding: 1rem;
   overflow-y: auto;
   flex-grow: 1;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-align: left;
+  font-size: 0.9rem;
+  border-radius: 20px;
 }
 
 .chat-header {
-  border-bottom: 1px solid #ddd;
   flex-shrink: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 0.875rem;
 }
 
 .chat-input {
@@ -325,16 +335,36 @@ watch(messages, () => {
 
 .chat-item {
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 0.8rem;
+  height: 140px;
 }
 
 .chat-item:hover,
-.chat-item.selected {
-  background-color: rgb(66, 232, 66);
+.chat-item.bg-black {
+  background-color: black;
+  color: white;
+}
+
+.message {
+  display: flex;
 }
 
 .message-content {
   word-break: break-word;
+  max-width: 70%;
+}
+
+.bg-58ea5d {
+  background-color: black;
+}
+
+.bg-f8f8f8 {
+  background-color: #f8f8f8;
 }
 
 /* Custom scrollbar */
