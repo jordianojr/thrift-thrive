@@ -567,6 +567,7 @@ const handleChoice = (category: string) => {
 .option-button.selected {
   color: green;
   border-color: green;
+  text-decoration: underline;
 }
 
 /* Hover States */
