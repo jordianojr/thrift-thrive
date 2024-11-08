@@ -63,7 +63,8 @@ const handleRegister = async () => {
       rating: 0, // Initialize the rating to 0
       reviews: [], // Initialize an empty reviews array
       role: 'user', // Set the role to 'user'
-      likedItems: [], // Initialize an empty liked items array
+      salesHistory: [], // Initialize an empty liked items array
+      userPosts: [], // Initialize an empty user posts array
     }
     alert("Registration is successful!");
     router.push('/home');

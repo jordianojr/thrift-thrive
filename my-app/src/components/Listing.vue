@@ -73,6 +73,14 @@
 };
   
 const deleteItem = async (itemId: string) => {
+  // Show confirmation dialog
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  
+  if (!confirmDelete) {
+    // User chose "Cancel," exit the function
+    return;
+  }
+
   const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 
   try {
@@ -84,9 +92,6 @@ const deleteItem = async (itemId: string) => {
 
     // Delete the item's photos from Firebase Storage
     const photoPath = `item_photos/${itemId}`;
-    // const folderRef = storageRef(storage, photoPath);
-
-    // Delete the folder and all its contents
     await deleteFolder(photoPath);
 
     // Remove the item from the local products array
@@ -99,7 +104,6 @@ const deleteItem = async (itemId: string) => {
     alert('Error deleting item');
   }
 };
-
 async function deleteFolder(folderPath: string | undefined) {
   const storage = getStorage();
   const folderRef = storageRef(storage, folderPath);

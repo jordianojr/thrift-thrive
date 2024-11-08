@@ -9,14 +9,12 @@
           <p>You have no purchases yet.</p>
         </div>
       <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12">
           <ul v-for="product in products" :key="product.id">
             <li>
               <h4 class="card-title" style="font-size: 1.2rem;">{{ product.itemName }}</h4>
-              <h6 class="card-subtitle text-muted" style="font-size: 1rem;">Sold by: {{ product.userId }}</h6>
+              <h6 class="card-subtitle text-muted" style="font-size: 1rem;">Sold by: {{ product.sellerUserName }}</h6>
             </li>
           </ul>
-        </div>
       </div>
     </div>
   </div>

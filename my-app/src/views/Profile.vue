@@ -11,6 +11,22 @@
         </div>
         <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
         <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
+        <p class="card-text" style="color: black"><strong>Rating: </strong> {{ rating }}
+          <span v-for="n in 5" :key="n">
+            <i 
+              :class="{
+                'bi-star-fill': n <= rating, 
+                'bi-star': n > rating
+              }" 
+              style="color: black; font-size: 1.2rem;">
+            </i>
+          </span>
+          </p>
+          <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button style="width: 100%; background-color: black; color: white; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewReviewModal">
+              <i class="bi bi-review"></i> View Reviews
+            </button>
+          </div>
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <button style="width: 48%; background-color: white; color: black; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             <i class="bi bi-pencil-square"></i> Edit Profile
@@ -19,15 +35,24 @@
             <i class="bi bi-trash"></i> Delete Account
           </button>
         </div>
+        <div>
+          <router-link to="/edit-post" class="text-center" style="color: black;"><p>Edit your posts</p></router-link>
+        </div>
       </div>
     </div>
     <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
       <Listing></Listing>
     </div>
   </div>
-  <div style="margin-top: 20px;">
-    <OrderHistory />
+  <div class="row" style="margin-top: 20px;">
+    <div class="col-6">
+      <OrderHistory />
+    </div>
+    <div class="col-6">
+      <SalesHistory />
+    </div>
   </div>
+
   
   <!-- Edit Profile Modal -->
   <div class="modal fade" id="editProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
@@ -88,6 +113,33 @@
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="viewReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editProfileModalLabel">
+            <i class="bi bi-journal-text"></i> User Reviews
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div v-if="reviews.length === 0">
+            <p>No reviews yet.</p>
+          </div>
+          <div v-else >
+            <ol>
+              <li v-for="review in reviews"> {{ review }}</li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -100,6 +152,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 import Listing from '../components/Listing.vue';
 import OrderHistory from '../components/OrderHistory.vue';
+import SalesHistory from '../components/SalesHistory.vue';
 
 const router = useRouter();
 const userEmail = ref('');
@@ -109,6 +162,9 @@ const profileRef = ref<HTMLElement | null>(null);
 const customColRef = ref<HTMLElement | null>(null);
 const confirmEmail = ref('');
 const confirmPassword = ref('');
+
+const rating = ref(0);
+const reviews = ref<any[]>([]);
 
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -139,6 +195,8 @@ const fetchUserData = async (uid: string) => {
     userEmail.value = userData.email || '';
     name.value = userData.username || '';
     photoURL.value = userData.photoURL || '';
+    rating.value = userData.rating || 0;
+    reviews.value = userData.reviews || [];
 
     // Update local storage
     localStorage.setItem(`user_${uid}`, JSON.stringify({

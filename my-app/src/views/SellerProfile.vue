@@ -11,6 +11,27 @@
           </div>
           <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
           <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
+          <p class="card-text" style="color: black"><strong>Rating: </strong> {{ rating }}
+          <span v-for="n in 5" :key="n">
+            <i 
+              :class="{
+                'bi-star-fill': n <= rating, 
+                'bi-star': n > rating
+              }" 
+              style="color: black; font-size: 1.2rem;">
+            </i>
+          </span>
+          </p>
+          <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <button style="width: 100%; background-color: white; color: black; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#giveReviewModal">
+            <i class="bi bi-review"></i> Review User
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <button style="width: 100%; background-color: black; color: white; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewReviewModal">
+            <i class="bi bi-review"></i> View Reviews
+          </button>
+        </div>
         </div>
       </div>
       <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
@@ -35,13 +56,72 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="giveReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="giveReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editProfileModalLabel">
+            <i class="bi bi-pen-fill"></i> Review User
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="submitReview">
+            <div>
+              <label for="reviewRating" class="form-label">Rating</label>
+              <div class="stars">
+                <span v-for="n in 5" :key="n" @click="setRating(n)" :class="{'bi-star-fill': n <= reviewRating, 'bi-star': n > reviewRating}" style="color: black; font-size: 1.5rem; cursor: pointer;"></span>
+              </div>
+            <!-- Review Text Area -->
+              <div>
+                <label for="reviewText" class="form-label">Review</label>
+                <textarea id="reviewText" v-model="reviewText" class="form-control" rows="3" placeholder="Write your review..."></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-dark">Submit Review</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="viewReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editProfileModalLabel">
+            <i class="bi bi-journal-text"></i> User Reviews
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div v-if="reviews.length === 0">
+            <p>No reviews yet.</p>
+          </div>
+          <div v-else >
+            <ol>
+              <li v-for="review in reviews"> {{ review }}</li>
+            </ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </template>
   
   <script setup lang="ts">
   import gsap from 'gsap'
   import { ref, onMounted } from 'vue';
   import { db } from '../lib/firebaseConfig'; 
-  import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+  import { doc, getDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore';
   import { useRoute } from 'vue-router';
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
   
@@ -54,6 +134,10 @@
   const customColRef = ref<HTMLElement | null>(null);
   const products = ref<any[]>([]);
   const isLoading = ref(true);
+  const rating = ref(0);
+  const reviews = ref<any[]>([]);
+  const reviewRating = ref(0);
+  const reviewText = ref('');
 
   const fetchUserData = async (uid: string) => {
     const userDoc = doc(db, 'users', uid);
@@ -64,8 +148,56 @@
       userEmail.value = userData.email || '';
       name.value = userData.username || '';
       photoURL.value = userData.photoURL || '';
+      rating.value = userData.rating || 0;
+      reviews.value = userData.reviews || [];
     }
   };
+
+  const setRating = (ratingValue: number) => {
+    reviewRating.value = ratingValue;
+  };
+
+  // Submit the review
+  async function updateUserReview(userId: string, review: string, rating: number) {
+  const userDoc = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userDoc);
+
+  if (userSnapshot.exists()) {
+    const userData = userSnapshot.data();
+    const updatedReviews = [...userData.reviews, review];
+    const updatedRating = (userData.rating * userData.reviews.length + rating) / (userData.reviews.length + 1);
+
+    await setDoc(userDoc, { reviews: updatedReviews, rating: updatedRating }, { merge: true });
+
+    return { updatedReviews, updatedRating };
+  } else {
+    throw new Error(`User with ID ${userId} not found.`);
+  }
+}
+
+const submitReview = async () => {
+  if (!reviewText.value) {
+    alert('Please enter a review.');
+    return;
+  }
+
+  if (reviewRating.value < 1 || reviewRating.value > 5) {
+    alert('Please enter a rating between 1 and 5.');
+    return;
+  }
+
+  try {
+    const { updatedReviews, updatedRating } = await updateUserReview(sellerId, reviewText.value, reviewRating.value);
+    reviews.value = updatedReviews;
+    rating.value = updatedRating;
+    alert('Review submitted successfully!');
+    reviewText.value = '';
+    reviewRating.value = 0;
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    alert('Failed to submit review. Please try again later.');
+  }
+};
 
   const fetchProducts = async () => {
     const uid = sellerId;
@@ -137,17 +269,19 @@
   }
   
   .profile-photo {
+    display: flex;
+    justify-content: center; /* Horizontally center the image */
+    align-items: center; /* Vertically center the image (if necessary) */
     margin-top: 15px;
     margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  .profile-photo img {
-    max-width: 100%;
-    height: auto;
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    margin-left: auto; /* Center the container horizontally */
+    margin-right: auto; /* Center the container horizontally */
   }
-  
   .col-9{
     padding-right: 0px;
   }
@@ -157,8 +291,9 @@
   }
   
   .profile-photo img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 50%;
   }
   
