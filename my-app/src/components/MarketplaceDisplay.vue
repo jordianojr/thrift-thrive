@@ -5,7 +5,7 @@
     </header>
 
     <div v-if="isLoading">
-      <Loading :isLoading="isLoading" message="Fetching drip..." />
+      <Loading :isLoading="isLoading" message="Fetching products..." />
     </div>
     <div v-else-if="filteredProducts.length > 0" class="products-grid">
       <div v-for="product in filteredProducts" 
