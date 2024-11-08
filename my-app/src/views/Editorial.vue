@@ -1,6 +1,6 @@
 <template>
   <!-- Template remains unchanged -->
-  <div style="padding-top: 45px; padding-bottom: 45px; border-bottom: black solid 1px;">
+  <div>
       <h3 class="head">Editorial</h3>
     </div>
   <div class="container-fluid">
@@ -206,6 +206,9 @@ onMounted(async () => {
   font-size: 1.9rem;
   color: black;
   margin: 0;
+  padding-top: 45px; 
+  padding-bottom: 45px; 
+  border-bottom: black solid 1px;
 }
 
 .row {

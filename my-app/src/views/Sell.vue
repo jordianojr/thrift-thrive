@@ -2,7 +2,7 @@
   <section class="upload-section container-fluid">
     <LoadingOverlay :isLoading="isLoading" message="Uploading your item..." />
     <form @submit.prevent="handleUpload" class="upload-form">
-      <div style="padding-top: 45px; padding-bottom: 45px;">
+      <div>
         <h3 class="head">Sell Item</h3>
       </div>
         <div class="form-group">
@@ -291,6 +291,9 @@ const updateLocalStorage = (newItem: JSON) => {
   font-size: 1.9rem;
   color: black;
   margin: 0;
+  padding-top: 45px; 
+  padding-bottom: 45px; 
+  border-bottom: black solid 1px;
 }
 
 .upload-form {
@@ -372,6 +375,7 @@ button:hover {
 .custom-file-upload input {
   display: none; /* Hide the default file input */
 }
+
 </style>
 
   

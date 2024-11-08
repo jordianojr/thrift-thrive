@@ -308,12 +308,6 @@ h5.blog-title {
   background-color: white;
 }
 
-.file-uploads {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
 .file-item {
   position: relative;
   width: 100%;

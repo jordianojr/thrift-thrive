@@ -1,12 +1,12 @@
 <template>
-    <div class="row" style="margin-bottom: 50px;">
+    <div class="row border-bottom border-dark" style="margin-bottom: 50px;">
         <div class="col-12">
-            <h4 class="text-center" style="margin-top: -20px;, margin-bottom: 20px;">Your posts</h4>
+            <h4 class="head">Your posts</h4>
         </div>
-        <div
+        <div 
         v-for="post in blogPosts"
         :key="post.id"
-        class="col-4 col-sm-3 col-md-2 col-lg-2"
+        class="col-4 col-sm-3 col-md-2 col-lg-2 m-0 p-0"
         ref="blogCard"
         >
         <div class="blog-card" @click="fetchPost(post.id)">
@@ -29,10 +29,10 @@
             </button>
             </div>
 
-            <div class="post-content p-3"> <!-- Reduced padding for smaller size -->
+            <!-- <div class="post-content p-3">
             <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
             <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
-            </div>
+            </div> -->
         </div>
         </div>
     </div>
@@ -87,14 +87,22 @@
               </div>
             </div>
           </div>
-          <button 
+          <button
             type="submit" 
-            class="btn btn-outline-elegant text-uppercase px-4 py-2 mt-3 border-2 submit-btn"
+            class="col-12 btn py-2 submit-btn"
             :disabled="!isFormValid || isSubmitting"
           >
             {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
           </button>
         </form>
+
+        <button 
+            @click = "deletePost"
+            class="col-12 btn py-2 delete-btn"
+            :disabled="!isFormValid || isDeleting"
+          >
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
       </div>
   
       <div class="col-md-1 col-12"></div>
@@ -104,7 +112,7 @@
   <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
-  import { doc, getDoc, updateDoc, collection, query, where, getDocs, documentId } from 'firebase/firestore';
+  import { doc, getDoc, deleteDoc, updateDoc, collection, query, where, getDocs, documentId } from 'firebase/firestore';
   import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
   import { auth, db } from '@/lib/firebaseConfig';
   
@@ -115,12 +123,17 @@
   const files = ref<File[]>([]);
   const fileInput = ref<HTMLInputElement | null>(null);
   const isSubmitting = ref(false);
+  const isDeleting = ref(false);
   
   const blogPosts = ref<any[]>([]);
 
   const previewImages = computed(() => {
-    return files.value.map(file => URL.createObjectURL(file));
-  });
+  if (editPostId.value) {
+    const selectedPost = blogPosts.value.find((post) => post.id === editPostId.value);
+    return selectedPost ? getPostImages(selectedPost) : [];
+  }
+  return files.value.map((file) => URL.createObjectURL(file));
+});
   
   const isFormValid = computed(() => {
     return title.value.length >= 1 && caption.value.length >= 1;
@@ -230,6 +243,40 @@
     }
   };
   
+  const deletePost = async () => {
+    if (!editPostId.value) {
+      console.error('No post ID found for deletion.');
+      return;
+    }
+
+    try {
+      isDeleting.value = true;
+      const user = auth.currentUser;
+      if (user) {
+        // Delete the editorial document from Firestore
+        const editorialDocRef = doc(db, 'Editorial', editPostId.value);
+        await deleteDoc(editorialDocRef);
+
+        // Remove the post ID from the user's userPosts array
+        const userDocRef = doc(db, 'users', user.uid);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          const updatedUserPosts = userData.userPosts.filter((id) => id !== editPostId.value);
+          await updateDoc(userDocRef, { userPosts: updatedUserPosts });
+        }
+
+        alert('Post deleted successfully');
+        router.push({ name: 'editorial' }); // Redirect after deleting
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('Failed to delete post. Please try again.');
+    } finally {
+      isDeleting.value = false;
+    }
+  };
+
   const fetchPostId = async () => {
     const uid = getUserUID(); // Get user UID
 
@@ -322,22 +369,67 @@
   </script>
   
   <style scoped>
+    .head{
+      font-family: 'Helvetica Neue', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: 1.9rem;
+      color: black;
+      margin: 0;
+      padding-top: 45px; 
+      padding-bottom: 45px; 
+      border-bottom: black solid 1px;
+    }
 
     .blog-card {
     max-width: 100%; /* Prevents card from overflowing */
-    margin-bottom: 15px; /* Adds some spacing between cards */
-    height: 300px;
-    }
-    .blog-card:hover{
-    cursor: pointer;
-    scale: 1.02;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
+    height: 100%;
+    border-right: 1px black solid;
     }
 
+
+    .blog-card:hover{
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+  .blog-card .blog-image{
+    border-radius:
+  }
+
     .blog-image {
-    height: 200px; /* Adjust the image height to make it smaller */
-    object-fit: cover; /* Ensures the image covers the space without distortion */
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .blog-card:hover .blog-image {
+      opacity: 0.5;
+    }
+
+    .carousel {
+      background: #000;
+    }
+
+    .empty-carousel {
+      background-color: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+    }
+
+    .carousel-item {
+      aspect-ratio: 3/4;
+      
     }
 
     .blog-title {
@@ -350,5 +442,93 @@
     overflow-y: scroll;
     }
 
-  </style>
-  
+
+    .file-item {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/4;
+      margin-bottom: 1rem;
+    }
+
+.file-item img.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.file-item .remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+    .file-item .remove-btn:hover {
+      transform: scale(1.1);
+      background: #333;
+    }
+
+    .file-uploads {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+    }
+
+
+
+    .submit-btn {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-weight: 500;
+      background-color: black !important;
+      letter-spacing: 1px;
+      color: white !important;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.875rem !important;
+      border: black 1px solid !important;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      color: black !important;
+      background-color: white !important;
+      border: black 1px solid !important;
+    }
+
+    .delete-btn {
+      font-family: 'Helvetica Neue', sans-serif;
+      font-weight: 500;
+      background-color: red !important;
+      letter-spacing: 1px;
+      color: white !important;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.875rem !important;
+      border: red 1px solid !important;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      color: red !important;
+      background-color: white !important;
+      border: red 1px solid !important;
+    }
+
+</style>
+      
