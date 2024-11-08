@@ -105,6 +105,10 @@ onMounted(() => {
   width: 100%;
 }
 
+/* Style for other routes */
+.default-view {
+  padding: 0px 0px 0px 0px;
+}
 
 .constant {
   position: fixed;

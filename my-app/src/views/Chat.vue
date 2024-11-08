@@ -11,9 +11,9 @@
           
           <div class="chat-list">
             <div v-for="chat in chatsWithSellerInfo" :key="chat.id" 
-                @click="selectChat(chat)"
-                :class="['chat-item p-3 border-bottom border-secondary', 
-                          selectedChatId === chat.id ? 'bg-black text-white' : '']">
+              @click="selectChat(chat)"
+              :class="['chat-item p-3 border-bottom border-secondary',
+            selectedChatId === chat.id ? 'chat-item-selected' : '']">
               <div class="d-flex">
                 <img :src="chat.sellerAvatar" :alt="chat.sellerName" 
                     class="rounded-circle" style="width: 48px; height: 48px;">
@@ -50,7 +50,7 @@
 
           <!-- Chat Messages -->
           <div class="flex-grow-1 overflow-auto chat-messages" ref="messageContainer">
-            <div v-if="messages.length === 0" class="text-center text-secondary my-5">
+            <div v-if="messages.length === 0" class="text-center chat-header text-secondary my-5">
               No messages yet. Start the conversation!
             </div>
             <div v-for="message in messages" :key="message.id" 
@@ -65,14 +65,14 @@
           </div>
 
           <!-- Message Input -->
-          <div class="p-3 border-top border-secondary chat-input">
+          <div class="border-top border-secondary chat-input">
             <div class="input-group">
-              <input type="text" class="form-control text-black border-secondary" 
+              <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;" type="text" class="py-3 form-control text-black" 
                     v-model="newMessage" 
                     @keyup.enter="sendMessage"
                     placeholder="Type a message...">
-              <button class="btn btn-primary" @click="sendMessage" 
-                      :disabled="!newMessage.trim()">Send</button>
+              <button style="border-radius: 0px; border-left:1px solid black;" class="btn send-button" @click="sendMessage" 
+                      ><span class="bi bi-send px-5"></span></button>
             </div>
           </div>
         </div>
@@ -297,13 +297,12 @@ watch(messages, () => {
 .chat-wrapper {
   background-color: white;
   height: 90%;
+  display: flex;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .chat-list {
-  height: calc(100% - 70px);
+  height: calc(100%);
   overflow-y: auto;
   background-color: white;
 }
@@ -317,6 +316,7 @@ watch(messages, () => {
   text-align: left;
   font-size: 0.9rem;
   border-radius: 20px;
+  height: calc(100% - 70px - 70px); /* Subtract the heights of the header and input group */
 }
 
 .chat-header {
@@ -331,6 +331,12 @@ watch(messages, () => {
 .chat-input {
   border-top: 1px solid #ddd;
   flex-shrink: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  border-radius: 0px;
+  bottom: 0px;
+  width: 75%;
+  position: fixed;
 }
 
 .chat-item {
@@ -344,14 +350,18 @@ watch(messages, () => {
   height: 140px;
 }
 
+.chat-item-selected {
+  background-color: rgba(48, 48, 48, 0.338);
+}
+
 .chat-item:hover,
-.chat-item.bg-black {
-  background-color: black;
-  color: white;
+.chat-item.chat-item-selected {
+  background-color: rgba(48, 48, 48, 0.338);
 }
 
 .message {
   display: flex;
+  
 }
 
 .message-content {
@@ -365,6 +375,23 @@ watch(messages, () => {
 
 .bg-f8f8f8 {
   background-color: #f8f8f8;
+}
+
+.send-button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-left: 1px solid black;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.send-button:hover {
+  background: #f8f8f8;
+  border: 1px solid black;
+  background: black;
+  color: white;
 }
 
 /* Custom scrollbar */

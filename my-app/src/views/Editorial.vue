@@ -6,10 +6,10 @@
   <div class="container-fluid">
     <div class="row position-relative">
 
-      <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -1.6rem;">
+      <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -1rem;">
         <button 
           id="createbtn" 
-          class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
+          class="btn submit-btn text-uppercase py-2" 
           @click="navigateToCreatePost"
         >
           Create Post
@@ -276,16 +276,25 @@ h5.blog-title {
   font-weight: 300;
 }
 
-.btn-outline-elegant {
+.submit-btn {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
+  background-color: black !important;
   letter-spacing: 1px;
+  color: white !important;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
+  width: 15%;
 }
 
-.btn-outline-elegant:hover {
-  color: green;
-  transform: scale(1.05);
+.submit-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
 }
 
 </style>

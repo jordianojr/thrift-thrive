@@ -2,7 +2,9 @@
   <section class="upload-section container-fluid">
     <LoadingOverlay :isLoading="isLoading" message="Uploading your item..." />
     <form @submit.prevent="handleUpload" class="upload-form">
-      <h2>Upload Item for Sale</h2>
+      <div style="padding-top: 45px; padding-bottom: 45px;">
+        <h3 class="head">Sell Item</h3>
+      </div>
         <div class="form-group">
           <label for="item-name">Name:</label>
           <input type="text" id="item-name" v-model="itemName" placeholder="Enter item name" required />
@@ -281,13 +283,26 @@ const updateLocalStorage = (newItem: JSON) => {
 </script>
 
 <style scoped>
+.head{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.9rem;
+  color: black;
+  margin: 0;
+}
+
 .upload-form {
-  max-width: 600px;
+  max-width: 50%;
+  padding-left: 130px;
+  padding-right: 130px;
   margin: auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-left: 1px black solid;
+  border-right: 1px black solid;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  height: 100vh;
 }
 
 .form-group {
@@ -323,13 +338,22 @@ button:hover {
   background-color: #0056b3;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .upload-form {
-    padding: 15px;
-  }
+  padding: 20px;
+  margin: 0px;
+  max-width: 100%;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  } 
 
   .form-group {
     margin-bottom: 10px;
+  }
+
+  .upload-section{
+    padding: 0px;
+    margin: 0px;
   }
 
   button {
