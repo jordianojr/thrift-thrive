@@ -2,11 +2,8 @@
   <div class="category-section">
     <!-- Desktop Layout -->
     <div class="desktop-layout">
-      <div style="padding-bottom: 94px; border-bottom: black solid 1px;">
-        
-      </div>
         <!-- Search Bar -->
-      <div class="search-container section-group">
+      <div class="search-container section-group py-1">
         <div class="search-wrapper">
           <i class="bi bi-search search-icon"></i>
           <input
@@ -368,8 +365,9 @@ const handleChoice = (category: string) => {
 
 /* Desktop Styles */
 .category-section {
-  margin-left: 2.5rem;
   background-color: white;
+  border-right: 1px black solid;
+  height: 100%;
 }
 
 .desktop-layout {

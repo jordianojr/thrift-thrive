@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-bottom: 40px; border-bottom: black solid 1px;">
+  <div style="padding-top: 45px; padding-bottom: 45px; border-bottom: black solid 1px;">
       <h3 class="title">Thrift & Vintage Stores in Singapore</h3>
   </div>
   <div class="row g-0">
@@ -220,7 +220,7 @@ onMounted(async () => {
     text-align: center;
     font-size: 1.9rem;
     color: black;
-    margin-bottom: 1.1rem;
+    margin: 0;
   }
 
 @media screen and (max-width: 991px) {
@@ -230,14 +230,4 @@ onMounted(async () => {
     margin: 0;
   }
 }
-
-.title {
-    font-family: 'Helvetica Neue', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 1.9rem;
-    color: black;
-    margin-bottom: 1.1rem;
-  }
 </style>

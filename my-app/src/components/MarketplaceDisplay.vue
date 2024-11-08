@@ -3,7 +3,7 @@
     <header class="header-section">
       <h3 class="category-title">{{ categoryChosen || 'All Products' }}</h3>
     </header>
-
+    
     <div v-if="isLoading">
       <Loading :isLoading="isLoading" message="Fetching products..." />
     </div>
@@ -255,7 +255,8 @@ const emit = defineEmits<{
 }
 
 .header-section {
-  padding-bottom: 40px;
+  padding-top: 45px;
+  padding-bottom: 45px;
   margin-bottom: 2.5rem;
   border-bottom: black solid 1px;
 }
@@ -264,11 +265,10 @@ const emit = defineEmits<{
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  text-align: right;
+  text-align: center;
   font-size: 1.9rem;
   color: black;
-  margin-bottom: 1.1rem;
-  margin-right: 40px;
+  margin-bottom: 0;
 }
 
 .noproducts{

@@ -1,9 +1,12 @@
 <template>
   <!-- Template remains unchanged -->
-  <div class="container-fluid py-5">
+  <div style="padding-top: 45px; padding-bottom: 45px; border-bottom: black solid 1px;">
+      <h3 class="head">Editorial</h3>
+    </div>
+  <div class="container-fluid">
     <div class="row position-relative">
 
-      <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -3rem;">
+      <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -1.6rem;">
         <button 
           id="createbtn" 
           class="btn btn-outline-elegant text-uppercase px-5 py-2 border-2 rounded-pill" 
@@ -16,7 +19,7 @@
       <div
         v-for="post in blogPosts"
         :key="post.id"
-        class="col-12 col-md-6 col-lg-4"
+        class="col-12 col-md-6 col-lg-4 products-grid"
         ref="blogCard"
       >
         <div class="blog-card">
@@ -191,8 +194,18 @@ onMounted(async () => {
 .container-fluid {
   margin: auto;
   max-width: 1400px;
-  padding-left: 2rem;
-  padding-right: 2rem;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.head{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.9rem;
+  color: black;
+  margin: 0;
 }
 
 .row {
@@ -209,12 +222,8 @@ onMounted(async () => {
   transition: transform 0.3s, box-shadow 0.3s;
   opacity: 0;
   transform: translateY(50px);
+  margin-top: 40px;
 }
-
-/* .blog-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px hsla(160, 100%, 37%, 1);
-} */
 
 .blog-image {
   width: 100%;
