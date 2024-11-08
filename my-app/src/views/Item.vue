@@ -71,10 +71,11 @@
           </div>
 
         <!-- Add to Cart Button -->
-        <button 
+        <button
+          v-if="!ownSeller"
           @click="addToCart" 
           :disabled="isProcessing"
-          class="btn btn-danger mb-4 d-block mx-auto">
+          class="btn btn-dark mb-4 d-block mx-auto">
           {{ isProcessing ? 'Processing...' : 'Buy Now!' }}
         </button>
   
@@ -102,11 +103,11 @@
             </div>
   
             <!-- Action Buttons -->
-            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3">
+            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3" :disabled="disableChat">
               Chat with Seller
             </button>
   
-            <div class="input-group mb-3">
+            <!-- <div class="input-group mb-3">
               <input 
                 v-model="offerPrice" 
                 type="text" 
@@ -115,12 +116,12 @@
               >
               <button 
                 class="btn text-white" 
-                style="background-color: hsla(160, 100%, 37%, 1)"
+                style="background-color: green"
               >
                 Make Offer
               </button>
-            </div>
-  
+            </div> -->
+            
             <!-- Safety Notice -->
             <div class="small text-muted mt-3">
               <p style="color: black" class="mb-2">Returns and refunds depend on the seller's decision. Not covered by Buyer Protection.</p>
@@ -136,7 +137,7 @@
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import axios from 'axios';
-  import { db } from '@/lib/firebaseConfig';
+  import { auth, db } from '@/lib/firebaseConfig';
   import { doc, getDoc } from 'firebase/firestore';
   import Loading from "@/components/LoadingOverlay.vue";
   import { stripePromise } from '@/lib/stripeConfig'; // Import stripePromise from your config
@@ -147,6 +148,9 @@
   const category = route.params.category as string;
 
   const isProcessing = ref(false);
+
+  const ownSeller = ref(false);
+  const disableChat = ref(false);
 
   const itemImages = ref<string[]>([]);
   const itemName = ref('');
@@ -198,6 +202,7 @@
         description.value = data.description || 'N/A';
   
         // Fetch user data based on sellerId
+        checkSeller(sellerId.value);
         await fetchUserData(sellerId.value);
       } else {
         console.error("No such item!");
@@ -247,6 +252,12 @@
   }
 };
   
+  const checkSeller = (sellerId: string | undefined) => {
+      if (auth.currentUser?.uid === sellerId) {
+        ownSeller.value = true;
+        disableChat.value = true;
+      }
+    };
   const redirectToChat = () => {
     router.push({
       name: 'chat',

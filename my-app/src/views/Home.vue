@@ -31,15 +31,15 @@
       <section class="content">
           <SuggestionPanel />
       </section>
-      <section class="content">
+      <!-- <section class="content">
           <DisplayItem />
-      </section>
+      </section> -->
     </div>
 </template>
 
 <script lang="ts" setup>
 import gsap from 'gsap';
-import DisplayItem from '../components/DisplayItem.vue';
+// import DisplayItem from '../components/DisplayItem.vue';
 import SuggestionPanel from '../components/SuggestionPanel.vue';
 import { ref, onMounted } from 'vue';
 import { auth, db } from '../lib/firebaseConfig'; // Add storage import
@@ -88,7 +88,7 @@ onMounted(async () => {
   const tl_img = gsap.timeline({ease: "power1.easeInOut"})
 
   .to(".home .img-overlay", {
-    duration: 1,
+    duration: 0.7,
     y: "100%"
   })
   // .to(".women .img-overlay", {
@@ -97,26 +97,29 @@ onMounted(async () => {
   // }, "-=.7")
   .from(".img img", {
     opacity: 0,
-    duration: 1,
+    duration: 0.7,
     scale: 1.2,
     stagger: 0.2
   })
   .from(".text h2", {
     opacity: 0,
-    duration: 1,
+    duration: 0.7,
     y: 50
   })
   .from(".text h5", {
     opacity: 0,
-    duration: 1,
+    duration: 0.7,
     y: 50
   }, "-=.5")
-  .to(".display", {
-    y: "75px"
-  })
   .to(".content", {
-    y: "75px"
+    y: "75px",
+    duration: 0.4
   })
+  .to(".display", {
+    y: "75px",
+    duration: 0.4
+  })
+
 
   if (currentUser) {
     loadFromLocalStorage();
