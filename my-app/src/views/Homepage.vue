@@ -112,7 +112,7 @@ onMounted(() => {
 
 /* Style for other routes */
 .default-view {
-  padding: 130px 20px 50px 20px;
+  padding: 130px 0px 50px 0px;
 }
 
 .constant {
@@ -130,5 +130,11 @@ onMounted(() => {
   bottom: 20px; /* Adjust as needed */
   right: 20px; /* Adjust as needed */
   z-index: 1001; /* Ensure it's above everything else */
+}
+
+@media (max-width: 480px) {
+  .default-view {
+  padding: 0px 0px 50px 0px;
+}
 }
 </style>

@@ -2,6 +2,9 @@
   <div class="category-section">
     <!-- Desktop Layout -->
     <div class="desktop-layout">
+      <div style="padding-bottom: 94px; border-bottom: black solid 1px;">
+        
+      </div>
         <!-- Search Bar -->
       <div class="search-container section-group">
         <div class="search-wrapper">
@@ -133,6 +136,7 @@
 
       </div>
     </div>
+  </div>
 
     <!-- Mobile Layout -->
     <div class="mobile-layout">
@@ -233,7 +237,7 @@
         </div>
       </div>
     </div>
-  </div>
+  
 </template>
 
 <script lang="ts" setup>
@@ -364,7 +368,7 @@ const handleChoice = (category: string) => {
 
 /* Desktop Styles */
 .category-section {
-  padding: 0rem;
+  margin-left: 2.5rem;
   background-color: white;
 }
 
@@ -374,6 +378,7 @@ const handleChoice = (category: string) => {
 
 .mobile-layout {
   display: none;
+  background-color: white;
 }
 
 .search-container {
@@ -472,10 +477,14 @@ const handleChoice = (category: string) => {
 
 /* Mobile Layout Styles */
 
+.mobile-layout .search-container {
+  margin: 0;
+  padding: 0;
+}
 
 .mobile-layout .search-input {
   width: 100%;
-  padding: 0rem 1rem 0rem 1.5rem;
+  padding: 0rem 1rem 0.3rem 1.5rem;
   font-size: 0.7rem;
   border: none;
   border-bottom: 1px solid transparent;
@@ -484,23 +493,24 @@ const handleChoice = (category: string) => {
   color:black;
 }
 
-.mobile-layout .search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.mobile-layout .search-icon {
-  position: absolute;
-  left: 0.1rem;
-  color: black;
-}
-
 .mobile-layout .search-input:focus {
   outline: none;
   border-bottom-color: black;
 }
 
+.mobile-layout .search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 0.8rem;
+}
+
+.mobile-layout .search-icon {
+  position: absolute;
+  left: 0.1rem;
+  padding-bottom: 0.3rem;
+  color: black;
+}
 
 .scroll-container {
   display: flex;
@@ -593,19 +603,13 @@ const handleChoice = (category: string) => {
   }
 
   .category-section {
-    padding: 0.3rem;
+    padding: 0rem;
+    margin: 0rem;
   }
 
-  .categories-row {
+  .categories-row, .filters-row, .sub-filters-row {
     border-bottom: 1px solid #e2e8f0;
   }
 
-  .filters-row {
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .sub-filters-row {
-    border-bottom: 1px solid #e2e8f0;
-  }
 }
 </style>

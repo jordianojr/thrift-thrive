@@ -5,7 +5,7 @@
     </header>
 
     <div v-if="isLoading">
-      <Loading :isLoading="isLoading" message="Fetching drip..." />
+      <Loading :isLoading="isLoading" message="Fetching products..." />
     </div>
     <div v-else-if="filteredProducts.length > 0" class="products-grid">
       <div v-for="product in filteredProducts" 
@@ -224,21 +224,24 @@ const emit = defineEmits<{
 .products-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0rem;
+  margin-bottom: 4rem;
 }
 
 .header-section {
+  padding-bottom: 40px;
   margin-bottom: 2.5rem;
+  border-bottom: black solid 1px;
 }
 
 .category-title {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
-  text-align: center;
+  text-align: right;
   font-size: 1.9rem;
   color: black;
   margin-bottom: 1.1rem;
+  margin-right: 40px;
 }
 
 .noproducts{
@@ -250,46 +253,12 @@ const emit = defineEmits<{
   color: black;
 }
 
-/* .active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-} */
-
-/* .filter-tag {
-  display: inline-flex;
-  align-items: center;
-  background-color: #e2e8f0;
-  padding: 0.5rem 1rem;
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  color: #4a5568;
-  transition: background-color 0.2s ease;
-}
-
-.filter-tag:hover {
-  background-color: #cbd5e0;
-}
-
-.clear-filter {
-  background: none;
-  border: none;
-  margin-left: 0.5rem;
-  cursor: pointer;
-  padding: 0 0.25rem;
-  color: #718096;
-  transition: color 0.2s ease;
-}
-
-.clear-filter:hover {
-  color: #4a5568;
-} */
-
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 2rem;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
 .product-card {
@@ -409,6 +378,12 @@ const emit = defineEmits<{
 }
 
 @media (max-width: 768px) {
+  .header-section {
+    padding-bottom: 0px;
+    margin-bottom: 0rem;
+    border: none;
+  }
+
   .products-container {
     padding: 1rem;
   }
@@ -416,6 +391,7 @@ const emit = defineEmits<{
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
+    padding: 0;
   }
 
   .category-title {
@@ -429,21 +405,45 @@ const emit = defineEmits<{
   .product-price {
     font-size: 1.25rem;
   }
-  
-  /* .filter-tag {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.813rem;
-  } */
 }
 
 @media (max-width: 480px) {
+  .header-section {
+    padding-bottom: 0px;
+    margin-bottom: 2.5rem;
+    border: none;
+  }
+
   .products-container {
     padding: 0.75rem;
+    margin-right: 0; /* Remove right margin for better mobile layout */
   }
 
   .products-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+    gap: 0.75rem; /* Slightly reduced gap for tighter mobile layout */
+    padding: 0;
+  }
+
+  .product-image-container {
+    height: 200px; /* Reduced height for better mobile proportions */
+  }
+
+  .product-content {
+    padding: 1rem; /* Reduced padding for mobile */
+  }
+
+  .product-title {
+    font-size: 0.75rem; /* Smaller font size for mobile */
+  }
+
+  .product-price {
+    font-size: 0.75rem;
+  }
+
+  .seller-name {
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
   }
 }
 </style>
