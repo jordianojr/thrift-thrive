@@ -15,8 +15,39 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ]
-  },
+    ],
+
+  "headers": [
+    {
+      "source": "/home",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; img-src 'self'; style-src 'self';"
+        }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'"
+        }
+      ]
+    }
+  ]
+},
+  
   "functions": [
     {
       "source": "functions",
