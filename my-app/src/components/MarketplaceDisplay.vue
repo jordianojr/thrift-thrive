@@ -37,7 +37,7 @@ import { ref, defineProps, onMounted, watch, computed } from 'vue';
 import { db } from '@/lib/firebaseConfig';
 import { collection, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { DocumentData } from 'firebase/firestore';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import Loading from '@/components/Loading.vue';
 
 interface Product {
@@ -60,18 +60,31 @@ interface Filters {
   gender: string;
   condition: string;
 }
-const route = useRoute();
-const router = useRouter();
-const searchBarTerm = route.params.searchTerm as string || '';
-const routeGender = route.params.gender as string || '';
-const props = defineProps<{
-  categoryChosen: string;
-  activeFilters: Filters;
-}>();
+
+// Make props optional with default values and handle empty string case
+const props = withDefaults(defineProps<{
+  categoryChosen?: string;
+  activeFilters?: Filters;
+}>(), {
+  categoryChosen: 'none',
+  activeFilters: () => ({
+    searchTerm: '',
+    priceRange: '',
+    size: '',
+    gender: '',
+    condition: ''
+  })
+});
 
 const isLoading = ref(true);
+const error = ref<string | null>(null);
 const products = ref<Product[]>([]);
 const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+
+// Computed property for effective category
+const effectiveCategory = computed(() => {
+  return props.categoryChosen === '' ? 'none' : props.categoryChosen;
+});
 
 // Computed property to check if any filters are active
 const hasActiveFilters = computed(() => {
@@ -80,139 +93,153 @@ const hasActiveFilters = computed(() => {
 
 // Computed property for filtered products
 const filteredProducts = computed(() => {
+  if (!products.value) return [];
+
   let filtered = [...products.value];
+  console.log('Initial products:', filtered.map(p => p.itemName));
 
-  if (searchBarTerm) {
-    const searchLower = searchBarTerm.toLowerCase();
-    filtered = filtered.filter(product => 
-      product.itemName.toLowerCase().includes(searchLower) ||
-      product.description.toLowerCase().includes(searchLower)
-    );
+  try {
+    // Apply search term filter
+    if (props.activeFilters.searchTerm) {
+      const searchLower = props.activeFilters.searchTerm.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.itemName.toLowerCase().includes(searchLower) ||
+        (product.description?.toLowerCase().includes(searchLower) ?? false)
+      );
+      console.log('After search filter:', filtered.map(p => p.itemName));
+    }
+
+    // Apply price range filter
+    if (props.activeFilters.priceRange) {
+      const range = props.activeFilters.priceRange;
+      let min = 0;
+      let max = Infinity;
+
+      if (range === '$201+') {
+        min = 201;
+      } else {
+        const [minStr, maxStr] = range.split('-')
+          .map(str => str.trim().replace('$', ''));
+        
+        min = parseInt(minStr) || 0;
+        max = parseInt(maxStr) || Infinity;
+      }
+
+      filtered = filtered.filter(product => {
+        const price = Number(product.itemPrice) || 0;
+        return price >= min && price <= max;
+      });
+      console.log(`After price range filter (${range}):`, filtered.map(p => p.itemName));
+    }
+
+    // Apply condition filter
+    if (props.activeFilters.condition) {
+      filtered = filtered.filter(product => product.condition === props.activeFilters.condition);
+      console.log('After condition filter:', filtered.map(p => p.itemName));
+    }
+
+    // Apply gender filter
+    if (props.activeFilters.gender) {
+      filtered = filtered.filter(product => product.gender === props.activeFilters.gender);
+      console.log('After gender filter:', filtered.map(p => p.itemName));
+    }
+
+    // Apply size filter
+    if (props.activeFilters.size) {
+      filtered = filtered.filter(product => product.size === props.activeFilters.size);
+      console.log('After size filter:', filtered.map(p => p.itemName));
+    }
+
+    return filtered;
+  } catch (err) {
+    console.error('Error filtering products:', err);
+    return [];
   }
-  // Apply search term filter
-  if (props.activeFilters.searchTerm) {
-    const searchLower = props.activeFilters.searchTerm.toLowerCase();
-    filtered = filtered.filter(product => 
-      product.itemName.toLowerCase().includes(searchLower) ||
-      product.description.toLowerCase().includes(searchLower)
-    );
-  }
-  // Apply price range filter
-  if (props.activeFilters.priceRange) {
-  const range = props.activeFilters.priceRange;
-  let min = 0;
-  let max = Infinity;
-
-  if (range === '$201+') {
-    min = 201;
-  } else {
-    // Remove '$' symbols and split by '-'
-    const [minStr, maxStr] = range.split('-')
-      .map(str => str.trim().replace('$', ''));
-    
-    min = parseInt(minStr);
-    max = parseInt(maxStr);
-  }
-
-  filtered = filtered.filter(product => {
-    const price = Number(product.itemPrice);
-    return price >= min && price <= max;
-  });
-}
-
-  // Apply condition filter
-  if (props.activeFilters.condition) {
-    filtered = filtered.filter(product => product.condition === props.activeFilters.condition);
-  }
-
-  // Apply gender filter
-  if (props.activeFilters.gender) {
-    filtered = filtered.filter(product => product.gender === props.activeFilters.gender);
-  }
-
-  // Apply size filter
-  if (props.activeFilters.size) {
-    filtered = filtered.filter(product => product.size === props.activeFilters.size);
-  }
-
-  return filtered;
 });
 
 // Function to fetch products from Firestore
 const fetchProducts = async () => {
-  if (props.categoryChosen) {
-    isLoading.value = true;
-    try {
-      const querySnapshot = await getDocs(collection(db, props.categoryChosen));
+  isLoading.value = true;
+  error.value = null;
+  
+  try {
+    if (effectiveCategory.value === 'none') {
+      // Fetch products from all categories when no specific category is chosen
+      const allProducts: Product[] = [];
+      for (const category of categories) {
+        try {
+          const querySnapshot = await getDocs(collection(db, category));
+          const categoryProducts = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+            id: doc.id,
+            ...doc.data()
+          } as Product));
+          allProducts.push(...categoryProducts);
+          console.log(`Fetched ${category} products:`, categoryProducts);
+        } catch (err) {
+          console.error(`Error fetching products from ${category}:`, err);
+          // Continue with other categories even if one fails
+        }
+      }
+      products.value = allProducts;
+    } else {
+      // Fetch products from specific category
+      const querySnapshot = await getDocs(collection(db, effectiveCategory.value));
       products.value = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
         id: doc.id,
         ...doc.data()
       } as Product));
-      console.log(products.value);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      products.value = [];
-    } finally {
-      isLoading.value = false;
     }
-  } else {
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    error.value = 'Failed to load products. Please try again later.';
     products.value = [];
-    isLoading.value = true;
-    console.log(routeGender, searchBarTerm);
-
-    try {
-      const allProducts: Product[] = [];
-      for (const category of categories) {
-        const querySnapshot = await getDocs(collection(db, category));
-        const categoryProducts = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
-          id: doc.id,
-          ...doc.data()
-        } as Product));
-        allProducts.push(...categoryProducts);
-      }
-      products.value = allProducts;
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      products.value = [];
-    } finally {
-      isLoading.value = false;
-    }
+  } finally {
+    isLoading.value = false;
   }
 };
 
-
-const formatPrice = (price: number) => {
+const formatPrice = (price: number | undefined) => {
+  if (!price) return '0.00';
   return price.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
 };
 
-
 const getProductImage = (product: Product) => {
+  if (!product.itemPhotoURLs) return '/placeholder-image.jpg';
+  
   if (Array.isArray(product.itemPhotoURLs)) {
     return product.itemPhotoURLs[0] || '/placeholder-image.jpg';
   }
-  return product.itemPhotoURLs || '/placeholder-image.jpg';
+  return product.itemPhotoURLs;
 };
 
+const router = useRouter();
 
 const navigateToItem = (product: Product) => {
+  if (!product || !product.id) return;
+  
   router.push({ 
     name: 'item', 
     params: { 
-      category: props.categoryChosen, 
+      category: effectiveCategory.value, 
       id: product.id 
     } 
   });
 };
 
 // Watch for changes in category or filters
-watch(() => props.categoryChosen, fetchProducts);
+watch(() => effectiveCategory.value, fetchProducts);
 watch(() => props.activeFilters, () => {}, { deep: true });
 
 // Initial fetch
-onMounted(fetchProducts);
+onMounted(() => {
+  fetchProducts().catch(err => {
+    console.error('Error during initial fetch:', err);
+    error.value = 'Failed to initialize products. Please refresh the page.';
+  });
+});
 
 // Define emits
 const emit = defineEmits<{
