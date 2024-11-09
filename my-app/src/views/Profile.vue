@@ -56,6 +56,21 @@
             >
               Edit Posts
             </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'vouchers' }"
+              @click="activeSection = 'vouchers'"
+            >
+              Vouchers
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'spin' }"
+              @click="activeSection = 'spin'"
+              v-if="spinChance > 0"
+            >
+              Lucky Wheel
+            </button>
           </div>
         </div>
       </section>
@@ -68,6 +83,8 @@
                activeSection === 'reviews' ? 'User Reviews' :
                activeSection === 'listing' ? 'Listings' :
                activeSection === 'editposts' ? 'Edit Posts' :
+               activeSection === 'spin' ? 'Lucky Spin' :
+               activeSection === 'vouchers' ? 'Vouchers' :
                activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
         </div>
 
@@ -131,6 +148,18 @@
           </div>
         </div>
 
+        <div v-if="activeSection === 'vouchers'" class="content-section">
+          <div v-if="vouchers.length === 0" class="no-container">
+            <p>No vouchers yet.</p>
+            <p>Spins left: {{ spinChance }}</p>
+          </div>
+          <div v-else>
+            <ol>
+              <li v-for="voucher in vouchers">{{ voucher }}</li>
+            </ol>
+          </div>
+        </div>
+
         <div v-if="activeSection === 'listing'">
           <Listing></Listing>
         </div>
@@ -142,6 +171,9 @@
         </div>
         <div v-if="activeSection === 'editposts'">
           <EditPosts />
+        </div>
+        <div v-if="activeSection === 'spin'">
+          <Game />
         </div>
       </section>
     </div>
@@ -159,6 +191,7 @@ import Listing from '../components/Listing.vue';
 import OrderHistory from '../components/OrderHistory.vue';
 import SalesHistory from '../components/SalesHistory.vue';
 import EditPosts from './EditPosts.vue';
+import Game from '@/components/Game.vue';
 
 interface UserData {
   email?: string;
@@ -182,6 +215,8 @@ const confirmPassword = ref('');
 const activeSection = ref('listing');
 const rating = ref(0);
 const reviews = ref<string[]>([]);
+const spinChance = ref(0);
+const vouchers = ref<string[]>([]);
 
 
 // Auth state observer
@@ -217,6 +252,8 @@ const fetchUserData = async (uid: string) => {
     tempName.value = userData.username || '';
     rating.value = userData.rating || 0;
     reviews.value = userData.reviews || [];
+    spinChance.value = userData.spinChance || 0;
+    vouchers.value = userData.vouchers || [];
 
     localStorage.setItem(`user_${uid}`, JSON.stringify({
       email: userEmail.value,

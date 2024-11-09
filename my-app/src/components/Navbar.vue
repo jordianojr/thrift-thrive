@@ -24,9 +24,6 @@
           <router-link class="nav-link nav-elegant mx-2" to="/editorial">
             <i class="bi bi-pencil"></i> Editorial
           </router-link>
-          <router-link class="nav-link nav-elegant mx-2" to="/lucky-spin">
-            <i class="bi bi-wheel"></i> Lucky Spin
-          </router-link>
         </div>
 
         <div class="navbar-nav">
@@ -52,12 +49,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { auth } from '../lib/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 
-const emit = defineEmits(['select']);
 const router = useRouter();
 
 async function animateBrand() {

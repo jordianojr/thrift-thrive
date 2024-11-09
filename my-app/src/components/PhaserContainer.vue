@@ -1,10 +1,11 @@
-<script setup>
+<script lang="ts" setup>
 import { onMounted, onUnmounted } from 'vue'
-import { db } from '@/lib/firebaseConfig'
-import { collection, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebaseConfig'
+import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore'
+import router from '@/router';
 
 const emit = defineEmits(['prizeWon'])
-let gameInstance = null
+let gameInstance: { destroy: (arg0: boolean) => void; } | null = null
 const containerId = 'game-container'
 
 // Save prize to Firebase
@@ -25,6 +26,21 @@ const savePrizeToFirebase = async (prizeData) => {
 
     console.log('Prize saved with ID:', prizeData.code);
     emit('prizeWon', { ...prizeData, id: prizeData.code });
+
+    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.data();
+      const updatedVouchers = [...userData.vouchers, prizeData.code];
+      const updatedSpins = userData.spinChance - 1;
+
+      await setDoc(userDocRef, { vouchers: updatedVouchers, spinChance: updatedSpins }, { merge: true });
+      if (updatedSpins <= 0) {
+        alert('No more spins left');
+        router.push({ name: 'home' });
+      }
+    }
   } catch (error) {
     console.error('Error saving prize:', error);
   }

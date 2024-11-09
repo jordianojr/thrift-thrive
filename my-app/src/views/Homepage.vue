@@ -1,7 +1,7 @@
 <template>
   <div class="homepage">
     <div class="constant" @mouseenter="showSearchBar" @mouseleave="hideSearchBar">
-      <Navbar @select="handleSelect" />
+      <Navbar @select="handleSelect" @spinChance="handleSpinChance" />
       <ProgressBar />
 
       <!-- <section class="hero">
@@ -27,10 +27,8 @@ import { useRoute } from 'vue-router';
 import gsap from "gsap";
 import Navbar from "@/components/Navbar.vue";
 import FashionBot from '@/components/FashionBot.vue';
-import router from "@/router";
 import ProgressBar from '@/components/ProgressBar.vue';
 
-const searchTerm = ref('');
 const showProfile = ref(false);
 const isFashionBotVisible = ref(false); // State for FashionBot visibility
 const searchBarContainer = ref<HTMLElement | null>(null);
@@ -38,13 +36,8 @@ const searchBarContainer = ref<HTMLElement | null>(null);
 // Get the current route
 const route = useRoute();
 
-// Check if the current route is '/home'
+// Computed property to check if the current route is '/lucky-spin'
 const isSpin = computed(() => route.path === '/lucky-spin');
-
-function handleSearch(query: string) {
-  searchTerm.value = query;
-  router.push({ name: 'search', params: { query } });
-}
 
 // Function to handle navbar selection
 function handleSelect(selected: string) {
@@ -56,7 +49,7 @@ function toggleFashionBot() {
   isFashionBotVisible.value = !isFashionBotVisible.value;
 }
 
-// Function to show the search bar
+// Function to show the search bar with animation
 function showSearchBar() {
   gsap.to(searchBarContainer.value, {
     duration: 0.5,
@@ -65,7 +58,7 @@ function showSearchBar() {
   });
 }
 
-// Function to hide the search bar
+// Function to hide the search bar with animation
 function hideSearchBar() {
   gsap.to(searchBarContainer.value, {
     duration: 0.5,
@@ -75,15 +68,7 @@ function hideSearchBar() {
 }
 
 onMounted(() => {
-  // const tl_header = gsap.timeline({ease: "power1.easeInOut"});
-
-  // tl_header.from(".constant", {
-  //   delay: 4.5,
-  //   duration: 0.75,
-  //   y: -80
-  // });
-
-  // Hide the search bar initially by positioning it off-screen
+  // Set initial position of the search bar off-screen
   gsap.set(searchBarContainer.value, { y: "-100%" });
 });
 </script>

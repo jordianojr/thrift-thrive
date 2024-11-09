@@ -50,6 +50,11 @@ const name = ref('');
 const photoURL = ref('');
 const loading = ref(true);
 const currentUser: User | null = auth.currentUser;
+const spinChance = ref(0);
+
+const emit = defineEmits<{
+  (event: 'spinChance', value: number): void;
+}>();
 
 if (currentUser) {
   userEmail.value = currentUser.email || '';
@@ -120,14 +125,15 @@ onMounted(async () => {
     duration: 0.4
   })
 
-
   if (currentUser) {
     loadFromLocalStorage();
     await fetchUserData();
   } else {
     loading.value = false;
   }
+
 });
+
 </script>
 
 <style scoped>
