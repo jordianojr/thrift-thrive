@@ -1,5 +1,5 @@
 <template>
-  <section class="upload-section container-fluid">
+  <section class="upload-section container-fluid px-0">
     <LoadingOverlay :isLoading="isLoading" message="Uploading your item..." />
     <form @submit.prevent="handleUpload" class="upload-form">
       <div>
