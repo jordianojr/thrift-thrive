@@ -84,7 +84,7 @@
                activeSection === 'reviews' ? 'User Reviews' :
                activeSection === 'listing' ? 'Listings' :
                activeSection === 'editposts' ? 'Edit Posts' :
-               activeSection === 'spin' ? 'Lucky Spin' :
+               activeSection === 'spin' ? 'Lucky Wheel' :
                activeSection === 'vouchers' ? 'Vouchers' :
                activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
         </div>
@@ -175,6 +175,7 @@
           <EditPosts />
         </div>
         <div v-if="activeSection === 'spin'">
+          <h5 style="margin-left: 30px; margin-top: 20px;">Spins left: {{ spinChance }}</h5>
           <Game />
         </div>
       </section>
@@ -368,7 +369,7 @@ onMounted(() => {
   if (customColRef.value) {
     tl.fromTo(customColRef.value, { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, "<");
   }
-  setInterval(startBouncing, 2000);
+  setInterval(startBouncing, 3000);
 });
 
 onBeforeUnmount(() => {
@@ -629,7 +630,7 @@ input[type="file"] {
   width: 400px;
 }
 
-.p {
+.p h5 {
   font-family: 'Helvetica Neue', sans-serif;
   color: black;
   font-size: 1rem;

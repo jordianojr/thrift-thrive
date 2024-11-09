@@ -65,6 +65,8 @@ const handleRegister = async () => {
       role: 'user', // Set the role to 'user'
       salesHistory: [], // Initialize an empty liked items array
       userPosts: [], // Initialize an empty user posts array
+      vouchers: [], // Initialize an empty vouchers array
+      spinChance: 3, // Initialize the spin chance to 0
     }
     alert("Registration is successful!");
     router.push('/home');
