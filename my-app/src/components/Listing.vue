@@ -1,13 +1,12 @@
 <template>
-    <div class="container-fluid">
-      <h3 style="padding-bottom: 10px">Your Listings</h3>
+    <div class="container-fluid" style="padding-right: 130px; padding-left: 130px; padding-top: 40px;">
       <div style="padding-bottom: 20px;">
         <Loading :isLoading="isLoading" message="Fetching your products..." />
       </div>
       <div v-if="!isLoading">
         <div v-if="products.length === 0" style="padding-bottom: 20px;">
           <p>You have no listing yet.</p>
-          <router-link to="/sell" class="btn btn-dark">Sell Item</router-link>
+          <router-link to="/sell" class="btn sell-btn">Sell Item</router-link>
         </div>
         <div v-else class="row">
           <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
@@ -131,17 +130,51 @@ async function deleteFolder(folderPath: string | undefined) {
   <style scoped>
   .container-fluid {
     color: black;
-    background-color: #fbfbfb;
     border-radius: 10px;
     padding-top: 15px;
   }
   .card-subtitle, .card-text {
+    font-family: 'Helvetica Neue', sans-serif;
     color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
   }
+  .card-title{
+      font-weight: 400;
+      text-transform: uppercase;
+      color: black;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
   .card-img-top {
     width: 100%;
     height: 250px;
     object-fit: cover;
+    aspect-ratio: 3/4;
   }
+
+  .sell-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black !important;
+  letter-spacing: 1px;
+  color: white !important;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
+  width: 100%;
+  padding-top: 7px;
+  padding-bottom:7px;
+}
+
+.sell-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
+}
   </style>
   

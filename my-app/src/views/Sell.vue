@@ -1,10 +1,10 @@
 <template>
   <section class="upload-section container-fluid px-0">
     <LoadingOverlay :isLoading="isLoading" message="Uploading your item..." />
+    <div class="header-container">
+      <h3 class="head">Sell Item</h3>
+    </div>
     <form @submit.prevent="handleUpload" class="upload-form">
-      <div>
-        <h3 class="head">Sell Item</h3>
-      </div>
         <div class="form-group">
           <label for="item-name">Name:</label>
           <input type="text" id="item-name" v-model="itemName" placeholder="Enter item name" required />
@@ -315,6 +315,14 @@ const updateFileInputDisplay = () => {
 </script>
 
 <style scoped>
+.header-container {
+  border-bottom: 1px solid black;
+  width: 50%; /* Match the form width */
+  margin: 0 auto;
+  border-left: 1px black solid;
+  border-right: 1px black solid;
+}
+
 .head{
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
@@ -325,26 +333,24 @@ const updateFileInputDisplay = () => {
   margin: 0;
   padding-top: 45px; 
   padding-bottom: 45px; 
-  border-bottom: black solid 1px;
-
 }
 
 .upload-form {
   max-width: 50%;
   padding-left: 130px;
   padding-right: 130px;
-  padding-bottom: 76px;
+  padding-bottom: 25px;
+  padding-top: 25px;
   margin: auto;
   border-left: 1px black solid;
   border-right: 1px black solid;
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 400;
   min-height: 100vh;
-
 }
 
 .form-group {
-  margin-top: 15px;
+  padding-top: 15px;
 }
 
 input[type="text"],

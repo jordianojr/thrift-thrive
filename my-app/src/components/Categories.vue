@@ -588,6 +588,7 @@ const handleChoice = (category: string) => {
 .reset-button-mobile:hover {
   color: green;
   border-color: green;
+  scale: 1.03;
 }
 
 /* Mobile Breakpoint */

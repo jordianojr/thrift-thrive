@@ -1,18 +1,17 @@
 <template>
-  <div class="container-fluid">
-    <h3 style="padding-bottom: 10px;">Order History</h3>
+  <div class="container-fluid" style="padding-right: 130px; padding-left: 130px; padding-top: 40px;">
     <div style="padding-bottom: 20px;">
         <Loading :isLoading="isLoading" message="Fetching your products..." />
       </div>
       <div v-if="!isLoading">
-        <div v-if="products.length === 0" style="padding-bottom: 20px;">
+        <div v-if="products.length === 0" style="padding-bottom: 20px;" class="no-container">
           <p>You have no purchases yet.</p>
         </div>
       <div class="row">
           <ul v-for="product in products" :key="product.id">
             <li>
-              <h4 class="card-title" style="font-size: 1.2rem;">{{ product.itemName }}</h4>
-              <h6 class="card-subtitle text-muted" style="font-size: 1rem;">Sold by: {{ product.sellerUserName }}</h6>
+              <h4 class="card-title">{{ product.itemName }}</h4>
+              <h6 class="card-subtitle text-muted">Sold by: {{ product.sellerUserName }}</h6>
             </li>
           </ul>
       </div>
@@ -112,17 +111,38 @@ onMounted(fetchProducts);
   <style scoped>
   .container-fluid {
     color: black;
-    background-color: #fbfbfb;
     border-radius: 10px;
     padding-top: 15px;
   }
   .card-subtitle, .card-text {
+    font-family: 'Helvetica Neue', sans-serif;
     color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
   }
+  .card-title{
+      font-weight: 400;
+      text-transform: uppercase;
+      color: black;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
   .card-img-top {
     width: 100%;
     height: 250px;
     object-fit: cover;
+    aspect-ratio: 3/4;
+  }
+  .no-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Adjust this value based on your needs */
+  }
+
+  .no-container p {
+    margin: 0;
+    text-align: center;
   }
   </style>
   

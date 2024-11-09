@@ -1,151 +1,144 @@
 <template>
-  <div class="row">
-    <div ref="profileRef" class="card col-lg-3 col-12 profile mx-auto" style="width: 18rem;">
-      <div class="card-body" style="padding-bottom: 10px;">
-        <h4 class="card-title">Your Profile</h4>
-        <div v-if="photoURL" class="profile-photo">
-          <img :src="photoURL" alt="Profile Photo" />
-        </div>
-        <div v-else class="profile-photo">
-          <img src="../assets/user.jpeg" alt="Profile Photo" />
-        </div>
-        <p class="card-text"><strong>Email:</strong> {{ userEmail }}</p>
-        <p class="card-text"><strong>Name:</strong> {{ name }}</p>
-        <p class="card-text"><strong>Rating: </strong> {{ rating }}
-          <span v-for="n in 5" :key="n">
-            <i 
-              :class="{
-                'bi-star-fill': n <= rating, 
-                'bi-star': n > rating
-              }" 
-              style="color: black; font-size: 1.2rem;">
-            </i>
-          </span>
-          </p>
-          <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button type="button" class="btn review-btn" data-bs-toggle="modal" data-bs-target="#viewReviewModal">
-              <i class="bi bi-review"></i> View Reviews
+  <div class="desktop-layout">
+    <div class="profile-layout">
+      <!-- Sidebar Section -->
+      <!-- Sidebar Section -->
+      <section class="sidebar-section">
+        <div class="profile-sidebar">
+          <!-- Navigation Links -->
+          <div class="nav-links">
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'profile' }"
+              @click="activeSection = 'profile'"
+            >
+              Edit Profile
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'delete' }"
+              @click="activeSection = 'delete'"
+            >
+              Delete Account
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'reviews' }"
+              @click="activeSection = 'reviews'"
+            >
+              View Reviews
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'listing' }"
+              @click="activeSection = 'listing'"
+            >
+              Listings
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'orders' }"
+              @click="activeSection = 'orders'"
+            >
+              Order History
+            </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'sales' }"
+              @click="activeSection = 'sales'"
+            >
+              Sales History
             </button>
           </div>
-        <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <button type="button" class="btn edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-            <i class="bi bi-pencil-square"></i> Edit Profile
-          </button>
-          <button type="button" class="btn delete-btn" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-            <i class="bi bi-trash"></i> Delete Account
-          </button>
         </div>
-        <div>
-          <router-link to="/edit-post" class="text-center" style="color: black;"><p>Edit your posts</p></router-link>
-        </div>
-      </div>
-    </div>
-    <div ref="customColRef" class="col-lg-9 col-12 custom-col mx-auto">
-      <Listing></Listing>
-    </div>
-  </div>
-  <div class="row" style="margin-top: 20px;">
-    <div class="col-6">
-      <OrderHistory />
-    </div>
-    <div class="col-6">
-      <SalesHistory />
-    </div>
-  </div>
+      </section>
 
-  
-  
-  <!-- Edit Profile Modal -->
-  <div class="modal fade" id="editProfileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editProfileModalLabel">
-            <i class="bi bi-pencil-square"></i> Edit Profile
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <!-- Display Section -->
+      <section class="display-section">
+        <div class="section-header">
+          <h2>{{ activeSection === 'profile' ? 'Edit Profile' : 
+               activeSection === 'delete' ? 'Delete Account' : 
+               activeSection === 'reviews' ? 'User Reviews' :
+               activeSection === 'listing' ? 'Listings' :
+               activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
         </div>
-        <div class="modal-body">
-          <form @submit.prevent="updateProfile">
+
+        <!-- Dynamic Content Based on Selection -->
+        <div v-if="activeSection === 'profile'" class="content-section">
+          <!-- User Profile Info -->
+          <div class="profile-header">
+            <div class="profile-photo">
+              <img :src="tempPhotoURL || photoURL || '../assets/user.jpeg'" alt="Profile Photo" />
+            </div>
+            
+            <div class="user-info text-center mb-4">
+              <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
+              <p class="mb-1">{{ userEmail }}</p>
+              <p class="mb-1">
+                <strong>Rating: </strong> {{ rating }}
+                <span v-for="n in 5" :key="n">
+                  <i :class="{
+                    'bi-star-fill': n <= rating,
+                    'bi-star': n > rating
+                  }" style="color: black; font-size: 1.2rem;">
+                  </i>
+                </span>
+              </p>
+            </div>
+          </div>
+          <form @submit.prevent="updateProfile" class="content-section">
             <div class="form-group">
               <label for="name">Name:</label>
-              <input type="text" id="name" v-model="name" placeholder="Enter your name" required />
+              <input type="text" id="name" v-model="tempName" placeholder="Enter your name" required />
             </div>
             <div class="form-group">
               <label for="photo">Profile Photo:</label>
               <input type="file" id="photo" @change="handlePhotoUpload" accept="image/*" />
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-success">Save Changes</button>
-            </div>
+            <button type="submit" class="save-btn">Save Changes</button>
           </form>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Delete Account Modal -->
-  <div class="modal fade" id="deleteAccountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="deleteAccountModalLabel">
-            <i class="bi bi-trash"></i> Delete Account
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
+        <div v-if="activeSection === 'delete'" class="content-section">
           <p>Are you sure you want to delete your account? This action cannot be undone.</p>
           <div class="form-group">
-            <p>Please confirm your email and password for account deletion:</p>
             <label for="confirmEmail">Email:</label>
             <input type="email" id="confirmEmail" v-model="confirmEmail" placeholder="Enter your email" required />
           </div>
           <div class="form-group">
-            <label for="confirmEmail">Password:</label>
+            <label for="confirmPassword">Password:</label>
             <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password" required />
           </div>
+          <button type="button" class="delete-btn" @click="confirmDeleteAccount">Delete Account</button>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-danger" @click="confirmDeleteAccount">Delete Account</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="modal fade" id="viewReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewReviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="editProfileModalLabel">
-            <i class="bi bi-journal-text"></i> User Reviews
-          </h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div v-if="reviews.length === 0">
+        <div v-if="activeSection === 'reviews'" class="content-section">
+          <div v-if="reviews.length === 0" class="no-container">
             <p>No reviews yet.</p>
           </div>
-          <div v-else >
+          <div v-else>
             <ol>
-              <li v-for="review in reviews"> {{ review }}</li>
+              <li v-for="review in reviews">{{ review }}</li>
             </ol>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
         </div>
-      </div>
+
+        <div v-if="activeSection === 'listing'">
+          <Listing></Listing>
+        </div>
+        <div v-if="activeSection === 'orders'">
+          <OrderHistory />
+        </div>
+        <div v-if="activeSection === 'sales'">
+          <SalesHistory />
+        </div>
+      </section>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
-import gsap from 'gsap';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { auth, db, storage } from '../lib/firebaseConfig'; 
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -155,17 +148,29 @@ import Listing from '../components/Listing.vue';
 import OrderHistory from '../components/OrderHistory.vue';
 import SalesHistory from '../components/SalesHistory.vue';
 
+interface UserData {
+  email?: string;
+  username?: string;
+  photoURL?: string;
+  rating?: number;
+  reviews?: string[];
+}
+
 const router = useRouter();
 const userEmail = ref('');
 const name = ref('');
 const photoURL = ref('');
+const tempName = ref('');
+const tempPhotoURL = ref('');
+const tempFile = ref<File | null>(null);
 const profileRef = ref<HTMLElement | null>(null);
 const customColRef = ref<HTMLElement | null>(null);
 const confirmEmail = ref('');
 const confirmPassword = ref('');
-
+const activeSection = ref('listing');
 const rating = ref(0);
-const reviews = ref<any[]>([]);
+const reviews = ref<string[]>([]);
+
 
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -184,6 +189,7 @@ const loadFromLocalStorage = async (uid: string) => {
     userEmail.value = userData.email || '';
     name.value = userData.name || '';
     photoURL.value = userData.photoURL || '';
+    tempName.value = userData.name || '';
   }
 };
 
@@ -192,14 +198,14 @@ const fetchUserData = async (uid: string) => {
   const userSnapshot = await getDoc(userDoc);
 
   if (userSnapshot.exists()) {
-    const userData = userSnapshot.data();
+    const userData = userSnapshot.data() as UserData;
     userEmail.value = userData.email || '';
     name.value = userData.username || '';
     photoURL.value = userData.photoURL || '';
+    tempName.value = userData.username || '';
     rating.value = userData.rating || 0;
     reviews.value = userData.reviews || [];
 
-    // Update local storage
     localStorage.setItem(`user_${uid}`, JSON.stringify({
       email: userEmail.value,
       name: name.value,
@@ -208,82 +214,92 @@ const fetchUserData = async (uid: string) => {
   }
 };
 
-// Reset user data when signed out
 const resetUserData = () => {
   userEmail.value = '';
   name.value = '';
   photoURL.value = '';
+  tempName.value = '';
+  tempPhotoURL.value = '';
+  tempFile.value = null;
 };
-
-onBeforeUnmount(() => {
-  unsubscribe(); // Clean up the observer
-});
 
 const handlePhotoUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
     const file = target.files[0];
-    const storagePath = `profile_photos/${auth.currentUser?.uid}`; // Use auth.currentUser here
-    const photoRef = storageRef(storage, storagePath);
-
-    await uploadBytes(photoRef, file);
-    const downloadURL = await getDownloadURL(photoRef);
-    photoURL.value = downloadURL; 
-    
-    await updateUserProfile(downloadURL);
-  }
-};
-
-const updateUserProfile = async (downloadURL: string) => {
-  const currentUser = auth.currentUser;
-  if (currentUser) {
-    const userDoc = doc(db, 'users', currentUser.uid);
-    const userData = {
-      username: name.value,
-      photoURL: downloadURL,
-    };
-    await setDoc(userDoc, userData, { merge: true });
-
-    localStorage.setItem(`user_${currentUser.uid}`, JSON.stringify({
-      email: userEmail.value,
-      name: name.value,
-      photoURL: downloadURL,
-    }));
-
-    alert('Profile updated successfully!');
+    tempFile.value = file;
+    tempPhotoURL.value = URL.createObjectURL(file);
   }
 };
 
 const updateProfile = async () => {
   const currentUser = auth.currentUser;
   if (currentUser) {
-    const userDoc = doc(db, 'users', currentUser.uid);
-    const userData = {
-      username: name.value,
-    };
-    await setDoc(userDoc, userData, { merge: true });
-    alert('Profile name updated successfully!');
+    try {
+      let newPhotoURL = photoURL.value;
+      
+      if (tempFile.value) {
+        const storagePath = `profile_photos/${currentUser.uid}`;
+        const photoRef = storageRef(storage, storagePath);
+        await uploadBytes(photoRef, tempFile.value);
+        newPhotoURL = await getDownloadURL(photoRef);
+      }
+
+      const userDoc = doc(db, 'users', currentUser.uid);
+      const userData: UserData = {
+        username: tempName.value,
+        photoURL: newPhotoURL,
+      };
+      
+      await setDoc(userDoc, userData, { merge: true });
+      
+      name.value = tempName.value;
+      photoURL.value = newPhotoURL;
+      
+      tempFile.value = null;
+      if (tempPhotoURL.value) {
+        URL.revokeObjectURL(tempPhotoURL.value);
+        tempPhotoURL.value = '';
+      }
+      
+      alert('Profile updated successfully!');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      alert('Error updating profile: ' + errorMessage);
+    }
   }
 };
 
 const confirmDeleteAccount = async () => {
-  if (confirmEmail && confirmPassword) {
+  if (confirmEmail.value && confirmPassword.value) {
     try {
       await signInWithEmailAndPassword(auth, confirmEmail.value, confirmPassword.value);
       const currentUser = auth.currentUser;
       if (currentUser) {
-        await deleteDoc(doc(db, 'users', currentUser.uid)); // Delete user data from Firestore
-        await currentUser.delete(); // Delete user account
-        localStorage.removeItem(`user_${currentUser.uid}`); // Clear local storage
+        await deleteDoc(doc(db, 'users', currentUser.uid));
+        await currentUser.delete();
+        localStorage.removeItem(`user_${currentUser.uid}`);
         alert('Account deleted successfully. We are sad to see you go!');
-        router.push('/login'); // Redirect to home page
-        location.reload(); // Reload the page
+        router.push('/login');
+        location.reload();
       }
     } catch (error) {
-      alert('Error deleting account: ' + error.message);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      alert('Error deleting account: ' + errorMessage);
     }
   }
 };
+
+// Remove updateUserProfile as its functionality is now merged into updateProfile
+
+watch(activeSection, () => {
+  tempName.value = name.value;
+  if (tempPhotoURL.value) {
+    URL.revokeObjectURL(tempPhotoURL.value);
+    tempPhotoURL.value = '';
+  }
+  tempFile.value = null;
+});
 
 const tl = gsap.timeline({ defaults: { duration: 0.5 } });
 onMounted(() => {
@@ -294,9 +310,179 @@ onMounted(() => {
     tl.fromTo(customColRef.value, { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, "<");
   }
 });
+
+onBeforeUnmount(() => {
+  unsubscribe();
+  // Clean up any object URLs
+  if (tempPhotoURL.value) {
+    URL.revokeObjectURL(tempPhotoURL.value);
+  }
+});
 </script>
 
+
 <style scoped>
+
+h2{
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 1.9rem;
+  color: black;
+  margin: 0;
+  padding-top: 45px; 
+  padding-bottom: 45px; 
+  border-bottom: black solid 1px;
+}
+
+.no-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px; /* Adjust this value based on your needs */
+}
+
+.no-container p {
+  margin: 0;
+  text-align: center;
+}
+
+
+.sidebar-section {
+  position: sticky;
+  top: 74px;
+  left: 0;
+  width: 20%;
+  height: 100vh;
+  background-color: white;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  border-right: 1px solid black;
+}
+
+.sidebar-section::-webkit-scrollbar {
+  display: none;
+}
+
+.profile-sidebar {
+  padding: 1rem;
+}
+
+.display-section {
+  flex: 1;
+  overflow-y: auto;
+}
+
+
+.nav-links{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-button {
+  background: none;
+  border: none;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0.2rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.selected,
+.active,
+.sidebar-button.selected {
+  color: green;
+  border-color: green;
+  text-decoration: underline;
+}
+
+/* Hover States */
+.sidebar-button:hover {
+  color: green;
+  border-color: green;
+  scale: 1.03;
+}
+
+
+/* Mobile Styles */
+.desktop-layout {
+  display: block;
+}
+
+.mobile-layout {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .desktop-layout {
+    display: none;
+  }
+
+  .mobile-layout {
+    display: block;
+  }
+
+  .profile-layout {
+    flex-direction: column;
+  }
+
+  .sidebar-section {
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .sticky-nav {
+    position: sticky;
+    top: 104px;
+    z-index: 10;
+    background: white;
+  }
+
+  .profile-photo.mobile {
+    width: 100px;
+    height: 100px;
+  }
+
+  .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-nav-button {
+    flex: 0 0 auto;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .mobile-nav-button:hover {
+    color: green;
+    border-color: green;
+  }
+}
+
 .profile-container {
   max-width: 600px;
   margin: auto;
@@ -306,12 +492,14 @@ onMounted(() => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-h4 {
-  text-align: center;
-}
-
 .form-group {
   margin-bottom: 15px;
+}
+
+.content-section{
+  padding-left: 130px;
+  padding-right: 130px;
+  padding-top: 40px;
 }
 
 input[type="text"],
@@ -327,6 +515,13 @@ input[type="file"] {
 .profile {
   height: 100%;
 }
+
+.profile-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
 
 .profile-photo {
   display: flex;
@@ -366,7 +561,7 @@ input[type="file"] {
 }
 
 
-.review-btn, .edit-btn, .delete-btn {
+.review-btn, .save-btn, .delete-btn {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
   background-color: black !important;
@@ -379,19 +574,19 @@ input[type="file"] {
   border: black 1px solid !important;
   cursor: pointer;
   width: 100%;
-  margin: 5px;
+  padding-top: 7px;
+  padding-bottom:7px;
+}
+
+.review-btn:hover, .save-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
 }
 
 .delete-btn {
   background-color: red !important;
   border: red 1px solid !important;
-}
-
-
-.review-btn:hover, .edit-btn:hover {
-  color: black !important;
-  background-color: white !important;
-  border: black 1px solid !important;
 }
 
 .delete-btn:hover {
