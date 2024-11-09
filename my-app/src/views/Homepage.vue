@@ -6,12 +6,12 @@
 
       <!-- <section class="hero">
         <div ref="searchBarContainer" class="search-bar-container">
-          <SearchBar @search="handleSearch" />
+          <LuckySpin />
         </div>
       </section> -->
     </div>
 
-    <div style="margin-top: 74px;":class="['view', isHome ? 'home-view' : 'default-view']">
+    <div style="margin-top: 74px;" :class="['view', isHome ? 'home-view' : 'default-view']">
       <RouterView />
     </div>
 
@@ -124,6 +124,12 @@ onMounted(() => {
   position: fixed; /* Make it fixed to stay in place */
   bottom: 20px; /* Adjust as needed */
   right: 20px; /* Adjust as needed */
+  z-index: 1001; /* Ensure it's above everything else */
+}
+.floating-spin {
+  position: fixed; /* Make it fixed to stay in place */
+  bottom: 20px; /* Adjust as needed */
+  left: 20px; /* Adjust as needed */
   z-index: 1001; /* Ensure it's above everything else */
 }
 

@@ -24,6 +24,9 @@
           <router-link class="nav-link nav-elegant mx-2" to="/editorial">
             <i class="bi bi-pencil"></i> Editorial
           </router-link>
+          <router-link class="nav-link nav-elegant mx-2" to="/lucky-spin">
+            <i class="bi bi-wheel"></i> Lucky Spin
+          </router-link>
         </div>
 
         <div class="navbar-nav">
