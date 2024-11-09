@@ -1,65 +1,64 @@
 <template>
     <div class="row" style="margin-bottom: 40px;">
-        <div 
-        v-for="post in blogPosts"
-        :key="post.id"
-        class="col-4 col-sm-3 col-md-2 col-lg-2 m-0 p-0"
-        ref="blogCard"
-        >
-        <div class="blog-card" @click="fetchPost(post.id)">
+      <div v-if="blogPosts.length == 0" style="padding-bottom: 20px;" class="no-container">
+          <p>You have no posts to edit yet.</p>
+      </div>
+
+      <template v-else>
+        <div v-for="post in blogPosts" :key="post.id" class="col-4 col-sm-3 col-md-2 col-lg-2 m-0 p-0" ref="blogCard">
+          <div class="blog-card" @click="fetchPost(post.id)">
             <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
+              <div class="carousel-inner">
                 <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
                 :class="{ active: index === 0 }">
                 <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
                 </div>
-            </div>
-            <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
-                data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
-                data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+              </div>
+              <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
+                  data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
+                  data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+              </button>
             </div>
 
             <!-- <div class="post-content p-3">
             <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
             <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
             </div> -->
+          </div>
         </div>
-        </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-1 col-12"></div>
-      <div class="col-md-3 col-sm-12">
-        <h4>Preview</h4>
-        <div class="preview-card">
-          <div :id="`carousel-preview`" class="carousel slide" :class="{ 'empty-carousel': previewImages.length === 0 }" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              <div class="carousel-item" v-for="(image, index) in previewImages" :key="index" :class="{ active: index === 0 }">
-                <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
+        <div class="row">
+          <div class="col-md-1 col-12"></div>
+            <div class="col-md-3 col-sm-12">
+            <h4>Preview</h4>
+            <div class="preview-card">
+              <div :id="`carousel-preview`" class="carousel slide" :class="{ 'empty-carousel': previewImages.length === 0 }" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item" v-for="(image, index) in previewImages" :key="index" :class="{ active: index === 0 }">
+                    <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
+                  </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-preview" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel-preview" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+              <div class="post-content p-4">
+                <h5 class="blog-title text-truncate-4">{{ title || 'Untitled' }}</h5>
+                <p class="blog-caption text-truncate-6">{{ caption || 'No caption provided' }}</p>
               </div>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-preview" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carousel-preview" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
           </div>
-          <div class="post-content p-4">
-            <h5 class="blog-title text-truncate-4">{{ title || 'Untitled' }}</h5>
-            <p class="blog-caption text-truncate-6">{{ caption || 'No caption provided' }}</p>
-          </div>
-        </div>
-      </div>
   
       <div class="col-md-1 col-12"></div>
   
@@ -93,16 +92,18 @@
           </button>
         </form>
 
-        <button 
-            @click = "deletePost"
-            class="col-12 btn py-2 delete-btn"
-            :disabled="!isFormValid || isDeleting"
-          >
-            {{ isDeleting ? 'Deleting...' : 'Delete' }}
-          </button>
-      </div>
-  
-      <div class="col-md-1 col-12"></div>
+            <button 
+                @click = "deletePost"
+                class="col-12 btn py-2 delete-btn"
+                :disabled="!isFormValid || isDeleting"
+              >
+                {{ isDeleting ? 'Deleting...' : 'Delete' }}
+              </button>
+          </div>
+      
+          <div class="col-md-1 col-12"></div>
+        </div>
+      </template>
     </div>
   </template>
   
@@ -483,7 +484,17 @@
       gap: 1rem;
     }
 
+    .no-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Adjust this value based on your needs */
+  }
 
+  .no-container p {
+    margin: 0;
+    text-align: center;
+  }
 
     .submit-btn {
       font-family: 'Helvetica Neue', sans-serif;

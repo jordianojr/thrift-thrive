@@ -7,7 +7,7 @@
           <div v-if="products.length === 0" style="padding-bottom: 20px;" class="no-container">
             <p>You have no sales yet.</p>
           </div>
-        <div class="row">
+        <div v-else class="row">
             <ul v-for="product in products" :key="product.id">
               <li>
                 <h4 class="card-title">{{ product.itemName }}</h4>
