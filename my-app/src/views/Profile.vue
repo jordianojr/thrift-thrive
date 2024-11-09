@@ -49,6 +49,13 @@
             >
               Sales History
             </button>
+            <button 
+              class="sidebar-button"
+              :class="{ 'active': activeSection === 'editposts' }"
+              @click="activeSection = 'editposts'"
+            >
+              Edit Posts
+            </button>
           </div>
         </div>
       </section>
@@ -60,6 +67,7 @@
                activeSection === 'delete' ? 'Delete Account' : 
                activeSection === 'reviews' ? 'User Reviews' :
                activeSection === 'listing' ? 'Listings' :
+               activeSection === 'editposts' ? 'Edit Posts' :
                activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
         </div>
 
@@ -132,6 +140,9 @@
         <div v-if="activeSection === 'sales'">
           <SalesHistory />
         </div>
+        <div v-if="activeSection === 'editposts'">
+          <EditPosts />
+        </div>
       </section>
     </div>
   </div>
@@ -147,6 +158,7 @@ import { useRouter } from 'vue-router';
 import Listing from '../components/Listing.vue';
 import OrderHistory from '../components/OrderHistory.vue';
 import SalesHistory from '../components/SalesHistory.vue';
+import EditPosts from './EditPosts.vue';
 
 interface UserData {
   email?: string;

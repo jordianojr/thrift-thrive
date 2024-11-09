@@ -1,8 +1,5 @@
 <template>
-    <div class="row border-bottom border-dark" style="margin-bottom: 50px;">
-        <div class="col-12">
-            <h4 class="head">Your posts</h4>
-        </div>
+    <div class="row" style="margin-bottom: 40px;">
         <div 
         v-for="post in blogPosts"
         :key="post.id"

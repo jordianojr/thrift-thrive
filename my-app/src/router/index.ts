@@ -12,7 +12,7 @@ import Chat from '../views/Chat.vue';
 import Editorial from '../views/Editorial.vue';
 import CreatePost from '../components/createPost.vue';
 import SellerProfile from '../views/SellerProfile.vue';
-import EditPost from '../views/EditPost.vue';
+import EditPost from '../views/EditPosts.vue';
 import Game from '@/components/Game.vue';
 
 // Function to check if user is logged in
