@@ -65,7 +65,8 @@
             </button>
             <button 
               class="sidebar-button"
-              :class="{ 'active': activeSection === 'spin' }"
+              style="color: gold;"
+              :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
               @click="activeSection = 'spin'"
               v-if="spinChance > 0"
             >
@@ -157,6 +158,7 @@
             <ol>
               <li v-for="voucher in vouchers">{{ voucher }}</li>
             </ol>
+            <p>Spins left: {{ spinChance }}</p>
           </div>
         </div>
 
@@ -218,6 +220,7 @@ const reviews = ref<string[]>([]);
 const spinChance = ref(0);
 const vouchers = ref<string[]>([]);
 
+const isBouncing = ref(false);
 
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -228,6 +231,13 @@ const unsubscribe = auth.onAuthStateChanged(async (user) => {
     resetUserData();
   }
 });
+
+const startBouncing = () => {
+  isBouncing.value = true;
+  setTimeout(() => {
+    isBouncing.value = false;
+  }, 1000); // Duration of the animation
+};
 
 const loadFromLocalStorage = async (uid: string) => {
   const cachedData = localStorage.getItem(`user_${uid}`);
@@ -358,6 +368,7 @@ onMounted(() => {
   if (customColRef.value) {
     tl.fromTo(customColRef.value, { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, "<");
   }
+  setInterval(startBouncing, 2000);
 });
 
 onBeforeUnmount(() => {
@@ -371,6 +382,22 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-15px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+
+}
+.bouncing {
+  animation: bounce 1s ease;
+}
 
 h2{
   font-family: 'Helvetica Neue', sans-serif;
