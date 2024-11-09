@@ -5,6 +5,11 @@ export default class WheelSpin extends Scene {
     super({ key: 'WheelSpin' });
   }
 
+  init(data) {
+    // Get the callback function passed from launch
+    this.onPrizeWon = data.onPrizeWon;
+  }
+
   create() {
     // Define the scale factor for resizing
     const wheelScale = 0.68; // Adjust this value as needed for the wheel size
@@ -31,13 +36,14 @@ export default class WheelSpin extends Scene {
   }
   
   spinWheel() {
+    this.sound.play('spinSound');
     // Only allow spinning if the wheel is not already spinning
     if (!this.isSpinning) {
       this.isSpinning = true;
       this.prizeText.setText('Spinning...');
   
       // Play sound
-      this.sound.play('spinSound');
+      this.sound.play('spin');
   
       // Randomize the rotation degrees
       const rounds = Phaser.Math.Between(3, 5); // Random rounds
@@ -57,6 +63,7 @@ export default class WheelSpin extends Scene {
         onComplete: () => {
           this.showPrize(finalDegrees); // Pass the finalDegrees to showPrize
           this.isSpinning = false;
+          this.sound.play('yay');
         },
       });
     }
@@ -84,6 +91,18 @@ export default class WheelSpin extends Scene {
   
     // Set the prize text based on the final prize slice
     this.prizeText.setText(prizes[prizeIndex]);
+    if (this.onPrizeWon) {
+      const prizeData = {
+        prize: prizes[prizeIndex],
+        timestamp: new Date().toISOString(),
+        code: this.generateUniqueCode()
+      };
+      this.onPrizeWon(prizeData);
+    }
+  }
+
+  generateUniqueCode() {
+    return 'PRIZE-' + Math.random().toString(36).substring(2, 8).toUpperCase();
   }
     
 }

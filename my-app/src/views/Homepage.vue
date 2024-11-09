@@ -11,7 +11,7 @@
       </section> -->
     </div>
 
-    <div style="margin-top: 74px;" :class="['view', isHome ? 'home-view' : 'default-view']">
+    <div style="margin-top: 74px;" :class="['view', isSpin ? 'spin-view' : 'default-view']">
       <RouterView />
     </div>
 
@@ -39,7 +39,7 @@ const searchBarContainer = ref<HTMLElement | null>(null);
 const route = useRoute();
 
 // Check if the current route is '/home'
-const isHome = computed(() => route.path === '/home');
+const isSpin = computed(() => route.path === '/lucky-spin');
 
 function handleSearch(query: string) {
   searchTerm.value = query;
@@ -110,6 +110,9 @@ onMounted(() => {
   padding: 0px 0px 0px 0px;
 }
 
+.spin-view {
+  padding: 40px 0px 0px 0px;
+}
 .constant {
   position: fixed;
   top: 0;
