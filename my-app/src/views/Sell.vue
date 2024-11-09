@@ -330,9 +330,9 @@ const updateFileInputDisplay = () => {
 }
 
 .upload-form {
-  max-width: 50%;
-  padding-left: 130px;
-  padding-right: 130px;
+  max-width: 60%;
+  padding-left: 80px;
+  padding-right: 80px;
   padding-bottom: 76px;
   margin: auto;
   border-left: 1px black solid;
