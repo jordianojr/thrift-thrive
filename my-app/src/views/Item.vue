@@ -278,6 +278,10 @@
   };
 
   const goToSeller = () => {
+    if (sellerId.value === auth.currentUser?.uid) {
+      router.push({ name: 'profile' });
+      return;
+    }
     router.push({
       name: 'sellerprofile',
       params: { sellerId: sellerId.value }

@@ -189,6 +189,15 @@ const removeFile = (index: number) => {
         date: new Date().toISOString(),
       });
 
+      const userDoc = doc(db, 'users', auth.currentUser.uid);
+      const userSnapshot = await getDoc(userDoc);
+
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data();
+        const updatedPosts = [...userData.userPosts, documentId];
+
+        await setDoc(userDoc, { userPosts: updatedPosts }, { merge: true });
+      }
       // Update the EditorialCount document
       await updateDoc(countDocRef, { count: newEditorialCount });
       

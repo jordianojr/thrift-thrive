@@ -71,11 +71,11 @@
         <form @submit.prevent="updatePost" class="create-post-form">
           <div class="form-group mb-3">
             <label for="title">Title</label>
-            <textarea class="form-control" id="title" v-model="title" placeholder="Write a title" required></textarea>
+            <textarea class="form-control" id="title" v-model="title" required>{{ title }}</textarea>
           </div>
           <div class="form-group mb-3">
             <label for="caption">Caption</label>
-            <textarea class="form-control" id="caption" v-model="caption" rows="4" placeholder="Write a caption" required></textarea>
+            <textarea class="form-control" id="caption" v-model="caption" rows="4" required>{{ caption }}</textarea>
           </div>
           <div class="form-group">
             <label for="photos">Photos</label>

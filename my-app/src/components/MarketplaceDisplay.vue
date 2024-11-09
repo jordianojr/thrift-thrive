@@ -51,6 +51,7 @@ interface Product {
   condition?: string;
   brand?: string;
   gender?: string;
+  category: string; // Added category property
 }
 
 interface Filters {
@@ -96,7 +97,6 @@ const filteredProducts = computed(() => {
   if (!products.value) return [];
 
   let filtered = [...products.value];
-  console.log('Initial products:', filtered.map(p => p.itemName));
 
   try {
     // Apply search term filter
@@ -171,10 +171,10 @@ const fetchProducts = async () => {
           const querySnapshot = await getDocs(collection(db, category));
           const categoryProducts = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
+            category
           } as Product));
           allProducts.push(...categoryProducts);
-          console.log(`Fetched ${category} products:`, categoryProducts);
         } catch (err) {
           console.error(`Error fetching products from ${category}:`, err);
           // Continue with other categories even if one fails
@@ -220,6 +220,16 @@ const router = useRouter();
 const navigateToItem = (product: Product) => {
   if (!product || !product.id) return;
   
+  if (effectiveCategory.value === 'none') {
+    router.push({ 
+    name: 'item', 
+    params: { 
+      category: product.category, 
+      id: product.id 
+    } 
+  });
+    return;
+  }
   router.push({ 
     name: 'item', 
     params: { 
