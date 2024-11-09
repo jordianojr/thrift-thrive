@@ -5,7 +5,7 @@
     <div v-else class="container-fluid">
       <!-- Image Carousel Section -->
       <div class="row mb-4">
-        <div class="col-12">
+        <div class="col-12 p-0">
           <div id="itemCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               <div v-for="(image, index) in itemImages" 
@@ -30,8 +30,8 @@
       <div class="row">
         <!-- Left Column - Item Details -->
         <div class="col-12 col-lg-8 mb-4">
-          <h1 class="display-6 text-black mb-3">{{ itemName }}</h1>
-          <div class="price-text mb-4" style="color: hsla(160, 100%, 37%, 1)">
+          <h1 class="display-6 itemName text-black mb-3">{{ itemName }}</h1>
+          <div class="price-text mb-4">
             S${{ itemPrice }}
           </div>
   
@@ -61,21 +61,29 @@
                 <p class="text-black">{{ category }}</p>
               </div>
             </div>
+            <div class="col-6">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50">Deal Method</h3>
+                <p class="text-black">{{ dealMethod }}</p>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50">Location</h3>
+                <p class="text-black">{{ location }}</p>
+              </div>
+            </div>
           </div>
   
           <!-- Deal Method -->
-          <div class="deal-method p-4 mb-4 rounded">
-            <h3 class="h5 text-black mb-3">Deal Method</h3>
-            <p class="text-black mb-2">{{ dealMethod }}</p>
-            <p class="text-black-50 small">{{ location }}</p>
-          </div>
+          
 
         <!-- Add to Cart Button -->
         <button
           v-if="!ownSeller"
           @click="addToCart" 
           :disabled="isProcessing"
-          class="btn btn-dark mb-4 d-block mx-auto">
+          class="btn submit-btn py-2 w-100">
           {{ isProcessing ? 'Processing...' : 'Buy Now!' }}
         </button>
   
@@ -103,7 +111,7 @@
             </div>
   
             <!-- Action Buttons -->
-            <button @click="redirectToChat" class="btn btn-secondary w-100 mb-3" :disabled="disableChat">
+            <button @click="redirectToChat" class="btn submit-btn w-100 mb-3" :disabled="disableChat">
               Chat with Seller
             </button>
   
@@ -282,6 +290,24 @@
   :deep(body) {
     background-color: #000;
   }
+
+  #itemCarousel {
+  border-bottom: 1px black solid;
+  margin: 0 -100vw;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.container-fluid {
+  padding: 0 4.5rem;
+  padding-top: 20px;
+}
+
+
   .carousel-control-prev, .carousel-control-next {
   border-radius: 50%;
   border: 1px solid black;
@@ -317,8 +343,10 @@
   
   /* Price styling */
   .price-text {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 600;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: hsla(160, 100%, 37%, 1);
   }
   
   /* Detail boxes */
@@ -340,4 +368,44 @@
     border: 1px solid lightgrey;
     padding-top: 20px;
   }
+  
+  .submit-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black !important;
+  letter-spacing: 1px;
+  color: white !important;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
+  width: 15%;
+}
+
+.submit-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
+}
+
+.itemName {
+  font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: left;
+    font-size: 1.9rem;
+    color: black;
+    margin: 0;
+}
+
+h3, p {
+  font-family: 'Helvetica Neue', sans-serif;
+  color: black;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+
   </style>
