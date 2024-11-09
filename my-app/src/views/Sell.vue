@@ -294,6 +294,7 @@ const updateLocalStorage = (newItem: JSON) => {
   padding-top: 45px; 
   padding-bottom: 45px; 
   border-bottom: black solid 1px;
+
 }
 
 .upload-form {

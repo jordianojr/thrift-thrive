@@ -9,9 +9,9 @@
         <div v-else class="profile-photo">
           <img src="../assets/user.jpeg" alt="Profile Photo" />
         </div>
-        <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
-        <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
-        <p class="card-text" style="color: black"><strong>Rating: </strong> {{ rating }}
+        <p class="card-text"><strong>Email:</strong> {{ userEmail }}</p>
+        <p class="card-text"><strong>Name:</strong> {{ name }}</p>
+        <p class="card-text"><strong>Rating: </strong> {{ rating }}
           <span v-for="n in 5" :key="n">
             <i 
               :class="{
@@ -23,15 +23,15 @@
           </span>
           </p>
           <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button style="width: 100%; background-color: black; color: white; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#viewReviewModal">
+            <button type="button" class="btn review-btn" data-bs-toggle="modal" data-bs-target="#viewReviewModal">
               <i class="bi bi-review"></i> View Reviews
             </button>
           </div>
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <button style="width: 48%; background-color: white; color: black; border: 1px solid black;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+          <button type="button" class="btn edit-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
             <i class="bi bi-pencil-square"></i> Edit Profile
           </button>
-          <button style="width: 48%; margin-left: 10px; background-color: black; border: 1px solid black;" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+          <button type="button" class="btn delete-btn" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
             <i class="bi bi-trash"></i> Delete Account
           </button>
         </div>
@@ -355,6 +355,48 @@ input[type="file"] {
 .card {
   margin-bottom: 20px;
   width: 400px;
+}
+
+.p {
+  font-family: 'Helvetica Neue', sans-serif;
+  color: black;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+
+.review-btn, .edit-btn, .delete-btn {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 500;
+  background-color: black !important;
+  letter-spacing: 1px;
+  color: white !important;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.875rem !important;
+  border: black 1px solid !important;
+  cursor: pointer;
+  width: 100%;
+  margin: 5px;
+}
+
+.delete-btn {
+  background-color: red !important;
+  border: red 1px solid !important;
+}
+
+
+.review-btn:hover, .edit-btn:hover {
+  color: black !important;
+  background-color: white !important;
+  border: black 1px solid !important;
+}
+
+.delete-btn:hover {
+  color: red !important;
+  background-color: white !important;
+  border: red 1px solid !important;
 }
 
 @media (max-width: 1228px) {
