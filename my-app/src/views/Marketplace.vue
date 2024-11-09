@@ -77,7 +77,7 @@ const handleFilters = (filters: Filters) => {
 
 .sidebar-section {
   position: sticky;
-  top: -22px;
+  top: 74px;
   left: 0;
   width: 20%; /* Adjust the width as needed */
   height: 100vh;

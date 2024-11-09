@@ -14,47 +14,24 @@
           <textarea id="item-description" v-model="itemDescription" placeholder="Enter item description" required></textarea>
         </div>
         <div class="form-group">
-        <label class="form-label">Upload Photos (Front, Back, Tag):</label>
-        <div class="row mb-3">
-          <div class="col-4">
-            <label class="custom-file-upload">
-              <input 
-                type="file" 
-                @change="(event) => handleSinglePhoto(event, 'front')" 
-                accept="image/*" 
-                required 
-              />
-              <img v-if="previewImages.front" :src="previewImages.front" class="img-thumbnail" alt="Front Photo" />
-              <span v-else>Front Photo</span>
-            </label>
+          <label class="form-label">Upload Photos:</label>
+          <input 
+            type="file" 
+            class="form-control" 
+            @change="handlePhotoUpload" 
+            accept="image/*" 
+            multiple
+            required 
+            ref="fileInputRef"
+          />
+          <div class="file-uploads mt-3">
+            <div class="file-item" v-for="(file, index) in selectedFiles" :key="index">
+              <img :src="getPreviewUrl(file)" alt="Preview" class="preview-image" />
+              <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
+            </div>
           </div>
-          <div class="col-4">
-            <label class="custom-file-upload">
-              <input 
-                type="file" 
-                @change="(event) => handleSinglePhoto(event, 'back')" 
-                accept="image/*" 
-                required 
-              />
-              <img v-if="previewImages.back" :src="previewImages.back" class="img-thumbnail" alt="Back Photo" />
-              <span v-else>Back Photo</span>
-            </label>
-          </div>
-          <div class="col-4">
-            <label class="custom-file-upload">
-              <input 
-                type="file" 
-                @change="(event) => handleSinglePhoto(event, 'tag')" 
-                accept="image/*" 
-                required 
-              />
-              <img v-if="previewImages.tag" :src="previewImages.tag" class="img-thumbnail" alt="Tag Photo" />
-              <span v-else>Tag Photo</span>
-            </label>
-          </div>
+          <small class="form-text text-muted">Please upload your photos</small>
         </div>
-        <small class="form-text text-muted">Please upload photos: front, back, and tag.</small>
-      </div>
       <!-- Other fields here -->
       <div class="form-group row">
         <div class="col-6">
@@ -124,162 +101,217 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { auth, db, storage } from '../lib/firebaseConfig';
-import { doc, setDoc, collection, getDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, getDoc, updateDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import LoadingOverlay from '@/components/LoadingOverlay.vue';
+import { useRoute } from 'vue-router';
+
+// Get route for post ID
+const route = useRoute();
+const postId = ref(route.params.id as string);
 
 const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavily used'];
-const sizes = ['XXS / EU 44 / UK 34 / US 34','XS / EU 46 / UK 36 / US 36','S / EU 48 / UK 38 / US 38','M / EU 50 / UK 40 / US 40','L / EU 52 / UK 42 / US 42','XL / EU 54 / UK 44 / US 44','XXL / EU 56 / UK 46 / US 46','XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S / EU 48 / UK 38 / US 38', 'M / EU 50 / UK 40 / US 40', 'L / EU 52 / UK 42 / US 42', 'XL / EU 54 / UK 44 / US 44', 'XXL / EU 56 / UK 46 / US 46', 'XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
 const genders = ['Male', 'Female', 'Unisex'];
 
+// Form state
 const isLoading = ref(false);
 const itemName = ref('');
 const itemDescription = ref('');
 const itemPrice = ref(0);
 const chosenCat = ref('');
-const selectedFiles = ref<File[]>([]);
-const previewImages = ref({ front: '', back: '', tag: '' }); // Reactive object for image previews
+const selectedFiles = ref<{ file: File; position: string }[]>([]);
+const previewImages = ref<Record<string, string>>({});
 const userName = ref('');
-
-// Additional Fields
 const gender = ref('');
 const brand = ref('');
 const size = ref('');
 const condition = ref('');
-const dealMethod = ref([]);
+const dealMethod = ref<string[]>([]);
 const location = ref('');
-const date = new Date();
-const listedDate = date.toISOString().split('T')[0];
-const itemPhotoURLs: string[] = [];
+const itemPhotoURLs = ref<string[]>([]);
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
-const handleSinglePhoto = (event: Event, position: string) => {
+
+// File handling functions
+const getPreviewUrl = (file: { file: File }) => {
+  return URL.createObjectURL(file.file);
+};
+
+const handlePhotoUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  if (target.files && target.files.length) {
-    const file = target.files[0];
-    selectedFiles.value.push({ file, position });
+  if (target.files) {
+    const filesArray = Array.from(target.files);
+    const formattedFiles = filesArray.map(file => ({
+      file: file,
+      position: selectedFiles.value.length.toString()
+    }));
+    selectedFiles.value = [...selectedFiles.value, ...formattedFiles];
     
-    // Generate a preview URL and update the previewImages object
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImages.value[position] = e.target.result as string; // Set the preview image
-    };
-    reader.readAsDataURL(file); // Read the file as a data URL
+    // Update preview images
+    formattedFiles.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          previewImages.value[`photo${selectedFiles.value.length - formattedFiles.length + index}`] = e.target.result as string;
+        }
+      };
+      reader.readAsDataURL(file.file);
+    });
+
+    // Update the file input display
+    updateFileInputDisplay();
+  }
+};
+
+const uploadPhoto = async (itemId: string, file: File, photoType: string): Promise<string> => {
+  const storagePath = `item_photos/${itemId}/${photoType}`;
+  const photoRef = storageRef(storage, storagePath);
+
+  try {
+    await uploadBytes(photoRef, file);
+    const downloadURL = await getDownloadURL(photoRef);
+    return downloadURL;
+  } catch (error) {
+    console.error(`Error uploading ${photoType}:`, error);
+    throw error;
   }
 };
 
 const handleUpload = async () => {
   const currentUser = auth.currentUser;
-  if (currentUser && selectedFiles.value.length === 3) {
+  if (!currentUser) {
+    alert('User is not logged in.');
+    return;
+  }
+
+  if (selectedFiles.value.length === 0) {
+    alert('Please select at least one photo.');
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+    
+    // Get user data
     const userDoc = doc(db, 'users', currentUser.uid);
     const userSnapshot = await getDoc(userDoc);
-    if (userSnapshot.exists()) {
-      const userData = userSnapshot.data();
-      userName.value = userData.username || '';
-    } else {
-      alert("Set up your username first!");
+    if (!userSnapshot.exists()) {
+      alert("Please set up your username first!");
       return;
     }
     
-    isLoading.value = true; // Start loading overlay
-    console.log("handle upload" + chosenCat.value)
-    const itemDocRef = doc(collection(db, chosenCat.value));
-    const itemUID = itemDocRef.id;
+    const userData = userSnapshot.data();
+    userName.value = userData.username || '';
 
-    const sellData = {
+    // Create or update item document
+    const itemDocRef = postId.value ? 
+      doc(collection(db, chosenCat.value), postId.value) : 
+      doc(collection(db, chosenCat.value));
+    
+    const itemId = postId.value || itemDocRef.id;
+
+    // Upload photos and get URLs
+    const uploadPromises = selectedFiles.value.map((file, index) => 
+      uploadPhoto(itemId, file.file, `photo${index}`)
+    );
+
+    const uploadedURLs = await Promise.all(uploadPromises);
+    itemPhotoURLs.value = uploadedURLs;
+
+    // Prepare item data
+    const itemData = {
       userId: currentUser.uid,
       userName: userName.value,
       itemName: itemName.value,
       description: itemDescription.value,
       itemPrice: itemPrice.value,
-      itemPhotoURLs: [], // Initialize an array for photo URLs
       condition: condition.value,
       dealMethod: dealMethod.value,
       location: location.value,
-      listedDate: listedDate,
+      listedDate: new Date().toISOString().split('T')[0],
       brand: brand.value,
       size: size.value,
       gender: gender.value,
+      itemPhotoURLs: itemPhotoURLs.value,
     };
 
-    await setDoc(itemDocRef, sellData, { merge: true });
+    // Save to Firestore
+    await setDoc(itemDocRef, itemData, { merge: true });
 
-    // Upload all selected photos
-    await Promise.all([
-      handlePhotoUpload(itemUID, selectedFiles.value[0], 'front'),
-      handlePhotoUpload(itemUID, selectedFiles.value[1], 'back'),
-      handlePhotoUpload(itemUID, selectedFiles.value[2], 'tag'),
-    ]);
-    
-    updateUpload(itemUID, itemPhotoURLs);
-    alert(`Item uploaded successfully! Item UID: ${itemUID}`);
-    isLoading.value = false;
-  } else {
-    alert('User is not logged in or incorrect number of files selected.');
+    // Update local storage
+    updateLocalStorage({
+      id: itemId,
+      ...itemData
+    });
+
+    alert(`Item ${postId.value ? 'updated' : 'uploaded'} successfully!`);
+    clearForm();
+  } catch (error) {
+    console.error('Error during upload:', error);
+    alert('An error occurred during upload. Please try again.');
+  } finally {
     isLoading.value = false;
   }
 };
 
-const handlePhotoUpload = async (itemUID: string, file: File, position: string) => {
-  const storagePath = `item_photos/${itemUID}/${position}`; // Naming the files as front.jpg, back.jpg, tag.jpg
-  const photoRef = storageRef(storage, storagePath);
-
-  console.log(file.file);
-  await uploadBytes(photoRef, file.file);
-  const downloadURL = await getDownloadURL(photoRef);
-  itemPhotoURLs.push(downloadURL);
-  console.log(downloadURL);
-  // Update Firestore document with the photo URL
-};
-
-const updateUpload = async (itemUID: string, itemPhotoURLs: unknown) => {
-  const currentUser = auth.currentUser;
-  if (currentUser) {
-    console.log("update upload" + chosenCat.value)
-    const itemDocRef = doc(collection(db, chosenCat.value), itemUID);
-    
-    // Update Firestore document with the new photo URL
-    await setDoc(itemDocRef, {
-      itemPhotoURLs: itemPhotoURLs, // Append to the array
-    }, { merge: true });
-
-    const uploadData = {
-      userId: currentUser.uid,
-      userName: userName.value,
-      itemName: itemName.value,
-      description: itemDescription.value,
-      itemPrice: itemPrice.value,
-    };
-
-    updateLocalStorage({ id: itemUID, ...uploadData });
-    isLoading.value = false;
-
-    // Clear form fields
-    itemName.value = '';
-    itemDescription.value = '';
-    itemPrice.value = 0;
-    chosenCat.value = '';
-    selectedFiles.value = []; // Clear selected files
-    condition.value = '';
-    dealMethod.value = [];
-    location.value = '';
-    brand.value = '';
-    size.value = '';
-    gender.value = '';
-    previewImages.value = { front: '', back: '', tag: '' }; // Clear image previews
-  } else {
-    alert('User is not logged in.');
-    isLoading.value = false;
+const clearForm = () => {
+  itemName.value = '';
+  itemDescription.value = '';
+  itemPrice.value = 0;
+  chosenCat.value = '';
+  selectedFiles.value = [];
+  condition.value = '';
+  dealMethod.value = [];
+  location.value = '';
+  brand.value = '';
+  size.value = '';
+  gender.value = '';
+  previewImages.value = {};
+  itemPhotoURLs.value = [];
+  
+  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
   }
 };
 
-const updateLocalStorage = (newItem: JSON) => {
+const updateLocalStorage = (newItem: Record<string, unknown>) => {
   const cachedProducts = localStorage.getItem('listing');
   const products = cachedProducts ? JSON.parse(cachedProducts) : [];
-  
   products.push(newItem);
   localStorage.setItem('listing', JSON.stringify(products));
 };
+
+const removeFile = (index: number) => {
+  selectedFiles.value.splice(index, 1);
+  const updatedPreviews: Record<string, string> = {};
+  selectedFiles.value.forEach((file, i) => {
+    updatedPreviews[`photo${i}`] = previewImages.value[`photo${i}`];
+  });
+  previewImages.value = updatedPreviews;
+
+  // Update the file input display
+  updateFileInputDisplay();
+};
+
+const updateFileInputDisplay = () => {
+  if (!fileInputRef.value) return;
+
+  // Create a new DataTransfer object
+  const dataTransfer = new DataTransfer();
+  
+  // Add all current files to the DataTransfer object
+  selectedFiles.value.forEach(({ file }) => {
+    dataTransfer.items.add(file);
+  });
+  
+  // Update the file input's files property
+  fileInputRef.value.files = dataTransfer.files;
+};
+
+
 </script>
 
 <style scoped>
@@ -301,16 +333,18 @@ const updateLocalStorage = (newItem: JSON) => {
   max-width: 50%;
   padding-left: 130px;
   padding-right: 130px;
+  padding-bottom: 76px;
   margin: auto;
   border-left: 1px black solid;
   border-right: 1px black solid;
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 400;
-  height: 100vh;
+  min-height: 100vh;
+
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 input[type="text"],
@@ -336,10 +370,63 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: 15px;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+.file-uploads {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.file-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  margin-bottom: 1rem;
+}
+
+.file-item img.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.file-item .remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-item .remove-btn:hover {
+  transform: scale(1.1);
+  background: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 992px) {
@@ -352,11 +439,11 @@ button:hover {
   } 
 
   .form-group {
-    margin-bottom: 10px;
+    margin-top: 10px;
   }
 
   .upload-section{
-    padding: 0px;
+    padding-bottom: 0px;
     margin: 0px;
   }
 
