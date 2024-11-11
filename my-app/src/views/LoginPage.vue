@@ -13,15 +13,22 @@
     <div ref="displayRef" class="col-lg-6 col-12">
       <RouterView />
     </div>
+
   </div>
   <div>
-    <div style="text-align: center;">
-      <!-- <h2>Curated Thrift Fashion</h2> -->
+    <div style="text-align: center; margin: auto">
       <h2 class="desc">Secondhand Fashion<br> curated by thrive.</h2> 
     </div> 
+    <div class="row" style="margin: auto; margin-top: 20px;">
+      <div class="scroll-popup">
+        <p>Scroll <i class="bi bi-arrow-down-circle-fill"></i></p> 
+      </div>
+    </div>
+
     <Editorial />
     <div style="text-align: center; padding-bottom: 20px;">
-      <p>Love what we're doing and our product collection? <span @click="scrollToTop" style="text-decoration: underline; cursor: pointer;">Join us!</span></p> 
+      <p>Love what we're doing and our product collection?</p>
+      <p @click="scrollToTop" style="text-decoration: underline; cursor: pointer;">Join us!</p>
     </div> 
   </div>
 </template>
@@ -36,23 +43,21 @@ const route = useRoute();
 const greetingRef = ref<HTMLElement | null>(null)
 const displayRef = ref<HTMLElement | null>(null)
 
-// Animation function for greeting section
+// Your existing animation functions
 async function animateGreeting() {
   gsap.fromTo(greetingRef.value, 
-    { opacity: 0, y: -50 }, // Start state
-    { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" } // End state
+    { opacity: 0, y: -50 },
+    { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }
   );
 }
 
-// Animation function for display section
 async function animateDisplay() {
   gsap.fromTo(displayRef.value, 
-    { opacity: 0, y: 50 }, // Start state
-    { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" } // End state
+    { opacity: 0, y: 50 },
+    { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" }
   );
 }
 
-// Animate the text color of the brand (".green")
 async function animateBrand() {
   gsap.to(".green", { 
     duration: 5,
@@ -63,7 +68,6 @@ async function animateBrand() {
   });
 }
 
-// Trigger animations on mount
 onMounted(() => {
   animateGreeting();
   animateDisplay();
@@ -87,25 +91,18 @@ const handleAnimation = () => {
         y: 0,
         duration: 0.8,
         ease: 'power2.out',
-        // onComplete: () => {
-        //   gsap.to(displayRef.value, {
-        //     opacity: 0,
-        //     y: -20,
-        //     duration: 0.5,
-        //     delay: 1,
-        //     ease: 'power2.out',
-        //   });
-        // },
       }
     );
   }
 };
+
 const scrollToTop = () => {
-      const bottomAnchor = document.getElementById('top');
-      if (bottomAnchor) {
-        bottomAnchor.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
+  const bottomAnchor = document.getElementById('top');
+  if (bottomAnchor) {
+    bottomAnchor.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
 </script>
 
 <style scoped>
@@ -193,6 +190,22 @@ nav a.router-link-active:hover {
   .greetings {
     flex: 1;
   }
+}
+.scroll-popup {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  width: 110px;
+  height: 40px;
+  transition: opacity 0.3s ease; /* Smooth transition for opacity */
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-10px); }
 }
 </style>
 
