@@ -1,7 +1,7 @@
 <template>
   <div class="homepage">
     <div class="constant" @mouseenter="showSearchBar" @mouseleave="hideSearchBar">
-      <Navbar @select="handleSelect" @spinChance="handleSpinChance" />
+      <Navbar @select="handleSelect" />
       <ProgressBar />
 
       <!-- <section class="hero">

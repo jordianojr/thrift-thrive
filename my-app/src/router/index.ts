@@ -13,6 +13,7 @@ import Editorial from '../views/Editorial.vue';
 import CreatePost from '../components/createPost.vue';
 import SellerProfile from '../views/SellerProfile.vue';
 import EditPost from '../views/EditPosts.vue';
+import EditItem from '../views/EditListing.vue';
 
 // Function to check if user is logged in
 const isLoggedIn = () => {
@@ -119,6 +120,12 @@ const router = createRouter({
       path: '/edit-post',
       name: 'editPost',
       component: EditPost,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/edit-listing/:id',
+      name: 'editItem',
+      component: EditItem,
       meta: { requiresAuth: true },
     },
   ]

@@ -116,14 +116,14 @@ onMounted(async () => {
     duration: 0.7,
     y: 50
   }, "-=.5")
-  .to(".content", {
-    y: "75px",
-    duration: 0.4
-  })
-  .to(".display", {
-    y: "75px",
-    duration: 0.4
-  })
+  // .to(".content", {
+  //   y: "75px",
+  //   duration: 0.4
+  // })
+  // .to(".display", {
+  //   y: "75px",
+  //   duration: 0.4
+  // })
 
   if (currentUser) {
     loadFromLocalStorage();

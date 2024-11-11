@@ -17,6 +17,9 @@
                 <h5 class="card-subtitle mb-2 text-muted">${{ product.itemPrice }}</h5>
                 <h6 class="card-subtitle">{{ product.seller }}</h6>
                 <p class="card-text">{{ product.description }}</p>
+                <button class="btn float-start" style="background-color: white;" @click="editItem(product.id)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
                 <button class="btn btn-danger float-end" @click="deleteItem(product.id)">
                   <i class="bi bi-trash"></i>
                 </button>
@@ -34,10 +37,12 @@
   import { db, auth, storage } from "@/lib/firebaseConfig"; // Adjust the path as necessary
   import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
   import { getStorage, ref as storageRef, listAll, deleteObject } from 'firebase/storage';
+  import { useRouter } from "vue-router";
 
   const products = ref<any[]>([]);
   const isLoading = ref(true);
-  
+  const router = useRouter();
+
   const fetchProducts = async () => {
     const uid = getUserUID();
     console.log(uid);
@@ -69,6 +74,12 @@
     alert('User is not logged in!');
     return null;
   }
+};
+
+const editItem = (itemId: string) => {
+  // Redirect to the EditItem page with the item ID as a route parameter
+  router.push({ name: 'editItem', params: { id: itemId } });
+  // console.log('Edit item with ID:', itemId);
 };
   
 const deleteItem = async (itemId: string) => {
