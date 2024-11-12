@@ -5,7 +5,7 @@
       <div class="card-body">
         <h5 class="card-title">More of a touchy buyer?</h5>
         <p class="card-text">Check out upcoming thrift events in Singapore</p>
-        <a href="/thrift-stores" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Thrift Events</a>
+        <a @click="navigateToThriftStores" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Thrift Events</a>
       </div>
     </div>
   </div>
@@ -14,7 +14,7 @@
       <div class="card-body">
         <h5 class="card-title">Need some inspiration?</h5>
         <p class="card-text">Explore our fashion editorial</p>
-        <a href="/editorial" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Editorial</a>
+        <a @click="navigateToEditorial" class="btn btn-outline-elegant text-uppercase px-4 py-2 ">Editorial</a>
       </div>
     </div>
   </div>
@@ -24,7 +24,15 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 
-  const router = useRouter();
+const router = useRouter();
+
+const navigateToThriftStores = () => {
+  router.push('/thrift-stores');
+};
+const navigateToEditorial = () => {
+  router.push('/editorial');
+};
+
 </script>
 
 <style scoped>
