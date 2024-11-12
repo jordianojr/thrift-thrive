@@ -1,13 +1,13 @@
 <template>
     <div>
-      <section class="display">
+      <section class="display" style="margin-top: -75px">
         <div class="common">
           <div class="img">
             <img src="../assets/home.png">
             <div class="img-overlay"></div>
           </div>
           <div class="text">
-            <h2>Just</h2>
+            <h2>Thrift</h2>
             <h5>Fashion</h5>
           </div>
           <div class="btn">
@@ -116,14 +116,14 @@ onMounted(async () => {
     duration: 0.7,
     y: 50
   }, "-=.5")
-  // .to(".content", {
-  //   y: "75px",
-  //   duration: 0.4
-  // })
-  // .to(".display", {
-  //   y: "75px",
-  //   duration: 0.4
-  // })
+  .to(".content", {
+    y: "75px",
+    duration: 0.4
+  })
+  .to(".display", {
+    y: "75px",
+    duration: 0.4
+  })
 
   if (currentUser) {
     loadFromLocalStorage();
@@ -148,11 +148,16 @@ template {
   text-align: center;
   color: white;
   background-color: white;
+  position: relative;
+  z-index: 2;
 }
 
 .display {
   display: flex;
   position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-bottom: 1px solid black;
 }
 
 .display img {

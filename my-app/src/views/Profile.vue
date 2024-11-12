@@ -1,83 +1,84 @@
 <template>
-  <div class="desktop-layout">
-    <div class="profile-layout">
-      <!-- Sidebar Section -->
-      <!-- Sidebar Section -->
-      <section class="sidebar-section">
-        <div class="profile-sidebar">
-          <!-- Navigation Links -->
-          <div class="nav-links">
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'profile' }"
-              @click="activeSection = 'profile'"
-            >
-              Edit Profile
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'delete' }"
-              @click="activeSection = 'delete'"
-            >
-              Delete Account
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'reviews' }"
-              @click="activeSection = 'reviews'"
-            >
-              View Reviews
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'listing' }"
-              @click="activeSection = 'listing'"
-            >
-              Listings
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'orders' }"
-              @click="activeSection = 'orders'"
-            >
-              Order History
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'sales' }"
-              @click="activeSection = 'sales'"
-            >
-              Sales History
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'editposts' }"
-              @click="activeSection = 'editposts'"
-            >
-              Edit Posts
-            </button>
-            <button 
-              class="sidebar-button"
-              :class="{ 'active': activeSection === 'vouchers' }"
-              @click="activeSection = 'vouchers'"
-            >
-              Vouchers
-            </button>
-            <button 
-              class="sidebar-button"
-              style="color: gold;"
-              :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
-              @click="activeSection = 'spin'"
-              v-if="spinChance > 0"
-            >
-              Lucky Wheel
-            </button>
+  <div>
+    <!-- Desktop Layout -->
+    <div class="desktop-layout">
+      <div class="profile-layout">
+        <!-- Sidebar Section -->
+        <section class="sidebar-section">
+          <div class="profile-sidebar">
+            <!-- Navigation Links -->
+            <div class="nav-links">
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'profile' }"
+                @click="activeSection = 'profile'"
+              >
+                Edit Profile
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'delete' }"
+                @click="activeSection = 'delete'"
+              >
+                Delete Account
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'reviews' }"
+                @click="activeSection = 'reviews'"
+              >
+                View Reviews
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'listing' }"
+                @click="activeSection = 'listing'"
+              >
+                Listings
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'orders' }"
+                @click="activeSection = 'orders'"
+              >
+                Order History
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'sales' }"
+                @click="activeSection = 'sales'"
+              >
+                Sales History
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'editposts' }"
+                @click="activeSection = 'editposts'"
+              >
+                Edit Posts
+              </button>
+              <button 
+                class="sidebar-button"
+                :class="{ 'active': activeSection === 'vouchers' }"
+                @click="activeSection = 'vouchers'"
+              >
+                Vouchers
+              </button>
+              <button 
+                class="sidebar-button"
+                style="color: gold;"
+                :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
+                @click="activeSection = 'spin'"
+                v-if="spinChance > 0"
+              >
+                Lucky Wheel
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Display Section -->
-      <section class="display-section">
+        <!-- Display Section -->
+        <section class="display-section">
         <div class="section-header">
           <h2>{{ activeSection === 'profile' ? 'Edit Profile' : 
                activeSection === 'delete' ? 'Delete Account' : 
@@ -179,8 +180,193 @@
           <Game />
         </div>
       </section>
+      </div>
     </div>
-  </div>
+
+
+
+    <!-- Mobile Layout -->
+    <div class="mobile-layout">
+      <!-- Profile Header -->
+      
+
+      <!-- Navigation Scroll Container -->
+      <div class="mobile-nav-container">
+        <div class="scroll-container">
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'profile' }"
+            @click="activeSection = 'profile'"
+          >
+            Edit Profile
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'delete' }"
+            @click="activeSection = 'delete'"
+          >
+            Delete Account
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'reviews' }"
+            @click="activeSection = 'reviews'"
+          >
+            Reviews
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'listing' }"
+            @click="activeSection = 'listing'"
+          >
+            Listings
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'orders' }"
+            @click="activeSection = 'orders'"
+          >
+            Orders
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'sales' }"
+            @click="activeSection = 'sales'"
+          >
+            Sales
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'editposts' }"
+            @click="activeSection = 'editposts'"
+          >
+            Posts
+          </button>
+          <button 
+            class="mobile-nav-button"
+            :class="{ 'active': activeSection === 'vouchers' }"
+            @click="activeSection = 'vouchers'"
+          >
+            Vouchers
+          </button>
+          <button 
+            v-if="spinChance > 0"
+            class="mobile-nav-button"
+            style="color: gold;"
+            :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
+            @click="activeSection = 'spin'"
+          >
+            Lucky Wheel
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Content Section -->
+      <div class="mobile-content">
+        <div class="section-header">
+          <h2>{{ activeSection === 'profile' ? 'Edit Profile' : 
+               activeSection === 'delete' ? 'Delete Account' : 
+               activeSection === 'reviews' ? 'User Reviews' :
+               activeSection === 'listing' ? 'Listings' :
+               activeSection === 'editposts' ? 'Edit Posts' :
+               activeSection === 'spin' ? 'Lucky Wheel' :
+               activeSection === 'vouchers' ? 'Vouchers' :
+               activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
+        </div>
+
+        <!-- Dynamic Content Based on Selection -->
+        <div v-if="activeSection === 'profile'" class="content-section">
+          <!-- User Profile Info -->
+          <div class="profile-header">
+            <div class="profile-photo">
+              <img :src="tempPhotoURL || photoURL || '../assets/user.jpeg'" alt="Profile Photo" />
+            </div>
+            
+            <div class="user-info text-center mb-4">
+              <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
+              <p class="mb-1">{{ userEmail }}</p>
+              <p class="mb-1">
+                <strong>Rating: </strong> {{ rating }}
+                <span v-for="n in 5" :key="n">
+                  <i :class="{
+                    'bi-star-fill': n <= rating,
+                    'bi-star': n > rating
+                  }" style="color: black; font-size: 1.2rem;">
+                  </i>
+                </span>
+              </p>
+            </div>
+          </div>
+          <form @submit.prevent="updateProfile" class="content-section">
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" id="name" v-model="tempName" placeholder="Enter your name" required />
+            </div>
+            <div class="form-group">
+              <label for="photo">Profile Photo:</label>
+              <input type="file" id="photo" @change="handlePhotoUpload" accept="image/*" />
+            </div>
+            <button type="submit" class="save-btn">Save Changes</button>
+          </form>
+        </div>
+
+        <div v-if="activeSection === 'delete'" class="content-section">
+          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          <div class="form-group">
+            <label for="confirmEmail">Email:</label>
+            <input type="email" id="confirmEmail" v-model="confirmEmail" placeholder="Enter your email" required />
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">Password:</label>
+            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password" required />
+          </div>
+          <button type="button" class="delete-btn" @click="confirmDeleteAccount">Delete Account</button>
+        </div>
+
+        <div v-if="activeSection === 'reviews'" class="content-section">
+          <div v-if="reviews.length === 0" class="no-container">
+            <p>No reviews yet.</p>
+          </div>
+          <div v-else>
+            <ol>
+              <li v-for="review in reviews">{{ review }}</li>
+            </ol>
+          </div>
+        </div>
+
+        <div v-if="activeSection === 'vouchers'" class="content-section">
+          <div v-if="vouchers.length === 0" class="no-container">
+            <p>No vouchers yet.</p>
+            <p>Spins left: {{ spinChance }}</p>
+          </div>
+          <div v-else>
+            <ol>
+              <li v-for="voucher in vouchers">{{ voucher }}</li>
+            </ol>
+            <p>Spins left: {{ spinChance }}</p>
+          </div>
+        </div>
+
+        <div v-if="activeSection === 'listing'">
+          <Listing></Listing>
+        </div>
+        <div v-if="activeSection === 'orders'">
+          <OrderHistory />
+        </div>
+        <div v-if="activeSection === 'sales'">
+          <SalesHistory />
+        </div>
+        <div v-if="activeSection === 'editposts'">
+          <EditPosts />
+        </div>
+        <div v-if="activeSection === 'spin'">
+          <h5 style="margin-left: 30px; margin-top: 20px;">Spins left: {{ spinChance }}</h5>
+          <Game />
+        </div>
+
+      </div>
+      </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -498,68 +684,6 @@ h2{
   display: none;
 }
 
-@media (max-width: 480px) {
-  .desktop-layout {
-    display: none;
-  }
-
-  .mobile-layout {
-    display: block;
-  }
-
-  .profile-layout {
-    flex-direction: column;
-  }
-
-  .sidebar-section {
-    width: 100%;
-    height: auto;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .sticky-nav {
-    position: sticky;
-    top: 104px;
-    z-index: 10;
-    background: white;
-  }
-
-  .profile-photo.mobile {
-    width: 100px;
-    height: 100px;
-  }
-
-  .scroll-container {
-    display: flex;
-    overflow-x: auto;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .scroll-container::-webkit-scrollbar {
-    display: none;
-  }
-
-  .mobile-nav-button {
-    flex: 0 0 auto;
-    padding: 0.5rem 1rem;
-    background: none;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    font-family: 'Helvetica Neue', sans-serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .mobile-nav-button:hover {
-    color: green;
-    border-color: green;
-  }
-}
-
 .profile-container {
   max-width: 600px;
   margin: auto;
@@ -573,10 +697,38 @@ h2{
   margin-bottom: 15px;
 }
 
-.content-section{
+.content-section {
   padding-left: 130px;
   padding-right: 130px;
   padding-top: 40px;
+}
+
+@media (max-width: 1200px) {
+  .content-section {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+
+@media (max-width: 992px) {
+  .content-section {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-section {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 input[type="text"],
@@ -676,6 +828,93 @@ input[type="file"] {
   .custom-col {
     flex: 0 0 100%; /* Make it full width */
     max-width: 100%; /* Prevent it from exceeding full width */
+  }
+}
+
+/* Updated and New Mobile Styles */
+@media (max-width: 480px) {
+  .desktop-layout {
+    display: none;
+  }
+
+  .mobile-layout {
+    display: block;
+  }
+
+  .mobile-profile-header {
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .profile-photo.mobile {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+
+  .user-info {
+    margin-top: 1rem;
+  }
+
+  .mobile-nav-container {
+    position: sticky;
+    top: 74px;
+    background: white;
+    z-index: 10;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    white-space: nowrap;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-nav-button {
+    flex: 0 0 auto;
+    padding: 0.5rem 1rem;
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-nav-button.active {
+    color: green;
+    border-color: green;
+    text-decoration: underline;
+  }
+
+  .mobile-nav-button:hover {
+    color: green;
+    border-color: green;
+    scale: 1.03;
+  }
+
+  .mobile-content {
+    padding: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  .content-section {
+    padding: 1rem;
   }
 }
 </style>
