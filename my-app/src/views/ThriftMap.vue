@@ -1,6 +1,6 @@
 <template>
   <div style="padding-top: 45px; padding-bottom: 45px; border-bottom: black solid 1px;">
-      <h3 class="title">Thrift & Vintage Stores in Singapore</h3>
+      <h3 class="head">Thrift Stores in Singapore</h3>
   </div>
   <div class="row g-0">
     <div class="col-12 col-lg-8 col-xl-8 col-xxl-8">
@@ -213,7 +213,7 @@ onMounted(async () => {
   margin: 0;
 }
 
-.title {
+.head {
     font-family: 'Helvetica Neue', sans-serif;
     font-weight: 700;
     text-transform: uppercase;
@@ -229,10 +229,6 @@ onMounted(async () => {
     height: 400px;
     margin: 0;
   }
-
-  .title{
-    padding-left: 10px;
-    padding-right: 10px;
-  }
 }
+
 </style>

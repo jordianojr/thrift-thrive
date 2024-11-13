@@ -1,8 +1,7 @@
 <template>
     <div class="row" style="margin-top: 130px;">
-      <div class="col-md-1 col-12"></div>
   
-      <div class="col-md-3 col-sm-12">
+      <div class="col-md-4 col-sm-12 px-5 py-2">
         <h3>Preview</h3>
         <div class="preview-card">
           <div :id="`carousel-preview`" class="carousel slide" :class="{ 'empty-carousel': previewImages.length === 0 }" data-bs-ride="carousel">
@@ -27,9 +26,8 @@
         </div>
       </div>
   
-      <div class="col-md-1 col-12"></div>
   
-      <div class="col-md-6 col-sm-12">
+      <div class="col-md-8 col-sm-12 px-5 py-2">
         <h3>Create Post</h3>
         <form @submit.prevent="createPost" class="create-post-form">
           <div class="form-group mb-3">
@@ -94,41 +92,41 @@
   };
   
   const handlePhotoUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files) {
-    const filesArray = Array.from(target.files);
-    files.value = [...files.value, ...filesArray];
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      const filesArray = Array.from(target.files);
+      files.value = [...files.value, ...filesArray];
+      
+      // Create a new DataTransfer object
+      const dataTransfer = new DataTransfer();
+      
+      // Add all files to the DataTransfer object
+      files.value.forEach(file => {
+        dataTransfer.items.add(file);
+      });
+      
+      // Update the file input's files
+      target.files = dataTransfer.files;
+    }
+  };
+
+  const removeFile = (index: number) => {
+    files.value.splice(index, 1);
     
     // Create a new DataTransfer object
     const dataTransfer = new DataTransfer();
     
-    // Add all files to the DataTransfer object
+    // Add remaining files to the DataTransfer object
     files.value.forEach(file => {
       dataTransfer.items.add(file);
     });
     
     // Update the file input's files
-    target.files = dataTransfer.files;
-  }
-};
-
-const removeFile = (index: number) => {
-  files.value.splice(index, 1);
-  
-  // Create a new DataTransfer object
-  const dataTransfer = new DataTransfer();
-  
-  // Add remaining files to the DataTransfer object
-  files.value.forEach(file => {
-    dataTransfer.items.add(file);
-  });
-  
-  // Update the file input's files
-  const fileInput = document.getElementById('photos') as HTMLInputElement;
-  if (fileInput) {
-    fileInput.files = dataTransfer.files;
-  }
-};
+    const fileInput = document.getElementById('photos') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+  };
 
   
   const createPost = async () => {

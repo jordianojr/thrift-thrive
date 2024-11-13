@@ -8,7 +8,6 @@
 
       <div v-if="userRole === 'admin'" class="d-flex justify-content-center position-absolute w-100" style="top: -1rem;">
         <button 
-          id="createbtn" 
           class="btn submit-btn text-uppercase py-2" 
           @click="navigateToCreatePost"
         >
@@ -291,7 +290,10 @@ h5.blog-title {
   font-size: 0.875rem !important;
   border: black 1px solid !important;
   cursor: pointer;
-  width: 15%;
+  min-width: 200px; /* Fixed minimum width */
+  width: auto; /* Allow button to grow if content needs more space */
+  padding-left: 2rem; /* Add horizontal padding */
+  padding-right: 2rem;
 }
 
 .submit-btn:hover {
@@ -299,5 +301,6 @@ h5.blog-title {
   background-color: white !important;
   border: black 1px solid !important;
 }
+
 
 </style>

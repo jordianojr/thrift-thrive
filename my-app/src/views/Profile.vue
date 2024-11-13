@@ -152,12 +152,8 @@
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
           <div v-if="vouchers.length === 0" class="no-container">
-<<<<<<< HEAD
-            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
-=======
             <p>No vouchers yet.</p> <br>
             <p>Spins left: {{ spinChance }}</p>
->>>>>>> 000fefc88efb915eebd9954835b02435422eb4d5
           </div>
           <div v-else>
             <ol>
@@ -402,7 +398,7 @@ const profileRef = ref<HTMLElement | null>(null);
 const customColRef = ref<HTMLElement | null>(null);
 const confirmEmail = ref('');
 const confirmPassword = ref('');
-const activeSection = ref('listing');
+const activeSection = ref('profile');
 const rating = ref(0);
 const reviews = ref<string[]>([]);
 const spinChance = ref(0);
@@ -732,8 +728,8 @@ h2{
 
 @media (max-width: 480px) {
   .content-section {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -886,15 +882,17 @@ input[type="file"] {
   }
 
   .mobile-nav-button {
-    flex: 0 0 auto;
-    padding: 0.5rem 1rem;
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    margin-right: 0.2rem;
     background: none;
     border: 1px solid #e2e8f0;
     border-radius: 0.5rem;
     font-family: 'Helvetica Neue', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     text-transform: uppercase;
-    white-space: nowrap;
+    letter-spacing: 1px;
+    cursor: pointer;
     transition: all 0.3s ease;
   }
 
@@ -910,17 +908,5 @@ input[type="file"] {
     scale: 1.03;
   }
 
-  .mobile-content {
-    padding: 1rem;
-  }
-
-  .section-header h2 {
-    font-size: 1.5rem;
-    padding: 1rem 0;
-  }
-
-  .content-section {
-    padding: 1rem;
-  }
 }
 </style>

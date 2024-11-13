@@ -135,9 +135,8 @@
     </div>
   </div>
 
-    <!-- Mobile Layout -->
+    <!-- Mobile Layout with fixes -->
     <div class="mobile-layout">
-      
       <div class="categories-row">
         <div class="search-container">
           <div class="search-wrapper">
@@ -151,6 +150,7 @@
           </div>
         </div>
       </div>
+      
       <!-- Categories Row -->
       <div class="categories-row scroll-container">
         <button 
@@ -169,7 +169,7 @@
         <button 
           v-if="hasActiveFilters"
           @click="resetFilters"
-          class="reset-button-mobile"
+          class="category-button"
         >
           Reset
         </button>
@@ -177,8 +177,11 @@
           v-for="filterType in filterTypes"
           :key="filterType.id"
           class="filter-button"
-          :class="{ 'active': openFilters.includes(filterType.id) }"
-          @click="toggleFilter(filterType.id)"
+          :class="{ 
+            'active': openFilters.includes(filterType.id),
+            'has-selection': hasFilterSelection(filterType.id)
+          }"
+          @click="mobiletoggleFilter(filterType.id)"
         >
           {{ filterType.label }}
         </button>
@@ -187,54 +190,53 @@
       <!-- Sub-Filters Row -->
       <div v-if="openFilters.length > 0" class="sub-filters-row">
         <div class="scroll-container">
-        <div v-if="openFilters.includes('price')" class="sub-filters-group">
-          <button 
-            v-for="range in priceRanges"
-            :key="range"
-            class="sub-filter-button"
-            :class="{ 'selected': filters.priceRange === range }"
-            @click="toggleSubFilter('priceRange', range)"
-          >
-            {{ range }}
-          </button>
-        </div>
-        <div v-if="openFilters.includes('condition')" class="sub-filters-group">
-          <button 
-            v-for="condition in conditions"
-            :key="condition"
-            class="sub-filter-button"
-            :class="{ 'selected': filters.condition === condition }"
-            @click="toggleSubFilter('condition', condition)"
-          >
-            {{ condition }}
-          </button>
-        </div>
-        <div v-if="openFilters.includes('gender')" class="sub-filters-group">
-          <button 
-            v-for="option in genderOptions"
-            :key="option"
-            class="sub-filter-button"
-            :class="{ 'selected': filters.gender === option }"
-            @click="toggleSubFilter('gender', option)"
-          >
-            {{ option }}
-          </button>
-        </div>
-        <div v-if="openFilters.includes('size')" class="sub-filters-group">
-          <button 
-            v-for="size in sizes"
-            :key="size"
-            class="sub-filter-button"
-            :class="{ 'selected': filters.condition === size }"
-            @click="toggleSubFilter('size', size)"
-          >
-            {{ size }}
-          </button>
-        </div>
+          <div v-if="openFilters.includes('price')" class="sub-filters-group">
+            <button 
+              v-for="range in priceRanges"
+              :key="range"
+              class="sub-filter-button"
+              :class="{ 'selected': filters.priceRange === range }"
+              @click="toggleSubFilter('priceRange', range)"
+            >
+              {{ range }}
+            </button>
+          </div>
+          <div v-if="openFilters.includes('condition')" class="sub-filters-group">
+            <button 
+              v-for="condition in conditions"
+              :key="condition"
+              class="sub-filter-button"
+              :class="{ 'selected': filters.condition === condition }"
+              @click="toggleSubFilter('condition', condition)"
+            >
+              {{ condition }}
+            </button>
+          </div>
+          <div v-if="openFilters.includes('gender')" class="sub-filters-group">
+            <button 
+              v-for="option in genderOptions"
+              :key="option"
+              class="sub-filter-button"
+              :class="{ 'selected': filters.gender === option }"
+              @click="toggleSubFilter('gender', option)"
+            >
+              {{ option }}
+            </button>
+          </div>
+          <div v-if="openFilters.includes('size')" class="sub-filters-group">
+            <button 
+              v-for="size in sizes"
+              :key="size"
+              class="sub-filter-button"
+              :class="{ 'selected': filters.size === size }"
+              @click="toggleSubFilter('size', size)"
+            >
+              {{ size }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  
 </template>
 
 <script lang="ts" setup>
@@ -354,6 +356,32 @@ const handleChoice = (category: string) => {
   }
   emit('categorySelected', selectedCategory.value);
 };
+
+const mobiletoggleFilter = (filterType: string) => {
+  const index = openFilters.value.indexOf(filterType);
+  if (index === -1) {
+    // Close other filters before opening new one
+    openFilters.value = [filterType];
+  } else {
+    // Only close if clicking the same filter
+    openFilters.value = [];
+  }
+};
+const hasFilterSelection = (filterType: string) => {
+  switch (filterType) {
+    case 'price':
+      return !!filters.priceRange;
+    case 'condition':
+      return !!filters.condition;
+    case 'gender':
+      return !!filters.gender;
+    case 'size':
+      return !!filters.size;
+    default:
+      return false;
+  }
+};
+
 </script>
 
 <style scoped>
@@ -544,7 +572,7 @@ const handleChoice = (category: string) => {
 .filter-button,
 .sub-filter-button {
   display: inline-block;
-  padding: 0.2rem 0.3rem;
+  padding: 0.3rem 0.6rem;
   margin-right: 0.2rem;
   background: none;
   border: 1px solid #e2e8f0;
@@ -557,38 +585,33 @@ const handleChoice = (category: string) => {
   transition: all 0.3s ease;
 }
 
-.reset-button-mobile {
-  padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
-  background: none;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
 /* Selected and Active States */
 .selected,
-.active,
-.sidebar-button.selected,
-.option-button.selected {
+.active
+{
   color: green;
   border-color: green;
   text-decoration: underline;
 }
 
 /* Hover States */
-.sidebar-button:hover,
-.option-button:hover,
-.category-button:hover,
-.filter-button:hover,
-.sub-filter-button:hover,
-.reset-button:hover,
-.reset-button-mobile:hover {
+.desktop-layout .sidebar-button:hover,
+.desktop-layout .option-button:hover,
+.desktop-layout .category-button:hover,
+.desktop-layout .filter-button:hover,
+.desktop-layout .sub-filter-button:hover,
+.desktop-layout .reset-button:hover
+{
   color: green;
   border-color: green;
   scale: 1.03;
+}
+
+.mobile-layout .filter-button.active,
+.mobile-layout .filter-button.has-selection {
+  color: green;
+  border-color: green;
+  text-decoration: underline;
 }
 
 /* Mobile Breakpoint */

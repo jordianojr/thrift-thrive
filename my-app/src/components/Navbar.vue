@@ -2,44 +2,41 @@
   <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom border-secondary">
     <div class="container-fluid">
       <router-link class="navbar-brand mx-3" to="/">Thrive</router-link>
-      <button 
-        class="navbar-toggler" 
-        type="button" 
-        data-bs-toggle="collapse" 
-        data-bs-target="#navbarNavAltMarkup" 
-        aria-controls="navbarNavAltMarkup" 
-        aria-expanded="false" 
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
         aria-label="Toggle navigation"
+        ref="navbarToggler"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup" ref="navbarCollapse">
         <div class="navbar-nav me-auto">
-          <router-link class="nav-link nav-elegant mx-2" to="/marketplace">
+          <router-link class="nav-link nav-elegant mx-2" to="/marketplace" @click="closeNavbar">
             <i class="bi bi-shop"></i> Marketplace
           </router-link>
-          <router-link class="nav-link nav-elegant mx-2" to="/thrift-stores">
+          <router-link class="nav-link nav-elegant mx-2" to="/thrift-stores" @click="closeNavbar">
             <i class="bi bi-bag"></i> Thrift Stores
           </router-link>
-          <router-link class="nav-link nav-elegant mx-2" to="/editorial">
+          <router-link class="nav-link nav-elegant mx-2" to="/editorial" @click="closeNavbar">
             <i class="bi bi-pencil"></i> Editorial
           </router-link>
         </div>
-
         <div class="navbar-nav">
-          <router-link class="nav-link nav-elegant mx-2" to="/sell">
+          <router-link class="nav-link nav-elegant mx-2" to="/sell" @click="closeNavbar">
             <i class="bi bi-box-seam"></i> Sell
           </router-link>
-          <!-- <router-link class="nav-link nav-elegant mx-2" to="/cart">
-            <i class="bi bi-cart"></i> Cart
-          </router-link> -->
-          <router-link class="nav-link nav-elegant mx-2" to="/chat">
+          <router-link class="nav-link nav-elegant mx-2" to="/chat" @click="closeNavbar">
             <i class="bi bi-chat"></i> Chat
           </router-link>
-          <router-link class="nav-link nav-elegant mx-2" to="/login" @click.prevent="handleLogout">
+          <router-link class="nav-link nav-elegant mx-2" to="/login" @click="handleLogout">
             <i class="bi bi-box-arrow-right"></i> Log out
           </router-link>
-          <router-link class="nav-link nav-elegant mx-2" to="/profile">
+          <router-link class="nav-link nav-elegant mx-2" to="/profile" @click="closeNavbar">
             <i class="bi bi-person-gear custom-icon"></i>
           </router-link>
         </div>
@@ -49,15 +46,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { auth } from '../lib/firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const navbarToggler = ref<HTMLElement | null>(null);
+const navbarCollapse = ref<HTMLElement | null>(null);
 
 async function animateBrand() {
-  gsap.to(".navbar-brand", { 
+  gsap.to(".navbar-brand", {
     duration: 5,
     color: '#ffffff',
     repeat: -1,
@@ -67,10 +66,18 @@ async function animateBrand() {
   });
 }
 
+const closeNavbar = () => {
+  // Check if the navbar is expanded (mobile view)
+  if (navbarCollapse.value?.classList.contains('show')) {
+    navbarToggler.value?.click();
+  }
+};
+
 const handleLogout = async () => {
   try {
     await signOut(auth);
     localStorage.clear();
+    closeNavbar(); // Close navbar on logout too
     router.push({ name: 'login' });
   } catch (error) {
     console.error("Logout error:", error);

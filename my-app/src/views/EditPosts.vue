@@ -1,42 +1,42 @@
 <template>
-    <div class="row" style="margin-bottom: 40px;">
+    <div class="row">
       <div v-if="blogPosts.length == 0" style="padding-bottom: 20px;" class="no-container">
           <p>You have no posts to edit yet.</p>
       </div>
 
       <template v-else>
-        <div v-for="post in blogPosts" :key="post.id" class="col-4 col-sm-3 col-md-2 col-lg-2 m-0 p-0" ref="blogCard">
-          <div class="blog-card" @click="fetchPost(post.id)">
-            <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-inner">
-                <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
-                :class="{ active: index === 0 }">
+  <div style="border-bottom: 1px black solid; margin-bottom: 40px;">
+    <div class="d-flex flex-row overflow-auto">
+      <div v-for="post in blogPosts" :key="post.id" class="blog-card-container">
+        <div class="blog-card" @click="fetchPost(post.id)">
+          <div :id="`carousel-${post.id}`" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item" v-for="(image, index) in getPostImages(post)" :key="index"
+              :class="{ active: index === 0 }">
                 <img :src="image" class="d-block w-100 blog-image" :alt="`Slide ${index + 1}`">
-                </div>
               </div>
-              <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
-                  data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-              </button>
-              <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
-                  data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-              </button>
             </div>
-
-            <!-- <div class="post-content p-3">
-            <h5 class="blog-title text-truncate-2">{{ post.title }}</h5>
-            <p class="blog-caption text-truncate-4">{{ post.caption }}</p>
-            </div> -->
+            <button class="carousel-control-prev" type="button" :data-bs-target="'#carousel-' + post.id"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" :data-bs-target="'#carousel-' + post.id"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-1 col-12"></div>
-            <div class="col-md-3 col-sm-12">
-            <h4>Preview</h4>
+        
+          </div>
+        </div>
+      </div>
+
+        <div class="row px-4 m-0">
+            <div class="col-md-4 col-sm-12 px-4 py-2">
+            <h3>Preview</h3>
             <div class="preview-card">
               <div :id="`carousel-preview`" class="carousel slide" :class="{ 'empty-carousel': previewImages.length === 0 }" data-bs-ride="carousel">
                 <div class="carousel-inner">
@@ -60,10 +60,9 @@
             </div>
           </div>
   
-      <div class="col-md-1 col-12"></div>
   
-      <div class="col-md-6 col-sm-12">
-        <h4>Edit Post</h4>
+      <div class="col-md-8 col-sm-12 px-4 py-2">
+        <h3>Edit Post</h3>
         <form @submit.prevent="updatePost" class="create-post-form">
           <div class="form-group mb-3">
             <label for="title">Title</label>
@@ -108,7 +107,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed, onMounted, onUnmounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { doc, getDoc, deleteDoc, updateDoc, collection, query, where, getDocs, documentId } from 'firebase/firestore';
   import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -126,12 +125,25 @@
   const blogPosts = ref<any[]>([]);
 
   const previewImages = computed(() => {
-  if (editPostId.value) {
-    const selectedPost = blogPosts.value.find((post) => post.id === editPostId.value);
-    return selectedPost ? getPostImages(selectedPost) : [];
-  }
-  return files.value.map((file) => URL.createObjectURL(file));
-});
+    // If there are newly uploaded files, show those
+    if (files.value.length > 0) {
+      return files.value.map(file => {
+        if (file instanceof File) {
+          return URL.createObjectURL(file);
+        }
+        // For existing images that might be stored as URLs
+        return typeof file === 'string' ? file : file.url;
+      });
+    }
+    
+    // Otherwise, if there's a selected post, show its images
+    if (editPostId.value) {
+      const selectedPost = blogPosts.value.find((post) => post.id === editPostId.value);
+      return selectedPost ? getPostImages(selectedPost) : [];
+    }
+    
+    return [];
+  });
   
   const isFormValid = computed(() => {
     return title.value.length >= 1 && caption.value.length >= 1;
@@ -181,6 +193,7 @@
   const fetchPost = async (postId: string) => {
     try {
       editPostId.value = postId;  
+      files.value = [];
       const postRef = doc(db, 'Editorial', postId); // Replace with the correct collection and document ID
       const postSnapshot = await getDoc(postRef);
       console.log('Post Snapshot:', postSnapshot.data());
@@ -364,6 +377,16 @@
     };
 
   onMounted(fetchPostId);
+  onUnmounted(() => {
+  // Cleanup any created object URLs
+  if (files.value.length > 0) {
+    files.value.forEach(file => {
+      if (file instanceof File) {
+        URL.revokeObjectURL(URL.createObjectURL(file));
+      }
+    });
+  }
+});
   </script>
   
   <style scoped>
@@ -380,6 +403,22 @@
       border-bottom: black solid 1px;
     }
 
+
+    .blog-card-container {
+        min-width: 110px; /* Adjust this value based on your needs */
+        width: 110px; /* Adjust this value based on your needs */
+        margin-right: 1px;
+      }
+
+      .d-flex.flex-row::-webkit-scrollbar {
+        display: none; /* Hides scrollbar for WebKit browsers */
+      }
+
+      .d-flex.flex-row {
+        -ms-overflow-style: none;  /* Hides scrollbar for IE and Edge */
+        scrollbar-width: none;  /* Hides scrollbar for Firefox */
+      }
+
     .blog-card {
     max-width: 100%; /* Prevents card from overflowing */
     height: 100%;
@@ -392,16 +431,10 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-  .blog-card .blog-image{
-    border-radius:
-  }
-
     .blog-image {
       width: 100%;
       aspect-ratio: 3/4;
       object-fit: cover;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
       position: relative;
       overflow: hidden;
       transition: all 0.3s ease;
@@ -413,6 +446,22 @@
 
     .carousel {
       background: #000;
+    }
+
+    h3{
+      text-transform: uppercase;
+      color: black;
+      font-size: 1.2rem;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    
+    .preview-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .empty-carousel {
@@ -427,19 +476,35 @@
 
     .carousel-item {
       aspect-ratio: 3/4;
-      
     }
 
-    .blog-title {
-    font-size: 1.1rem; /* Make the title smaller */
+    h5.blog-title {
+      font-weight: 400;
+      color: black;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      word-wrap: break-word;
+      white-space: normal;
     }
 
     .blog-caption {
-    font-size: 0.9rem; /* Make the caption smaller */
-    height: 100px; /* Ensures the card takes up the full height */
-    overflow-y: scroll;
+      font-family: 'Helvetica Neue', sans-serif;
+      color: black;
+      font-size: 0.875rem;
+      font-weight: 300;
+      word-wrap: break-word;
+      white-space: normal;
     }
 
+    .create-post-form {
+  background-color: white;
+  margin-top: 1.4rem;
+  color: rgb(25, 25, 25);
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 400;
+  text-align: left;
+  font-size: 0.875rem;
+}
 
     .file-item {
       position: relative;
