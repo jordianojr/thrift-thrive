@@ -21,5 +21,8 @@ import PhaserContainer from '@/components/PhaserContainer.vue'
   font-family: 'Courier New', Courier, monospace;
   background-color: white;
   margin: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 </style>

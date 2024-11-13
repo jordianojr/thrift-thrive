@@ -68,7 +68,7 @@
                 class="sidebar-button"
                 style="color: gold;"
                 :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
-                @click="activeSection = 'spin'"
+                @click="goToSpin"
                 v-if="spinChance > 0"
               >
                 Lucky Wheel
@@ -152,7 +152,12 @@
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
           <div v-if="vouchers.length === 0" class="no-container">
+<<<<<<< HEAD
             <p>No vouchers yet. Spins left: {{ spinChance }}</p>
+=======
+            <p>No vouchers yet.</p> <br>
+            <p>Spins left: {{ spinChance }}</p>
+>>>>>>> 000fefc88efb915eebd9954835b02435422eb4d5
           </div>
           <div v-else>
             <ol>
@@ -173,10 +178,6 @@
         </div>
         <div v-if="activeSection === 'editposts'">
           <EditPosts />
-        </div>
-        <div v-if="activeSection === 'spin'">
-          <h5 style="margin-left: 30px; margin-top: 20px;">Spins left: {{ spinChance }}</h5>
-          <Game />
         </div>
       </section>
       </div>
@@ -253,7 +254,7 @@
             class="mobile-nav-button"
             style="color: gold;"
             :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
-            @click="activeSection = 'spin'"
+            @click="goToSpin"
           >
             Lucky Wheel
           </button>
@@ -359,8 +360,8 @@
           <EditPosts />
         </div>
         <div v-if="activeSection === 'spin'">
-          <h5 style="margin-left: 30px; margin-top: 20px;">Spins left: {{ spinChance }}</h5>
-          <Game />
+          <h5 style="position: fixed; margin-left: 30px; margin-top: 20px;">Spins left: {{ spinChance }}</h5>
+          <Game></Game>
         </div>
 
       </div>
@@ -390,6 +391,7 @@ interface UserData {
 }
 
 const router = useRouter();
+const userId = ref('');
 const userEmail = ref('');
 const name = ref('');
 const photoURL = ref('');
@@ -408,10 +410,13 @@ const vouchers = ref<string[]>([]);
 
 const isBouncing = ref(false);
 
+const goToSpin = () => {
+  router.push('/spin');
+};
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
   if (user) {
-    await loadFromLocalStorage(user.uid);
+    await loadFromLocalStorage();
     await fetchUserData(user.uid);
   } else {
     resetUserData();
@@ -425,10 +430,11 @@ const startBouncing = () => {
   }, 1000); // Duration of the animation
 };
 
-const loadFromLocalStorage = async (uid: string) => {
-  const cachedData = localStorage.getItem(`user_${uid}`);
+const loadFromLocalStorage = async () => {
+  const cachedData = localStorage.getItem(`user`);
   if (cachedData) {
     const userData = JSON.parse(cachedData);
+    userId.value = userData.uid;
     userEmail.value = userData.email || '';
     name.value = userData.name || '';
     photoURL.value = userData.photoURL || '';
@@ -451,7 +457,8 @@ const fetchUserData = async (uid: string) => {
     spinChance.value = userData.spinChance || 0;
     vouchers.value = userData.vouchers || [];
 
-    localStorage.setItem(`user_${uid}`, JSON.stringify({
+    localStorage.setItem(`user`, JSON.stringify({
+      uid: uid,
       email: userEmail.value,
       name: name.value,
       photoURL: photoURL.value,
@@ -704,29 +711,29 @@ h2{
 
 @media (max-width: 1200px) {
   .content-section {
-    padding-left: 80px;
-    padding-right: 80px;
-  }
-}
-
-@media (max-width: 992px) {
-  .content-section {
     padding-left: 60px;
     padding-right: 60px;
   }
 }
 
+@media (max-width: 992px) {
+  .content-section {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
 @media (max-width: 768px) {
   .content-section {
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .content-section {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }
 

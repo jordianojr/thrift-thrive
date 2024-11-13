@@ -3,28 +3,36 @@ import BootScene from '@/components/scene/BootScene.js'
 import WheelSpin from '@/components/scene/WheelScene.js'
 
 export function launch(containerId, callbacks = {}) {
+  // Get initial window dimensions
+  const getWindowDimensions = () => ({
+    width: window.innerWidth,
+    height: window.innerHeight
+  })
+
   const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    autoCenter: true,
+    scale: {
+      mode: Phaser.Scale.FIT,  // Changed from RESIZE to FIT to avoid framebuffer issues
+      parent: containerId,
+      width: 800,  // Set base width
+      height: 600, // Set base height
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     backgroundColor: '#ffffff',
-    parent: containerId,
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 300 },
-        debug: false
+        debug: true
       }
     },
     scene: [BootScene, WheelSpin]
   }
 
   const game = new Phaser.Game(config)
-  
-  // Pass callbacks to the scene
-  game.scene.start('WheelSpin', { 
-    onPrizeWon: callbacks.onPrizeWon 
+
+  // Start the wheel spin scene with callbacks
+  game.scene.start('WheelSpin', {
+    onPrizeWon: callbacks.onPrizeWon
   })
 
   return game

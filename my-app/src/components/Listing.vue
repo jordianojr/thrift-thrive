@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid" style="padding-right: 130px; padding-left: 130px; padding-top: 40px;">
+    <div class="container-fluid" style="padding-top: 40px;">
       <div style="padding-bottom: 20px;">
         <Loading :isLoading="isLoading" message="Fetching your products..." />
       </div>
@@ -9,7 +9,7 @@
           <router-link to="/sell" class="btn sell-btn">Sell Item</router-link>
         </div>
         <div v-else class="row">
-          <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
+          <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-6 col-12">
             <div class="card mb-4">
               <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">
               <div class="card-body">
@@ -68,12 +68,13 @@
   };
   
   const getUserUID = () => {
-  if (auth.currentUser) {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
     return auth.currentUser.uid;
-  } else {
-    alert('User is not logged in!');
-    return null;
-  }
+    }
 };
 
 const editItem = (itemId: string) => {
@@ -187,5 +188,41 @@ async function deleteFolder(folderPath: string | undefined) {
   background-color: white !important;
   border: black 1px solid !important;
 }
+
+@media (min-width: 1200px) {
+  .container-fluid {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container-fluid {
+    padding-left: 90px;
+    padding-right: 90px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container-fluid {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
   </style>
   
