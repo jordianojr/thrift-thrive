@@ -149,9 +149,25 @@
     return title.value.length >= 1 && caption.value.length >= 1;
   });
   
-  const getPreviewUrl = (file: File) => {
+  const getPreviewUrl = (file: File | string) => {
+  console.log('File:', file);
+
+  // Check if file is a string (URL), then return it directly
+  if (typeof file.url === 'string') {
+    return file.url;
+  }
+
+  // Ensure file is a File or Blob before creating an object URL
+  if (file instanceof File) {
+    console.log(URL.createObjectURL(file))
     return URL.createObjectURL(file);
-  };
+  }
+
+  // Return null or a default placeholder if file type is invalid
+  console.warn('Invalid file type:', file);
+  return null;
+};
+
   
   const handlePhotoUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -174,7 +190,6 @@
   
   const removeFile = (index: number) => {
     files.value.splice(index, 1);
-    
     // Create a new DataTransfer object
     const dataTransfer = new DataTransfer();
     
@@ -224,21 +239,32 @@
       const user = auth.currentUser;
       if (user) {
         // If new images are uploaded, handle the upload
-        const photoUrls = files.value.length
-          ? await Promise.all(files.value.map(async (file, index) => {
+        const newFiles:any = [];
+        const oldUrls:any = [];
+        files.value.forEach(file => {
+          if (file instanceof File) {
+            newFiles.push(file);
+          }else{
+            oldUrls.push(file.url);
+          }
+        });
+        console.log('New Files:', newFiles);
+        const photoUrls = newFiles.length
+          ? await Promise.all(newFiles.map(async (file: Blob | ArrayBuffer | Uint8Array, index: number) => {
               const storage = getStorage();
-              const photoRef = storageRef(storage, `editorial_photos/${postId}/photo-${index + 1}.webp`);
+              const photoRef = storageRef(storage, `editorial_photos/${editPostId.value}/photo-${index + oldUrls.length}.webp`);
               const snapshot = await uploadBytes(photoRef, file);
               return await getDownloadURL(snapshot.ref);
             }))
           : [];
-  
+        const updateUrls = oldUrls.concat(photoUrls);   
+        console.log('Update URLs:', updateUrls); 
         // Update the editorial document in Firestore
         const editorialDocRef = doc(db, 'Editorial', editPostId.value);
         await updateDoc(editorialDocRef, {
           title: title.value.toUpperCase(),
           caption: caption.value,
-          image: photoUrls.length ? photoUrls : files.value.map(file => file.url),
+          image: updateUrls.length ? updateUrls : files.value.map(file => file.url),
           sellerId: user.uid,
           date: new Date().toISOString(),
         });
@@ -273,7 +299,7 @@
         const userSnapshot = await getDoc(userDocRef);
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
-          const updatedUserPosts = userData.userPosts.filter((id) => id !== editPostId.value);
+          const updatedUserPosts = userData.userPosts.filter((id: string) => id !== editPostId.value);
           await updateDoc(userDocRef, { userPosts: updatedUserPosts });
         }
 
