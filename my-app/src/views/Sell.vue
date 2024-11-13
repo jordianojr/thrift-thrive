@@ -436,12 +436,19 @@ button:hover {
 }
 
 @media (max-width: 992px) {
+  .header-container {
+  width: 100%;
+  margin: 0 auto;
+  border-left: 0px;
+  border-right: 0px;
+}
   .upload-form {
   padding: 20px;
   margin: 0px;
   max-width: 100%;
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 400;
+  border: 0px;
   } 
 
   .form-group {

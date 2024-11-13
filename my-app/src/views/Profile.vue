@@ -152,8 +152,7 @@
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
           <div v-if="vouchers.length === 0" class="no-container">
-            <p>No vouchers yet.</p>
-            <p>Spins left: {{ spinChance }}</p>
+            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
           </div>
           <div v-else>
             <ol>
