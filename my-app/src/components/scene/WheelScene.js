@@ -74,11 +74,11 @@ export default class WheelSpin extends Scene {
     const prizes = [
       "🎉 20% OFF",
       "🎉 10% OFF",
-      "🎉 FREE DELIVERY",
+      "🎉 5% OFF",
       "🎉 10% OFF",
       "🎉 20% OFF",
       "🎉 10% OFF",
-      "🎉 FREE DELIVERY",
+      "🎉 5% OFF",
       "🎉 10% OFF",
     ];
   

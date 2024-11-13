@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { auth, db } from '@/lib/firebaseConfig'
 import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore'
 import router from '@/router';
@@ -55,11 +55,22 @@ onMounted(() => {
   gameInstance = game.launch(containerId, { onPrizeWon: savePrizeToFirebase })
 })
 
-onUnmounted(() => {
-  gameInstance.destroy(false)
+onBeforeUnmount(() => {
+  if (gameInstance.value) {
+    // Properly destroy the Phaser game instance
+    gameInstance.value.destroy(true, false)
+  }
 })
 </script>
 
 <template>
-  <div :id="containerId" />
+  <div :id="containerId"></div>
 </template>
+
+<style scoped>
+#containerId {
+  width: 100%;
+  height: 100vh; /* Full viewport height */
+  overflow: hidden; /* Prevents scrolling if the game overflows */
+}
+</style>

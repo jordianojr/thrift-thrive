@@ -135,6 +135,18 @@
               <p style="color: black" class="mb-2">Returns and refunds depend on the seller's decision. Not covered by Buyer Protection.</p>
               <p style="color: black" class="mb-0">Pay only at the meet-up. Transferring money directly to strangers puts you at risk of e-commerce scams.</p>
             </div>
+            <div class="card bg-white rounded-2 p-4" style="margin-top: 20px; padding: 10px !important;">
+              <h5>Vouchers</h5>
+              <p v-if="vouchers.length === 0">No vouchers available</p>
+              <div v-else>
+                <select id="voucher-select" v-model="selectedVoucher" @change="applyVoucher">
+                <option v-for="voucher in vouchers" :key="voucher.id" :value="voucher.prize">
+                  {{ voucher.code }} - {{ voucher.prize }}
+                </option>
+                </select>
+              <p>Selected Voucher: {{ selectedVoucher }}</p>              
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -142,7 +154,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, type Ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import axios from 'axios';
   import { auth, db } from '@/lib/firebaseConfig';
@@ -163,6 +175,7 @@
   const itemImages = ref<string[]>([]);
   const itemName = ref('');
   const itemPrice = ref(0);
+  let originalPrice = 0;
   const condition = ref('');
   const type = ref('');
   const listedTime = ref('');
@@ -176,7 +189,24 @@
   const reviews = ref([]);
   const offerPrice = ref('');
   const isLoading = ref(true);
+  const selectedVoucher = ref('');  
+
+  interface Voucher {
+  id: string; // Or use 'any' if you’re unsure of the type
+  // Add other properties of your voucher documents if needed
+  prize?: string; // Optional example property
+}
+
+const vouchers: Ref<Voucher[]> = ref([]);
   
+  const applyVoucher = () => {
+    console.log('Selected voucher:', selectedVoucher.value);
+    const text = selectedVoucher.value;
+    const number = parseInt(text.match(/\d+/)[0], 10);
+    const percentage = 1 - number/100; // 10% discount
+    itemPrice.value = (originalPrice * percentage).toFixed(2);
+  };
+
   const fetchUserData = async (userId: string) => {
     const userDocRef = doc(db, 'users', userId);
     const userDocSnap = await getDoc(userDocRef);
@@ -212,6 +242,7 @@
         // Fetch user data based on sellerId
         checkSeller(sellerId.value);
         await fetchUserData(sellerId.value);
+        originalPrice = itemPrice.value;
       } else {
         console.error("No such item!");
         alert("Item not found. Please try again.");
@@ -224,7 +255,37 @@
     }
   };
   
-  onMounted(fetchItem);
+  const fetchVouchers = async () => {
+  try {
+    const userId = auth.currentUser?.uid as string;
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    const userVouchers = userDocSnap.data()?.vouchers || [];
+
+    const fetchedVouchers: Voucher[] = []; // Ensure this array matches the Voucher type
+
+    for (const voucherId of userVouchers) {
+      const voucherDocRef = doc(db, 'prizes', voucherId);
+      const voucherDocSnap = await getDoc(voucherDocRef);
+
+      if (voucherDocSnap.exists()) {
+        fetchedVouchers.push({ id: voucherId, ...voucherDocSnap.data() } as Voucher);
+      }
+    }
+
+    vouchers.value = fetchedVouchers; // This should work now without errors
+
+    console.log(vouchers.value); // Verify the populated data
+  } catch (error) {
+    console.error("Error fetching vouchers:", error);
+  }
+};
+
+onMounted( async () => {
+    await fetchVouchers();
+    fetchItem();
+    });
 
   const addToCart = async () => {
   try {

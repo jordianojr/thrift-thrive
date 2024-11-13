@@ -14,6 +14,7 @@ import CreatePost from '../components/createPost.vue';
 import SellerProfile from '../views/SellerProfile.vue';
 import EditPost from '../views/EditPosts.vue';
 import EditItem from '../views/EditListing.vue';
+import Game from '../components/Game.vue';
 
 // Function to check if user is logged in
 const isLoggedIn = () => {
@@ -126,6 +127,12 @@ const router = createRouter({
       path: '/edit-listing/:id',
       name: 'editItem',
       component: EditItem,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/spin',
+      name: 'spin',
+      component: Game,
       meta: { requiresAuth: true },
     },
   ]
