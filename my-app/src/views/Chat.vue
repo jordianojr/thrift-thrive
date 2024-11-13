@@ -3,7 +3,7 @@
     <div class="container-fluid h-100">
       <div class="row h-100 chat-wrapper">
         <!-- Left Column - Inbox -->
-        <div class="col-md-4 col-lg-3 p-0 border-end border-secondary">
+        <div :class="['col-md-4 col-lg-3 p-0 border-end border-secondary', {'hidden': isMobileAndChatSelected}]">
           <div class="d-flex align-items-center p-3 border-bottom border-secondary topbar">
             <h5 class="chat-header m-0">Inbox</h5>
             <span class="chat-header text-secondary ms-2">({{ unreadCount }} unread)</span>
@@ -39,11 +39,16 @@
           <!-- Chat Header -->
           <div class="p-3 border-bottom border-secondary chat-header topbar">
             <div class="d-flex align-items-center">
-              <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt="" 
-                  class="rounded-circle" style="width: 40px; height: 40px;">
-              <div class="ms-3">
-                <h5 class="mb-0 text-black">{{ selectedChat?.sellerName || 'Select a chat' }}</h5>
-                <small class="text-secondary">{{ selectedChat?.itemName }}</small>
+              <button 
+                class="btn mobile-back-button d-md-none"
+                @click="backToInbox"
+              >
+                <i class="bi bi-chevron-left fs-4"></i>
+              </button>
+              <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt="" class="rounded-circle chat-header-avatar">
+              <div class="ms-3 chat-header-info">
+                <h5 class="mb-0 text-black seller-name">{{ selectedChat?.sellerName || 'Select a chat' }}</h5>
+                <small class="text-secondary product-name">{{ selectedChat?.itemName }}</small>
               </div>
             </div>
           </div>
@@ -104,6 +109,23 @@ const selectedChat = ref<any>({});
 const newMessage = ref('');
 const unreadCount = ref(0);
 const messageContainer = ref<HTMLElement | null>(null);
+
+const isMobile = ref(window.innerWidth <= 768);
+const isMobileAndChatSelected = computed(() => 
+  isMobile.value && selectedChatId.value !== null
+);
+function backToInbox() {
+  if (isMobile.value) {
+    selectedChatId.value = null;
+    selectedChat.value = {};
+    messages.value = [];
+  }
+}
+onMounted(() => {
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth <= 768;
+  });
+});
 
 // Computed property to combine chats with seller info
 const chatsWithSellerInfo = computed(() => {
@@ -290,8 +312,8 @@ watch(messages, () => {
   justify-content: center;
 }
 
-.topbar{
-  height: 70px;
+.topbar {
+  height: 60px;
 }
 
 .chat-wrapper {
@@ -326,6 +348,32 @@ watch(messages, () => {
   text-transform: uppercase;
   text-align: left;
   font-size: 0.875rem;
+}
+
+.chat-header-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.chat-header-info {
+  min-width: 0; /* Important for text truncation to work */
+  flex: 1;
+}
+
+.seller-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.product-name {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .chat-input {
@@ -408,24 +456,106 @@ watch(messages, () => {
   border-radius: 3px;
 }
 
+.mobile-back-button {
+    display: none;
+  }
+
 /* Updated responsive styles */
 @media (max-width: 768px) {
   .chat-container {
     padding: 0;
+    height: 100vh;
+    align-items: flex-start;
   }
 
   .chat-wrapper {
     border-radius: 0;
     height: 100vh;
+    flex-direction: column;
   }
 
+  /* Left Column - Inbox */
   .col-md-4 {
-    height: 40vh;
-    border-bottom: 1px solid #333;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    background: white;
+    transition: transform 0.3s ease;
   }
-  
+
+  .col-md-4.hidden {
+    transform: translateX(-100%);
+  }
+
+  /* Right Column - Chat */
   .col-md-8 {
-    height: 60vh;
+    height: 100vh;
+    width: 100%;
   }
+
+  .chat-input {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+  }
+
+  .chat-messages {
+    height: calc(100vh - 140px); /* Subtract header and input heights */
+    padding-bottom: 70px; /* Add padding to prevent messages from being hidden behind input */
+  }
+
+  .topbar {
+    padding: 0.75rem !important;
+  }
+
+  .chat-header-info {
+    max-width: calc(100% - 90px); /* Accounts for back button and avatar */
+  }
+
+  .chat-header-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .seller-name {
+    font-size: 0.9rem;
+  }
+
+  .product-name {
+    font-size: 0.8rem;
+  }
+
+  .mobile-back-button {
+    display: block !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 0.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    top: 100px;
+  }
+
+  .mobile-back-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+  }
+
+  /* Ensure the icon is visible */
+  .mobile-back-button i {
+    color: #000;
+    font-size: 1.5rem;
+  }
+}
+
+/* Hide the back button on desktop */
+.mobile-back-button {
+  display: none;
 }
 </style>
