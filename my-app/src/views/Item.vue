@@ -45,8 +45,8 @@
             </div>
             <div class="col-6">
               <div class="detail-box">
-                <h3 class="h6 text-black-50">Type</h3>
-                <p class="text-black">{{ type }}</p>
+                <h3 class="h6 text-black-50">Suitable for:</h3>
+                <p class="text-black">{{ gender }}</p>
               </div>
             </div>
             <div class="col-6">
@@ -177,7 +177,7 @@
   const itemPrice = ref(0);
   let originalPrice = 0;
   const condition = ref('');
-  const type = ref('');
+  const gender = ref('');
   const listedTime = ref('');
   const dealMethod = ref('');
   const location = ref('');
@@ -231,7 +231,7 @@ const vouchers: Ref<Voucher[]> = ref([]);
         itemName.value = data.itemName || 'Unnamed Item';
         itemPrice.value = data.itemPrice || 0;
         condition.value = data.condition || 'N/A';
-        type.value = data.type || 'N/A';
+        gender.value = data.gender || 'N/A';
         listedTime.value = data.listedDate || 'N/A';
         sellerName.value = data.userName || 'Anonymous Seller';
         sellerId.value = data.userId || 'N/A';
