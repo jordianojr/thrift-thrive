@@ -229,5 +229,10 @@ onMounted(async () => {
     height: 400px;
     margin: 0;
   }
+
+  .title{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 </style>
