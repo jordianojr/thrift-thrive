@@ -163,11 +163,11 @@
   </template>
   
   <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { auth, db } from '@/lib/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, type DocumentData } from 'firebase/firestore';
 import Loading from "@/components/LoadingOverlay.vue";
 import { stripePromise } from '@/lib/stripeConfig';
 import gsap from 'gsap';
@@ -178,7 +178,7 @@ gsap.registerPlugin(ScrollTrigger);
   const router = useRouter();
   const route = useRoute();
   const itemId = route.params.id as string;
-  const category = route.params.category as string;
+  let category = route.params.category as string;
 
   const isProcessing = ref(false);
 
@@ -220,7 +220,7 @@ const vouchers: Ref<Voucher[]> = ref([]);
     itemPrice.value = (originalPrice * percentage).toFixed(2);
   };
 
-  const gallery = ref(null);
+const gallery = ref(null);
 const galleryWrapper = ref(null);
 const progressBar = ref(null);
 const currentIndex = ref(0);
@@ -292,38 +292,68 @@ onMounted(async () => {
   };
   
   const fetchItem = async () => {
-    try {
+  const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+  let itemFound = false;
+
+  try {
+    if (category) {
+      // Attempt to fetch item in the specified category
       const docRef = doc(db, category, itemId);
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
+        itemFound = true;
         const data = docSnap.data();
-        itemImages.value = data.itemPhotoURLs || [];
-        itemName.value = data.itemName || 'Unnamed Item';
-        itemPrice.value = data.itemPrice || 0;
-        condition.value = data.condition || 'N/A';
-        gender.value = data.gender || 'N/A';
-        listedTime.value = data.listedDate || 'N/A';
-        sellerName.value = data.userName || 'Anonymous Seller';
-        sellerId.value = data.userId || 'N/A';
-        dealMethod.value = data.dealMethod || 'N/A';
-        location.value = data.location || 'N/A';
-        description.value = data.description || 'N/A';
-  
-        // Fetch user data based on sellerId
-        checkSeller(sellerId.value);
-        await fetchUserData(sellerId.value);
-        originalPrice = itemPrice.value;
-      } else {
-        console.error("No such item!");
-        alert("Item not found. Please try again.");
+        updateItemData(data);
       }
-    } catch (error) {
-      console.error('Error fetching item:', error);
-      alert("Error fetching item details. Please try again.");
-    } finally {
-      isLoading.value = false;
+    } 
+
+    if (!itemFound) {
+      // If category is null or item not found, iterate through all categories
+      for (const cat of categories) {
+        const docRef = doc(db, cat, itemId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          itemFound = true;
+          const data = docSnap.data();
+          updateItemData(data);
+          category = cat;
+          break;
+        }
+      }
     }
-  };
+
+    if (!itemFound) {
+      console.error("No such item!");
+      alert("Item not found in any category. Please try again.");
+    }
+  } catch (error) {
+    console.error('Error fetching item:', error);
+    alert("Error fetching item details. Please try again.");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const updateItemData = (data: DocumentData) => {
+  itemImages.value = data.itemPhotoURLs || [];
+  itemName.value = data.itemName || 'Unnamed Item';
+  itemPrice.value = data.itemPrice || 0;
+  condition.value = data.condition || 'N/A';
+  gender.value = data.gender || 'N/A';
+  listedTime.value = data.listedDate || 'N/A';
+  sellerName.value = data.userName || 'Anonymous Seller';
+  sellerId.value = data.userId || 'N/A';
+  dealMethod.value = data.dealMethod || 'N/A';
+  location.value = data.location || 'N/A';
+  description.value = data.description || 'N/A';
+
+  // Fetch user data based on sellerId
+  checkSeller(sellerId.value);
+  fetchUserData(sellerId.value);
+  originalPrice = itemPrice.value;
+};
   
   const getUserUID = () => {
     const cachedData = localStorage.getItem(`user`);
@@ -410,6 +440,7 @@ onMounted( async () => {
         disableChat.value = true;
       }
     };
+
   const redirectToChat = () => {
     router.push({
       name: 'chat',

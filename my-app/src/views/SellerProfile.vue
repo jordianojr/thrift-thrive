@@ -41,7 +41,7 @@
         <div v-if="!isLoading">
             <div class="row">
             <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
-                <div class="card mb-4">
+                <div class="card mb-4" @click="goToItem(product.id)">
                 <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">
                 <div class="card-body">
                     <h4 class="card-title">{{ product.itemName }}</h4>
@@ -122,10 +122,11 @@
   import { ref, onMounted } from 'vue';
   import { db } from '../lib/firebaseConfig'; 
   import { doc, getDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
   
   const route = useRoute();
+  const router = useRouter();
   const sellerId = route.params.sellerId as string;
   const userEmail = ref('');
   const name = ref('');
@@ -222,6 +223,10 @@ const submitReview = async () => {
     isLoading.value = false;
   };
 
+  const goToItem = (id: string) => {
+    router.push({ name: 'item', params: { id } });
+  }
+  
   onMounted(() => {
     fetchUserData(sellerId);
     fetchProducts();
