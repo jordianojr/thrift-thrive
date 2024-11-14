@@ -568,15 +568,22 @@ const getVoucherClass = (prize) => {
 
 const getVoucherBackgroundColor = (prize) => {
   const discount = parseInt(prize.match(/\d+/)[0], 10);  // Extract the discount percentage from the string
-  console.log(discount); // Debug log to ensure correct extraction
-  if (discount === 5) {
-    return { backgroundColor: '#cd7f32' }; // Bronze color
-  } else if (discount === 10) {
-    return { backgroundColor: '#c0c0c0' }; // Silver color
-  } else if (discount === 20) {
-    return { backgroundColor: '#ffd700' }; // Gold color
+
+  let gradient = '';
+  switch (discount) {
+    case 5:
+      gradient = 'linear-gradient(to right, #cd7f32, #f4c542)'; // Bronze gradient
+      break;
+    case 10:
+      gradient = 'linear-gradient(to right, #c0c0c0, #e5e5e5)'; // Silver gradient
+      break;
+    case 20:
+      gradient = 'linear-gradient(to right, #ffd700, #ffcc00)'; // Gold gradient
+      break;
+    default:
+      gradient = 'linear-gradient(to right, #f0f0f0, #ffffff)'; // Default gradient (light gray)
   }
-  return { backgroundColor: '#f0f0f0' }; // Default color for any other prize
+  return { background: gradient };
 };
 
 watch(activeSection, () => {
