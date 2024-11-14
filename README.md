@@ -19,9 +19,7 @@ npm install
 npm start
 ```
 
-Open a new terminal to run Stripe API
-```console
-node server.js
-```
+Below is the deployed link of this application: 
+https://thriftthrive-a28e7.web.app/
 
 You should be able to view this application on localhost:5173
