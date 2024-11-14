@@ -129,16 +129,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { db, auth, storage } from '@/lib/firebaseConfig';
 import { 
   collection, query, where, orderBy, onSnapshot,
   addDoc, serverTimestamp, doc, setDoc, updateDoc, getDoc
 } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import router from '@/router';
 
 const route = useRoute();
+const router = useRouter();
 const sellerId = route.params.sellerId as string;
 const itemId = route.params.itemId as string;
 const category = route.params.category as string;
@@ -338,6 +338,7 @@ onMounted(async () => {
     await fetchSellerInfo(sellerId);
     const chatId = await getOrCreateChat(sellerId, itemId);
     // selectChat({ id: chatId });
+    router.push({ path: '/chat' });
   }
 });
 

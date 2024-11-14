@@ -166,7 +166,7 @@
     </div>
   </template>
   
-  <script setup lang="ts">
+<script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
