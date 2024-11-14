@@ -248,7 +248,6 @@
             oldUrls.push(file.url);
           }
         });
-        console.log('New Files:', newFiles);
         const photoUrls = newFiles.length
           ? await Promise.all(newFiles.map(async (file: Blob | ArrayBuffer | Uint8Array, index: number) => {
               const storage = getStorage();

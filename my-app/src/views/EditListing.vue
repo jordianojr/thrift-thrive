@@ -25,10 +25,10 @@
             ref="fileInputRef"
           />
           <div class="file-uploads mt-3">
-            <div class="file-item" v-for="image in images" :key="index">
-              <img :src="image" alt="Preview" class="preview-image" />
-              <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
-            </div>
+            <div class="file-item" v-for="(file, index) in files" :key="index">
+                <img :src="getPreviewUrl(file)" alt="Preview" class="preview-image" />
+                <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
+              </div>
           </div>
           <small class="form-text text-muted">Please upload your photos</small>
         </div>
@@ -91,11 +91,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { routerKey, useRoute, useRouter } from "vue-router";
 import { db, auth, storage } from "@/lib/firebaseConfig"; // Adjust the path as necessary
 import { collection, getDoc, setDoc, doc, documentId } from "firebase/firestore";
-import { getStorage, ref as storageRef, listAll, deleteObject } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
 
 const route = useRoute();
@@ -111,7 +111,6 @@ const itemPrice = ref(0);
 const chosenCat = ref('');
 const images = ref([]);
 const selectedFiles = ref<{ file: File; position: string }[]>([]);
-const previewImages = ref<Record<string, string>>({});
 const userName = ref('');
 const userId = ref('');
 const gender = ref('');
@@ -124,8 +123,60 @@ const itemPhotoURLs = ref<string[]>([]);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavily used'];
-const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S / EU 48 / UK 38 / US 38', 'M / EU 50 / UK 40 / US 40', 'L / EU 52 / UK 42 / US 42', 'XL / EU 54 / UK 44 / US 44', 'XXL / EU 56 / UK 46 / US 46', 'XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+// const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S / EU 48 / UK 38 / US 38', 'M / EU 50 / UK 40 / US 40', 'L / EU 52 / UK 42 / US 42', 'XL / EU 54 / UK 44 / US 44', 'XXL / EU 56 / UK 46 / US 46', 'XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+const sizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size', 'Others'];
 const genders = ['Male', 'Female', 'Unisex'];
+
+const files = ref<File[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null);
+
+const getPreviewUrl = (file: File | string) => {
+  // Check if file is a string (URL), then return it directly
+  if (typeof file === 'string') {
+    return file;
+  }
+
+  // Ensure file is a File or Blob before creating an object URL
+  if (file instanceof File) {
+    return URL.createObjectURL(file);
+  }
+
+  // Return null or a default placeholder if file type is invalid
+  console.warn('Invalid file type:', file);
+  return null;
+};
+
+// Handle photo upload
+const handlePhotoUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files) {
+    const filesArray = Array.from(target.files);
+    files.value = [...files.value, ...filesArray];
+    
+    // Update file input state
+    const dataTransfer = new DataTransfer();
+    files.value.forEach(file => {
+      dataTransfer.items.add(file);
+    });
+    
+    target.files = dataTransfer.files;
+  }
+};
+
+// Remove photo
+const removeFile = (index: number) => {
+  files.value.splice(index, 1);
+  
+  // Update file input state
+  const dataTransfer = new DataTransfer();
+  files.value.forEach(file => {
+    dataTransfer.items.add(file);
+  });
+  
+  if (fileInput.value) {
+    fileInput.value.files = dataTransfer.files;
+  }
+};
 
 const fetchItem = async () => {
     const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
@@ -134,7 +185,6 @@ const fetchItem = async () => {
         for (const collectionName of collectionsToCheck) {
             const postRef = doc(db, collectionName, itemId.value); // Replace with the correct collection and document ID
         const postSnapshot = await getDoc(postRef);
-        console.log('Post Snapshot:', postSnapshot.data());
         if (postSnapshot.exists()) {
             const postData = postSnapshot.data();
             itemName.value = postData?.itemName || '';
@@ -145,7 +195,7 @@ const fetchItem = async () => {
             brand.value = postData?.brand || '';
             gender.value = postData?.gender || '';
             dealMethod.value = postData?.dealMethod || [];
-            images.value = postData?.itemPhotoURLs || [];
+            files.value = postData?.itemPhotoURLs || [];
             chosenCat.value = collectionName;
             location.value = postData?.location || '';
             userName.value = postData?.userName || '';
@@ -159,20 +209,46 @@ const fetchItem = async () => {
 };
 
 const handleSave = async () => {
+  if (!itemName.value || itemName.value.length < 1) {
+      alert('Name must be at least 1 character long');
+      return;
+    }
+  
+    if (!itemDescription.value || itemDescription.value.length < 1) {
+      alert('Description must be at least 1 character long');
+      return;
+    }
+
+    if (!files.value || files.value.length < 1) {
+      alert('Upload must have at least 1 photo');
+      return;
+    }
   try {
     isSaved.value = false;
     
     // Create or update item document
     const itemDocRef = doc(db, chosenCat.value, itemId.value); // Replace with the correct collection and document ID
 
-    // Upload photos and get URLs
-    // const uploadPromises = selectedFiles.value.map((file, index) => 
-    //   uploadPhoto(itemId, file.file, `photo${index}`)
-    // );
-
-    // const uploadedURLs = await Promise.all(uploadPromises);
-    // itemPhotoURLs.value = uploadedURLs;
-
+    const newFiles:any = [];
+        const oldUrls:any = [];
+        files.value.forEach(file => {
+          if (file instanceof File) {
+            newFiles.push(file);
+          }else{
+            oldUrls.push(file);
+          }
+        });
+        const saveFolder = chosenCat.value.toLowerCase() + '_photos/' + itemId.value;
+        const photoUrls = newFiles.length
+          ? await Promise.all(newFiles.map(async (file: Blob | ArrayBuffer | Uint8Array, index: number) => {
+              const storage = getStorage();
+              const photoRef = storageRef(storage, `${saveFolder}/photo-${index + oldUrls.length}.webp`);
+              const snapshot = await uploadBytes(photoRef, file);
+              return await getDownloadURL(snapshot.ref);
+            }))
+          : [];
+        const updateUrls = oldUrls.concat(photoUrls);   
+        console.log('Update URLs:', updateUrls); 
     // Prepare item data
     const itemData = {
       userId: userId.value,
@@ -186,7 +262,7 @@ const handleSave = async () => {
       brand: brand.value,
       size: size.value,
       gender: gender.value,
-      itemPhotoURLs: itemPhotoURLs.value,
+      itemPhotoURLs: updateUrls.length ? updateUrls : files.value.map(file => file),
     };
 
     // Save to Firestore
