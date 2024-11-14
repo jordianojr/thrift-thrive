@@ -76,7 +76,7 @@
           </div>
 
           <!-- Message Input -->
-          <div class="border-top border-secondary chat-input">
+          <div v-if="selectedChatId" class="border-top border-secondary chat-input">
             <div class="input-group">
               <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;"
                 type="text" class="py-3 form-control text-black" v-model="newMessage" @keyup.enter="sendMessage"
@@ -92,6 +92,7 @@
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -645,7 +646,7 @@ watch(messages, () => {
   .chat-messages {
     height: calc(100vh - 140px);
     /* Subtract header and input heights */
-    padding-bottom: 70px;
+    padding-bottom: 20px;
     /* Add padding to prevent messages from being hidden behind input */
   }
 
