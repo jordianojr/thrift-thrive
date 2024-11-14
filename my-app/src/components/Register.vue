@@ -1,34 +1,22 @@
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
   <div>
     <h2 class="header">Register</h2>
     <form class="row flex-center flex" @submit.prevent="handleRegister">
       <div class="form-widget">
         <div>
-          <input
-            class="inputField"
-            required
-            type="email"
-            placeholder="Email"
-            v-model="email"
-          />
+          <input class="inputField" required type="email" placeholder="Email" v-model="email" />
         </div>
         <div>
-          <input
-            class="inputField"
-            required
-            type="password"
-            placeholder="Password"
-            v-model="password"
-          />
+          <input class="inputField" required type="password" placeholder="Password" v-model="password" />
         </div>
         <div v-if="statusMessage" class="error">{{ statusMessage }}</div>
         <div>
-          <input
-            type="submit"
-            class="btn submit-btn py-2"
-            :value="loading ? 'Loading' : 'Register'"
-            :disabled="loading"
-          />
+          <input type="submit" class="btn submit-btn py-2" :value="loading ? 'Loading' : 'Register'"
+            :disabled="loading" />
         </div>
       </div>
     </form>
@@ -41,7 +29,19 @@ import { auth, db } from '../lib/firebaseConfig' // Ensure you have the Firestor
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { useRouter } from 'vue-router' // Import useRouter
+import CustomAlert from '@/components/CustomAlert.vue';
 
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 const router = useRouter()
 const loading = ref(false)
 const email = ref('')
@@ -68,10 +68,12 @@ const handleRegister = async () => {
       vouchers: [], // Initialize an empty vouchers array
       spinChance: 3, // Initialize the spin chance to 0
     }
-    alert("Registration is successful!");
+    //alert("Registration is successful!");
+    showCustomAlert('Registration successful!', 'success');
+
     router.push('/home');
     await setDoc(doc(db, 'users', user.uid), userData) // Assuming 'users' is your collection name
- // Redirect to home
+    // Redirect to home
     email.value = ''
     password.value = ''
 
@@ -128,10 +130,12 @@ const handleRegister = async () => {
 }
 
 .error {
-  color: red; /* Style for error message */
+  color: red;
+  /* Style for error message */
   margin-top: 10px;
 }
-.header{
+
+.header {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
   text-transform: uppercase;

@@ -1,22 +1,24 @@
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
   <div class="chat-container">
     <div class="container-fluid h-100">
       <div class="row h-100 chat-wrapper">
         <!-- Left Column - Inbox (unchanged) -->
-        <div :class="['col-md-4 col-lg-3 p-0 border-end border-secondary', {'hidden': isMobileAndChatSelected}]">
+        <div :class="['col-md-4 col-lg-3 p-0 border-end border-secondary', { 'hidden': isMobileAndChatSelected }]">
           <div class="d-flex align-items-center p-3 border-bottom border-secondary topbar">
             <h5 class="chat-header m-0">Inbox</h5>
             <!-- <span class="chat-header text-secondary ms-2">({{ unreadCount }} unread)</span> -->
           </div>
-          
+
           <div class="chat-list">
-            <div v-for="chat in chatsWithSellerInfo" :key="chat.id" 
-              @click="selectChat(chat)"
-              :class="['chat-item p-3 border-bottom border-secondary',
-            selectedChatId === chat.id ? 'chat-item-selected' : '']">
+            <div v-for="chat in chatsWithSellerInfo" :key="chat.id" @click="selectChat(chat)" :class="['chat-item p-3 border-bottom border-secondary',
+              selectedChatId === chat.id ? 'chat-item-selected' : '']">
               <div class="d-flex">
-                <img :src="chat.sellerAvatar" :alt="chat.sellerName" 
-                    class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+                <img :src="chat.sellerAvatar" :alt="chat.sellerName" class="rounded-circle"
+                  style="width: 48px; height: 48px; object-fit: cover;">
                 <div class="ms-3 flex-grow-1">
                   <div class="d-flex justify-content-between">
                     <h6 class="mb-1 text-black">{{ chat.sellerName }}</h6>
@@ -24,8 +26,8 @@
                   </div>
                   <p class="mb-1 text-truncate text-black-50" style="width: 100%">{{ chat.lastMessage }}</p>
                   <div class="d-flex align-items-center">
-                    <img :src="chat.itemImage" :alt="chat.itemName" 
-                        class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                    <img :src="chat.itemImage" :alt="chat.itemName" class="rounded"
+                      style="width: 40px; height: 40px; object-fit: cover;">
                     <span class="ms-2 text-secondary small">{{ chat.itemName }}</span>
                   </div>
                 </div>
@@ -39,16 +41,14 @@
           <!-- Chat Header (unchanged) -->
           <div class="p-3 border-bottom border-secondary chat-header topbar">
             <div class="d-flex align-items-center">
-              <button 
-                class="btn mobile-back-button d-md-none"
-                @click="backToInbox"
-              >
+              <button class="btn mobile-back-button d-md-none" @click="backToInbox">
                 <i class="bi bi-chevron-left fs-4"></i>
               </button>
-              <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt="" class="rounded-circle chat-header-avatar">
+              <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt=""
+                class="rounded-circle chat-header-avatar">
               <div class="ms-3 chat-header-info">
                 <h5 class="mb-0 text-black seller-name">{{ selectedChat?.sellerName || 'Select a chat' }}</h5>
-                <small class="text-secondary product-name">{{ selectedChat?.itemName || ''}} </small>
+                <small class="text-secondary product-name">{{ selectedChat?.itemName || '' }} </small>
               </div>
             </div>
           </div>
@@ -58,20 +58,16 @@
             <div v-if="messages.length === 0" class="text-center chat-header text-secondary my-5">
               No messages yet. Start the conversation!
             </div>
-            <div v-for="message in messages" :key="message.id" 
-                :class="['message mb-3', 
-                          message.senderId === userId ? 'justify-content-end' : 'justify-content-start']">
-              <div :class="['message-content p-3 rounded', 
-                          message.senderId === userId ? 'bg-58ea5d text-white' : 'bg-f8f8f8']">
+            <div v-for="message in messages" :key="message.id" :class="['message mb-3',
+              message.senderId === userId ? 'justify-content-end' : 'justify-content-start']">
+              <div :class="['message-content p-3 rounded',
+                message.senderId === userId ? 'bg-58ea5d text-white' : 'bg-f8f8f8']">
                 <!-- Text message -->
                 <p v-if="message.type === 'text'" class="mb-1">{{ message.content }}</p>
                 <!-- Image message -->
-                <img v-else-if="message.type === 'image'" 
-                     :src="message.content" 
-                     alt="Sent image" 
-                     class="img-fluid rounded mb-1" 
-                     style="max-width: 300px; cursor: pointer"
-                     @click="openImageModal(message.content)">
+                <img v-else-if="message.type === 'image'" :src="message.content" alt="Sent image"
+                  class="img-fluid rounded mb-1" style="max-width: 300px; cursor: pointer"
+                  @click="openImageModal(message.content)">
                 <div class="row">
                   <small style="float: inline-end;" class="text-secondary">{{ formatDate(message.timestamp) }}</small>
                 </div>
@@ -82,26 +78,16 @@
           <!-- Message Input -->
           <div class="border-top border-secondary chat-input">
             <div class="input-group">
-              <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;" 
-                     type="text" 
-                     class="py-3 form-control text-black" 
-                     v-model="newMessage" 
-                     @keyup.enter="sendMessage"
-                     placeholder="Type a message...">
+              <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;"
+                type="text" class="py-3 form-control text-black" v-model="newMessage" @keyup.enter="sendMessage"
+                placeholder="Type a message...">
               <!-- Image upload button -->
               <button class="btn" @click="triggerFileInput">
                 <i class="bi bi-image"></i>
               </button>
-              <input 
-                type="file" 
-                ref="fileInput" 
-                accept="image/*" 
-                class="d-none" 
-                @change="handleImageUpload"
-              >
-              <button style="border-radius: 0px; border-left:1px solid black;" 
-                      class="btn send-button" 
-                      @click="sendMessage">
+              <input type="file" ref="fileInput" accept="image/*" class="d-none" @change="handleImageUpload">
+              <button style="border-radius: 0px; border-left:1px solid black;" class="btn send-button"
+                @click="sendMessage">
                 <span class="bi bi-send px-5"></span>
               </button>
             </div>
@@ -111,8 +97,7 @@
     </div>
 
     <!-- Image Modal -->
-    <div v-if="showImageModal" class="modal fade show" 
-         style="display: block; background-color: rgba(0,0,0,0.5)">
+    <div v-if="showImageModal" class="modal fade show" style="display: block; background-color: rgba(0,0,0,0.5)">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -131,13 +116,25 @@
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { db, auth, storage } from '@/lib/firebaseConfig';
-import { 
+import {
   collection, query, where, orderBy, onSnapshot,
   addDoc, serverTimestamp, doc, setDoc, updateDoc, getDoc
 } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import router from '@/router';
+import CustomAlert from '@/components/CustomAlert.vue';
 
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 const route = useRoute();
 const sellerId = route.params.sellerId as string;
 const itemId = route.params.itemId as string;
@@ -158,7 +155,7 @@ const unreadCount = ref(0);
 const messageContainer = ref<HTMLElement | null>(null);
 
 const isMobile = ref(window.innerWidth <= 768);
-const isMobileAndChatSelected = computed(() => 
+const isMobileAndChatSelected = computed(() =>
   isMobile.value && selectedChatId.value !== null
 );
 // Image modal functions
@@ -188,7 +185,8 @@ async function handleImageUpload(event: Event) {
   const maxSize = 5 * 1024 * 1024; // 5MB limit
 
   if (file.size > maxSize) {
-    alert('Image size should be less than 5MB');
+    //alert('Image size should be less than 5MB');
+    showCustomAlert('Image size should be less than 5MB', 'error');
     return;
   }
 
@@ -199,7 +197,8 @@ async function handleImageUpload(event: Event) {
     await sendImageMessage(downloadURL);
   } catch (error) {
     console.error('Error uploading image:', error);
-    alert('Failed to upload image. Please try again.');
+    //alert('Failed to upload image. Please try again.');
+    showCustomAlert('Failed to upload image. Please try again.', 'error');
   }
 }
 
@@ -285,21 +284,21 @@ const chatsWithSellerInfo = computed(() => {
 // Function to fetch seller information
 async function fetchSellerInfo(sellerId: string) {
   if (sellerInfo.value.has(sellerId)) return;
-  
+
   try {
     const sellerDoc = await getDoc(doc(db, 'users', sellerId));
     if (sellerDoc.exists()) {
       sellerInfo.value.set(sellerId, sellerDoc.data());
     } else {
       console.warn(`Seller ${sellerId} not found`);
-      sellerInfo.value.set(sellerId, { 
+      sellerInfo.value.set(sellerId, {
         username: 'Unknown Seller',
         photoURL: 'https://via.placeholder.com/48'
       });
     }
   } catch (error) {
     console.error('Error fetching seller info:', error);
-    sellerInfo.value.set(sellerId, { 
+    sellerInfo.value.set(sellerId, {
       username: 'Unknown Seller',
       photoURL: 'https://via.placeholder.com/48'
     });
@@ -319,17 +318,17 @@ onMounted(async () => {
       id: doc.id,
       ...doc.data()
     }));
-    
+
     // Fetch seller info for all chats
-    const sellerIds = new Set(chats.value.map(chat => 
+    const sellerIds = new Set(chats.value.map(chat =>
       chat.participants.find((id: string) => id !== userId)
     ));
-    
+
     for (const sellerId of sellerIds) {
       await fetchSellerInfo(sellerId);
     }
-    
-    unreadCount.value = chats.value.filter(chat => 
+
+    unreadCount.value = chats.value.filter(chat =>
       chat.unreadCount && chat.lastMessageSenderId !== userId
     ).length;
   });
@@ -461,7 +460,8 @@ watch(messages, () => {
   text-align: left;
   font-size: 0.9rem;
   border-radius: 20px;
-  height: auto; /* Changed to auto to flex properly */
+  height: auto;
+  /* Changed to auto to flex properly */
 }
 
 .chat-header {
@@ -480,7 +480,8 @@ watch(messages, () => {
 }
 
 .chat-header-info {
-  min-width: 0; /* Important for text truncation to work */
+  min-width: 0;
+  /* Important for text truncation to work */
   flex: 1;
 }
 
@@ -506,8 +507,10 @@ watch(messages, () => {
   font-weight: 400;
   border-radius: 0px;
   background: white;
-  width: 100%; /* Changed to 100% */
-  position: relative; /* Changed to relative */
+  width: 100%;
+  /* Changed to 100% */
+  position: relative;
+  /* Changed to relative */
 }
 
 .chat-item {
@@ -532,7 +535,7 @@ watch(messages, () => {
 
 .message {
   display: flex;
-  
+
 }
 
 .message-content {
@@ -548,7 +551,7 @@ watch(messages, () => {
   background-color: #f8f8f8;
 }
 
-.send-button{
+.send-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -580,8 +583,8 @@ watch(messages, () => {
 }
 
 .mobile-back-button {
-    display: none;
-  }
+  display: none;
+}
 
 /* Updated responsive styles */
 @media (max-width: 768px) {
@@ -627,8 +630,10 @@ watch(messages, () => {
   }
 
   .chat-messages {
-    height: calc(100vh - 140px); /* Subtract header and input heights */
-    padding-bottom: 70px; /* Add padding to prevent messages from being hidden behind input */
+    height: calc(100vh - 140px);
+    /* Subtract header and input heights */
+    padding-bottom: 70px;
+    /* Add padding to prevent messages from being hidden behind input */
   }
 
   .topbar {
@@ -636,7 +641,8 @@ watch(messages, () => {
   }
 
   .chat-header-info {
-    max-width: calc(100% - 90px); /* Accounts for back button and avatar */
+    max-width: calc(100% - 90px);
+    /* Accounts for back button and avatar */
   }
 
   .chat-header-avatar {
