@@ -1,7 +1,7 @@
 <template>
   <div class="cart-container">
     <h2 class="text-white mb-4">Shopping Cart</h2>
-    
+
     <div v-if="cartStore.items.length === 0" class="text-white text-center">
       <p>Your cart is empty</p>
       <router-link to="/marketplace" class="btn btn-success">Continue Shopping</router-link>
@@ -24,16 +24,12 @@
                 </div>
                 <p class="card-text">Price: ${{ item.price }}</p>
                 <div class="quantity-controls">
-                  <button 
-                    class="btn btn-sm btn-secondary"
-                    @click="updateQuantity(item, -1)"
+                  <button class="btn btn-sm btn-secondary" @click="updateQuantity(item, -1)"
                     :disabled="item.quantity <= 1">
                     -
                   </button>
                   <span class="mx-2">{{ item.quantity }}</span>
-                  <button 
-                    class="btn btn-sm btn-secondary"
-                    @click="updateQuantity(item, 1)">
+                  <button class="btn btn-sm btn-secondary" @click="updateQuantity(item, 1)">
                     +
                   </button>
                 </div>
@@ -41,19 +37,17 @@
             </div>
           </div>
         </div>
-      </div>          <div class="cart-summary card mt-4">
-            <div class="card-body">
-              <h5 class="card-title">Cart Summary</h5>
-              <p class="card-text">Total Items: {{ cartStore.totalQuantity }}</p>
-              <p class="card-text">Total Price: ${{ cartStore.totalPrice }}</p>
-              <button 
-                class="btn btn-success w-100" 
-                @click="handleCheckout"
-                :disabled="isProcessing">
-                {{ isProcessing ? 'Processing...' : 'Proceed to Checkout' }}
-              </button>
-            </div>
-          </div>
+      </div>
+      <div class="cart-summary card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Cart Summary</h5>
+          <p class="card-text">Total Items: {{ cartStore.totalQuantity }}</p>
+          <p class="card-text">Total Price: ${{ cartStore.totalPrice }}</p>
+          <button class="btn btn-success w-100" @click="handleCheckout" :disabled="isProcessing">
+            {{ isProcessing ? 'Processing...' : 'Proceed to Checkout' }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -63,6 +57,19 @@ import { ref } from 'vue'
 import { useCartStore } from '@/stores/cartStore'
 import type { CartItem } from '@/stores/cartStore'
 import { stripePromise } from '@/lib/stripeConfig'
+import CustomAlert from '@/components/CustomAlert.vue';
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 
 const cartStore = useCartStore()
 const isProcessing = ref(false)
@@ -70,7 +77,7 @@ const isProcessing = ref(false)
 const handleCheckout = async () => {
   try {
     isProcessing.value = true
-    
+
     // Create a line items array for Stripe
     const lineItems = cartStore.items.map(item => ({
       price_data: {
@@ -94,7 +101,7 @@ const handleCheckout = async () => {
     })
 
     const { sessionId } = await response.json()
-    
+
     // Redirect to Stripe checkout
     const stripe = await stripePromise
     if (stripe) {
@@ -103,6 +110,7 @@ const handleCheckout = async () => {
   } catch (error) {
     console.error('Error during checkout:', error)
     alert('There was an error processing your payment. Please try again.')
+    showCustomAlert('There was an error processing your payment. Please try again.', 'error');
   } finally {
     isProcessing.value = false
   }
@@ -111,7 +119,7 @@ const handleCheckout = async () => {
 const updateQuantity = (item: CartItem, change: number) => {
   const newQuantity = item.quantity + change
   if (newQuantity < 1) return
-  
+
   item.quantity = newQuantity
 }
 </script>

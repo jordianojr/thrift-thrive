@@ -1,4 +1,8 @@
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
   <section class="upload-section container-fluid px-0">
     <LoadingOverlay :isLoading="isLoading" message="Fetching your item details..." />
     <LoadingOverlay :isLoading="!isSaved" message="Saving your new item details..." />
@@ -6,32 +10,27 @@
       <h3 class="head">Edit Listing</h3>
     </div>
     <form @submit.prevent="handleSave" class="upload-form">
-        <div class="form-group">
-          <label for="item-name">Name:</label>
-          <input type="text" id="item-name" v-model="itemName" placeholder="Enter item name" required />
-        </div>
-        <div class="form-group">
-          <label for="item-description">Description:</label>
-          <textarea id="item-description" v-model="itemDescription" placeholder="Enter item description" required></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Upload Photos:</label>
-          <input 
-            type="file" 
-            class="form-control" 
-            @change="handlePhotoUpload" 
-            accept="image/*" 
-            multiple
-            ref="fileInputRef"
-          />
-          <div class="file-uploads mt-3">
-            <div class="file-item" v-for="image in images" :key="index">
-              <img :src="image" alt="Preview" class="preview-image" />
-              <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
-            </div>
+      <div class="form-group">
+        <label for="item-name">Name:</label>
+        <input type="text" id="item-name" v-model="itemName" placeholder="Enter item name" required />
+      </div>
+      <div class="form-group">
+        <label for="item-description">Description:</label>
+        <textarea id="item-description" v-model="itemDescription" placeholder="Enter item description"
+          required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload Photos:</label>
+        <input type="file" class="form-control" @change="handlePhotoUpload" accept="image/*" multiple
+          ref="fileInputRef" />
+        <div class="file-uploads mt-3">
+          <div class="file-item" v-for="image in images" :key="index">
+            <img :src="image" alt="Preview" class="preview-image" />
+            <button class="remove-btn" @click.prevent="removeFile(index)">×</button>
           </div>
-          <small class="form-text text-muted">Please upload your photos</small>
         </div>
+        <small class="form-text text-muted">Please upload your photos</small>
+      </div>
       <!-- Other fields here -->
       <div class="form-group row">
         <div class="col-6">
@@ -39,16 +38,16 @@
           <input type="number" id="item-price" v-model="itemPrice" placeholder="Enter item price" required />
         </div>
         <div class="col-6">
-            <label>Deal Method:</label>
-            <br>
-            <label for="meetup">
+          <label>Deal Method:</label>
+          <br>
+          <label for="meetup">
             <input type="checkbox" id="meetup" value="Meet-up" v-model="dealMethod" />
             Meet-up
-            </label>
-            <label for="delivery">
+          </label>
+          <label for="delivery">
             <input style="margin-left: 5px;" type="checkbox" id="delivery" value="Delivery" v-model="dealMethod" />
             Delivery
-            </label>
+          </label>
         </div>
       </div>
       <!-- Additional Fields -->
@@ -97,6 +96,19 @@ import { db, auth, storage } from "@/lib/firebaseConfig"; // Adjust the path as 
 import { collection, getDoc, setDoc, doc, documentId } from "firebase/firestore";
 import { getStorage, ref as storageRef, listAll, deleteObject } from 'firebase/storage';
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
+import CustomAlert from '@/components/CustomAlert.vue';
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -128,40 +140,40 @@ const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S /
 const genders = ['Male', 'Female', 'Unisex'];
 
 const fetchItem = async () => {
-    const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+  const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 
-    try {
-        for (const collectionName of collectionsToCheck) {
-            const postRef = doc(db, collectionName, itemId.value); // Replace with the correct collection and document ID
-        const postSnapshot = await getDoc(postRef);
-        console.log('Post Snapshot:', postSnapshot.data());
-        if (postSnapshot.exists()) {
-            const postData = postSnapshot.data();
-            itemName.value = postData?.itemName || '';
-            itemDescription.value = postData?.description || '';
-            itemPrice.value = postData?.itemPrice || 0;
-            condition.value = postData?.condition || '';
-            size.value = postData?.size || '';
-            brand.value = postData?.brand || '';
-            gender.value = postData?.gender || '';
-            dealMethod.value = postData?.dealMethod || [];
-            images.value = postData?.itemPhotoURLs || [];
-            chosenCat.value = collectionName;
-            location.value = postData?.location || '';
-            userName.value = postData?.userName || '';
-            userId.value = postData?.userId || '';
-            itemPhotoURLs.value = postData?.itemPhotoURLs || [];
-        }
-    }isLoading.value = false;
-    } catch (error) {
-        console.error('Error fetching products:', error);
-    }
+  try {
+    for (const collectionName of collectionsToCheck) {
+      const postRef = doc(db, collectionName, itemId.value); // Replace with the correct collection and document ID
+      const postSnapshot = await getDoc(postRef);
+      console.log('Post Snapshot:', postSnapshot.data());
+      if (postSnapshot.exists()) {
+        const postData = postSnapshot.data();
+        itemName.value = postData?.itemName || '';
+        itemDescription.value = postData?.description || '';
+        itemPrice.value = postData?.itemPrice || 0;
+        condition.value = postData?.condition || '';
+        size.value = postData?.size || '';
+        brand.value = postData?.brand || '';
+        gender.value = postData?.gender || '';
+        dealMethod.value = postData?.dealMethod || [];
+        images.value = postData?.itemPhotoURLs || [];
+        chosenCat.value = collectionName;
+        location.value = postData?.location || '';
+        userName.value = postData?.userName || '';
+        userId.value = postData?.userId || '';
+        itemPhotoURLs.value = postData?.itemPhotoURLs || [];
+      }
+    } isLoading.value = false;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
 };
 
 const handleSave = async () => {
   try {
     isSaved.value = false;
-    
+
     // Create or update item document
     const itemDocRef = doc(db, chosenCat.value, itemId.value); // Replace with the correct collection and document ID
 
@@ -192,31 +204,34 @@ const handleSave = async () => {
     // Save to Firestore
     await setDoc(itemDocRef, itemData, { merge: true });
 
-    alert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`);
+    //alert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`);
+    showCustomAlert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`, 'success');
     router.push({ name: 'profile' });
   } catch (error) {
     console.error('Error during upload:', error);
-    alert('An error occurred during upload. Please try again.');
+    //alert('An error occurred during upload. Please try again.');
+    showCustomAlert('An error occurred during upload. Please try again.', 'error');
   } finally {
     isSaved.value = true;
   }
 };
 
 onMounted(() => {
-    fetchItem();
+  fetchItem();
 });
 </script>
 
 <style scoped>
 .header-container {
   border-bottom: 1px solid black;
-  width: 50%; /* Match the form width */
+  width: 50%;
+  /* Match the form width */
   margin: 0 auto;
   border-left: 1px black solid;
   border-right: 1px black solid;
 }
 
-.head{
+.head {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -224,8 +239,8 @@ onMounted(() => {
   font-size: 1.9rem;
   color: black;
   margin: 0;
-  padding-top: 45px; 
-  padding-bottom: 45px; 
+  padding-top: 45px;
+  padding-bottom: 45px;
 }
 
 .upload-form {
@@ -258,7 +273,8 @@ select {
 }
 
 textarea {
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
+  /* Allow vertical resizing */
 }
 
 button {
@@ -330,37 +346,40 @@ button:hover {
 
 @media (max-width: 992px) {
   .upload-form {
-  padding: 20px;
-  margin: 0px;
-  max-width: 100%;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-weight: 400;
-  } 
+    padding: 20px;
+    margin: 0px;
+    max-width: 100%;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+  }
 
   .form-group {
     margin-top: 10px;
   }
 
-  .upload-section{
+  .upload-section {
     padding-bottom: 0px;
     margin: 0px;
   }
 
   button {
-    padding: 10px; /* Adjust button padding */
+    padding: 10px;
+    /* Adjust button padding */
   }
 }
+
 .custom-file-upload {
   display: inline-block;
   cursor: pointer;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #f8f9fa; /* Light background */
+  background-color: #f8f9fa;
+  /* Light background */
 }
 
 .custom-file-upload input {
-  display: none; /* Hide the default file input */
+  display: none;
+  /* Hide the default file input */
 }
-
 </style>

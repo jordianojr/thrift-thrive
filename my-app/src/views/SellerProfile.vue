@@ -1,4 +1,8 @@
 <template>
+      <!-- for alerts popping in and out-->
+      <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+
     <div class="row">
       <div ref="profileRef" class="card col-lg-3 col-12 profile mx-auto" style="width: 18rem;">
         <div class="card-body">
@@ -124,7 +128,20 @@
   import { doc, getDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore';
   import { useRoute } from 'vue-router';
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
-  
+  import CustomAlert from "@/components/CustomAlert.vue";
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
+
   const route = useRoute();
   const sellerId = route.params.sellerId as string;
   const userEmail = ref('');
@@ -177,12 +194,14 @@
 
 const submitReview = async () => {
   if (!reviewText.value) {
-    alert('Please enter a review.');
+    //alert('Please enter a review.');
+    showCustomAlert('Please enter a review', 'error');
     return;
   }
 
   if (reviewRating.value < 1 || reviewRating.value > 5) {
-    alert('Please enter a rating between 1 and 5.');
+    //alert('Please enter a rating between 1 and 5.');
+    showCustomAlert('Please enter a rating between 1 and 5.', 'error');
     return;
   }
 
@@ -190,12 +209,14 @@ const submitReview = async () => {
     const { updatedReviews, updatedRating } = await updateUserReview(sellerId, reviewText.value, reviewRating.value);
     reviews.value = updatedReviews;
     rating.value = updatedRating;
-    alert('Review submitted successfully!');
+    //alert('Review submitted successfully!');
+    showCustomAlert('Review submitted successfully!', 'success');
     reviewText.value = '';
     reviewRating.value = 0;
   } catch (error) {
     console.error('Error submitting review:', error);
-    alert('Failed to submit review. Please try again later.');
+    //alert('Failed to submit review. Please try again later.');
+    showCustomAlert('Failed to submit review. Please try again later.', 'error');
   }
 };
 

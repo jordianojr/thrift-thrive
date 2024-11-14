@@ -1,4 +1,8 @@
 <template>
+    <!-- for alerts popping in and out-->
+    <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+      
     <div v-if="isLoading" class="loading-container">
       <Loading :isLoading="isLoading" message="Loading item details..." />
     </div>
@@ -161,7 +165,20 @@
   import { doc, getDoc } from 'firebase/firestore';
   import Loading from "@/components/LoadingOverlay.vue";
   import { stripePromise } from '@/lib/stripeConfig'; // Import stripePromise from your config
+  import CustomAlert from '@/components/CustomAlert.vue';
 
+  // Added these refs for alert handling
+  const showAlert = ref(false);
+  const alertMessage = ref('');
+  const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+  // Helper function to show alerts
+  const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+    alertMessage.value = message;
+    alertType.value = type;
+    showAlert.value = true;
+  };
+  
   const router = useRouter();
   const route = useRoute();
   const itemId = route.params.id as string;
@@ -245,11 +262,13 @@ const vouchers: Ref<Voucher[]> = ref([]);
         originalPrice = itemPrice.value;
       } else {
         console.error("No such item!");
-        alert("Item not found. Please try again.");
+        //alert("Item not found. Please try again.");
+        showCustomAlert('Item not found. Please try again.', 'error');
       }
     } catch (error) {
       console.error('Error fetching item:', error);
-      alert("Error fetching item details. Please try again.");
+      //alert("Error fetching item details. Please try again.");
+      showCustomAlert('Error fetching item details. Please try again.', 'error');
     } finally {
       isLoading.value = false;
     }
@@ -291,7 +310,8 @@ onMounted( async () => {
   try {
     if (!itemId || !itemName.value || !itemPrice.value) {
       console.error('Missing required item data');
-      alert('Error: Could not process payment');
+      //alert('Error: Could not process payment');
+      showCustomAlert('Error: Could not process payment.', 'error');
       return;
     }
 
@@ -311,11 +331,13 @@ onMounted( async () => {
 
     if (error) {
       console.error('Error:', error);
-      alert('Payment failed. Please try again.');
+      //alert('Payment failed. Please try again.');
+      showCustomAlert('Payment failed. Please try again.', 'error');
     }
   } catch (error) {
     console.error('Error processing payment:', error);
-    alert('Error: Could not process payment');
+    //alert('Error: Could not process payment');
+    showCustomAlert('Error: Could not process payment', 'error');
   } finally {
     isProcessing.value = false;
   }

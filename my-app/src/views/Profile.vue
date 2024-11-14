@@ -1,5 +1,10 @@
 <template>
   <div>
+
+    <!-- for alerts popping in and out-->
+    <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+
     <!-- Desktop Layout -->
     <div class="desktop-layout">
       <div class="profile-layout">
@@ -8,69 +13,41 @@
           <div class="profile-sidebar">
             <!-- Navigation Links -->
             <div class="nav-links">
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'profile' }"
-                @click="activeSection = 'profile'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'profile' }"
+                @click="activeSection = 'profile'">
                 Edit Profile
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'delete' }"
-                @click="activeSection = 'delete'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'delete' }"
+                @click="activeSection = 'delete'">
                 Delete Account
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'reviews' }"
-                @click="activeSection = 'reviews'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'reviews' }"
+                @click="activeSection = 'reviews'">
                 View Reviews
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'listing' }"
-                @click="activeSection = 'listing'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'listing' }"
+                @click="activeSection = 'listing'">
                 Listings
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'orders' }"
-                @click="activeSection = 'orders'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'orders' }"
+                @click="activeSection = 'orders'">
                 Order History
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'sales' }"
-                @click="activeSection = 'sales'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'sales' }"
+                @click="activeSection = 'sales'">
                 Sales History
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'editposts' }"
-                @click="activeSection = 'editposts'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'editposts' }"
+                @click="activeSection = 'editposts'">
                 Edit Posts
               </button>
-              <button 
-                class="sidebar-button"
-                :class="{ 'active': activeSection === 'vouchers' }"
-                @click="activeSection = 'vouchers'"
-              >
+              <button class="sidebar-button" :class="{ 'active': activeSection === 'vouchers' }"
+                @click="activeSection = 'vouchers'">
                 Vouchers
               </button>
-              <button 
-                class="sidebar-button"
-                style="color: gold;"
-                :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
-                @click="goToSpin"
-                v-if="spinChance > 0"
-              >
+              <button class="sidebar-button" style="color: gold;"
+                :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }" @click="goToSpin"
+                v-if="spinChance > 0">
                 Lucky Wheel
               </button>
             </div>
@@ -79,103 +56,104 @@
 
         <!-- Display Section -->
         <section class="display-section">
-        <div class="section-header">
-          <h2>{{ activeSection === 'profile' ? 'Edit Profile' : 
-               activeSection === 'delete' ? 'Delete Account' : 
-               activeSection === 'reviews' ? 'User Reviews' :
-               activeSection === 'listing' ? 'Listings' :
-               activeSection === 'editposts' ? 'Edit Posts' :
-               activeSection === 'spin' ? 'Lucky Wheel' :
-               activeSection === 'vouchers' ? 'Vouchers' :
-               activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
-        </div>
-
-        <!-- Dynamic Content Based on Selection -->
-        <div v-if="activeSection === 'profile'" class="content-section">
-          <!-- User Profile Info -->
-          <div class="profile-header">
-            <div class="profile-photo">
-              <img :src="tempPhotoURL || photoURL || '../assets/user.jpeg'" alt="Profile Photo" />
-            </div>
-            
-            <div class="user-info text-center mb-4">
-              <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
-              <p class="mb-1">{{ userEmail }}</p>
-              <p class="mb-1">
-                <strong>Rating: </strong> {{ rating }}
-                <span v-for="n in 5" :key="n">
-                  <i :class="{
-                    'bi-star-fill': n <= rating,
-                    'bi-star': n > rating
-                  }" style="color: black; font-size: 1.2rem;">
-                  </i>
-                </span>
-              </p>
-            </div>
+          <div class="section-header">
+            <h2>{{ activeSection === 'profile' ? 'Edit Profile' :
+              activeSection === 'delete' ? 'Delete Account' :
+                activeSection === 'reviews' ? 'User Reviews' :
+                  activeSection === 'listing' ? 'Listings' :
+                    activeSection === 'editposts' ? 'Edit Posts' :
+                      activeSection === 'spin' ? 'Lucky Wheel' :
+                        activeSection === 'vouchers' ? 'Vouchers' :
+                          activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
           </div>
-          <form @submit.prevent="updateProfile" class="content-section">
+
+          <!-- Dynamic Content Based on Selection -->
+          <div v-if="activeSection === 'profile'" class="content-section">
+            <!-- User Profile Info -->
+            <div class="profile-header">
+              <div class="profile-photo">
+                <img :src="tempPhotoURL || photoURL || '../assets/user.jpeg'" alt="Profile Photo" />
+              </div>
+
+              <div class="user-info text-center mb-4">
+                <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
+                <p class="mb-1">{{ userEmail }}</p>
+                <p class="mb-1">
+                  <strong>Rating: </strong> {{ rating }}
+                  <span v-for="n in 5" :key="n">
+                    <i :class="{
+                      'bi-star-fill': n <= rating,
+                      'bi-star': n > rating
+                    }" style="color: black; font-size: 1.2rem;">
+                    </i>
+                  </span>
+                </p>
+              </div>
+            </div>
+            <form @submit.prevent="updateProfile" class="content-section">
+              <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" v-model="tempName" placeholder="Enter your name" required />
+              </div>
+              <div class="form-group">
+                <label for="photo">Profile Photo:</label>
+                <input type="file" id="photo" @change="handlePhotoUpload" accept="image/*" />
+              </div>
+              <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+          </div>
+
+          <div v-if="activeSection === 'delete'" class="content-section">
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
             <div class="form-group">
-              <label for="name">Name:</label>
-              <input type="text" id="name" v-model="tempName" placeholder="Enter your name" required />
+              <label for="confirmEmail">Email:</label>
+              <input type="email" id="confirmEmail" v-model="confirmEmail" placeholder="Enter your email" required />
             </div>
             <div class="form-group">
-              <label for="photo">Profile Photo:</label>
-              <input type="file" id="photo" @change="handlePhotoUpload" accept="image/*" />
+              <label for="confirmPassword">Password:</label>
+              <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password"
+                required />
             </div>
-            <button type="submit" class="save-btn">Save Changes</button>
-          </form>
-        </div>
+            <button type="button" class="delete-btn" @click="confirmDeleteAccount">Delete Account</button>
+          </div>
 
-        <div v-if="activeSection === 'delete'" class="content-section">
-          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-          <div class="form-group">
-            <label for="confirmEmail">Email:</label>
-            <input type="email" id="confirmEmail" v-model="confirmEmail" placeholder="Enter your email" required />
+          <div v-if="activeSection === 'reviews'" class="content-section">
+            <div v-if="reviews.length === 0" class="no-container">
+              <p>No reviews yet.</p>
+            </div>
+            <div v-else>
+              <ol>
+                <li v-for="review in reviews">{{ review }}</li>
+              </ol>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="confirmPassword">Password:</label>
-            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password" required />
-          </div>
-          <button type="button" class="delete-btn" @click="confirmDeleteAccount">Delete Account</button>
-        </div>
 
-        <div v-if="activeSection === 'reviews'" class="content-section">
-          <div v-if="reviews.length === 0" class="no-container">
-            <p>No reviews yet.</p>
+          <div v-if="activeSection === 'vouchers'" class="content-section">
+            <div v-if="vouchers.length === 0" class="no-container">
+              <p>No vouchers yet.</p> <br>
+              <p>Spins left: {{ spinChance }}</p>
+            </div>
+            <div v-else>
+              <ol>
+                <li v-for="voucher in vouchers">{{ voucher }}</li>
+              </ol>
+              <p>Spins left: {{ spinChance }}</p>
+            </div>
           </div>
-          <div v-else>
-            <ol>
-              <li v-for="review in reviews">{{ review }}</li>
-            </ol>
-          </div>
-        </div>
 
-        <div v-if="activeSection === 'vouchers'" class="content-section">
-          <div v-if="vouchers.length === 0" class="no-container">
-            <p>No vouchers yet.</p> <br>
-            <p>Spins left: {{ spinChance }}</p>
+          <div v-if="activeSection === 'listing'">
+            <Listing></Listing>
           </div>
-          <div v-else>
-            <ol>
-              <li v-for="voucher in vouchers">{{ voucher }}</li>
-            </ol>
-            <p>Spins left: {{ spinChance }}</p>
+          <div v-if="activeSection === 'orders'">
+            <OrderHistory />
           </div>
-        </div>
-
-        <div v-if="activeSection === 'listing'">
-          <Listing></Listing>
-        </div>
-        <div v-if="activeSection === 'orders'">
-          <OrderHistory />
-        </div>
-        <div v-if="activeSection === 'sales'">
-          <SalesHistory />
-        </div>
-        <div v-if="activeSection === 'editposts'">
-          <EditPosts />
-        </div>
-      </section>
+          <div v-if="activeSection === 'sales'">
+            <SalesHistory />
+          </div>
+          <div v-if="activeSection === 'editposts'">
+            <EditPosts />
+          </div>
+        </section>
       </div>
     </div>
 
@@ -184,74 +162,45 @@
     <!-- Mobile Layout -->
     <div class="mobile-layout">
       <!-- Profile Header -->
-      
+
 
       <!-- Navigation Scroll Container -->
       <div class="mobile-nav-container">
         <div class="scroll-container">
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'profile' }"
-            @click="activeSection = 'profile'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'profile' }"
+            @click="activeSection = 'profile'">
             Edit Profile
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'delete' }"
-            @click="activeSection = 'delete'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'delete' }"
+            @click="activeSection = 'delete'">
             Delete Account
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'reviews' }"
-            @click="activeSection = 'reviews'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'reviews' }"
+            @click="activeSection = 'reviews'">
             Reviews
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'listing' }"
-            @click="activeSection = 'listing'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'listing' }"
+            @click="activeSection = 'listing'">
             Listings
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'orders' }"
-            @click="activeSection = 'orders'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'orders' }"
+            @click="activeSection = 'orders'">
             Orders
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'sales' }"
-            @click="activeSection = 'sales'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'sales' }"
+            @click="activeSection = 'sales'">
             Sales
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'editposts' }"
-            @click="activeSection = 'editposts'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'editposts' }"
+            @click="activeSection = 'editposts'">
             Posts
           </button>
-          <button 
-            class="mobile-nav-button"
-            :class="{ 'active': activeSection === 'vouchers' }"
-            @click="activeSection = 'vouchers'"
-          >
+          <button class="mobile-nav-button" :class="{ 'active': activeSection === 'vouchers' }"
+            @click="activeSection = 'vouchers'">
             Vouchers
           </button>
-          <button 
-            v-if="spinChance > 0"
-            class="mobile-nav-button"
-            style="color: gold;"
-            :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }"
-            @click="goToSpin"
-          >
+          <button v-if="spinChance > 0" class="mobile-nav-button" style="color: gold;"
+            :class="{ 'active': activeSection === 'spin', bouncing: isBouncing }" @click="goToSpin">
             Lucky Wheel
           </button>
         </div>
@@ -260,14 +209,14 @@
       <!-- Mobile Content Section -->
       <div class="mobile-content">
         <div class="section-header">
-          <h2>{{ activeSection === 'profile' ? 'Edit Profile' : 
-               activeSection === 'delete' ? 'Delete Account' : 
-               activeSection === 'reviews' ? 'User Reviews' :
-               activeSection === 'listing' ? 'Listings' :
-               activeSection === 'editposts' ? 'Edit Posts' :
-               activeSection === 'spin' ? 'Lucky Wheel' :
-               activeSection === 'vouchers' ? 'Vouchers' :
-               activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
+          <h2>{{ activeSection === 'profile' ? 'Edit Profile' :
+            activeSection === 'delete' ? 'Delete Account' :
+              activeSection === 'reviews' ? 'User Reviews' :
+                activeSection === 'listing' ? 'Listings' :
+                  activeSection === 'editposts' ? 'Edit Posts' :
+                    activeSection === 'spin' ? 'Lucky Wheel' :
+                      activeSection === 'vouchers' ? 'Vouchers' :
+                        activeSection === 'orders' ? 'Order History' : 'Sales History' }}</h2>
         </div>
 
         <!-- Dynamic Content Based on Selection -->
@@ -277,7 +226,7 @@
             <div class="profile-photo">
               <img :src="tempPhotoURL || photoURL || '../assets/user.jpeg'" alt="Profile Photo" />
             </div>
-            
+
             <div class="user-info text-center mb-4">
               <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
               <p class="mb-1">{{ userEmail }}</p>
@@ -314,7 +263,8 @@
           </div>
           <div class="form-group">
             <label for="confirmPassword">Password:</label>
-            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password" required />
+            <input type="password" id="confirmPassword" v-model="confirmPassword" placeholder="Enter your password"
+              required />
           </div>
           <button type="button" class="delete-btn" @click="confirmDeleteAccount">Delete Account</button>
         </div>
@@ -361,13 +311,13 @@
         </div>
 
       </div>
-      </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { auth, db, storage } from '../lib/firebaseConfig'; 
+import { auth, db, storage } from '../lib/firebaseConfig';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -377,6 +327,7 @@ import OrderHistory from '../components/OrderHistory.vue';
 import SalesHistory from '../components/SalesHistory.vue';
 import EditPosts from './EditPosts.vue';
 import Game from '@/components/Game.vue';
+import CustomAlert from '@/components/CustomAlert.vue';
 
 interface UserData {
   email?: string;
@@ -408,6 +359,18 @@ const isBouncing = ref(false);
 
 const goToSpin = () => {
   router.push('/spin');
+};
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
 };
 // Auth state observer
 const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -485,7 +448,7 @@ const updateProfile = async () => {
   if (currentUser) {
     try {
       let newPhotoURL = photoURL.value;
-      
+
       if (tempFile.value) {
         const storagePath = `profile_photos/${currentUser.uid}`;
         const photoRef = storageRef(storage, storagePath);
@@ -498,22 +461,24 @@ const updateProfile = async () => {
         username: tempName.value,
         photoURL: newPhotoURL,
       };
-      
+
       await setDoc(userDoc, userData, { merge: true });
-      
+
       name.value = tempName.value;
       photoURL.value = newPhotoURL;
-      
+
       tempFile.value = null;
       if (tempPhotoURL.value) {
         URL.revokeObjectURL(tempPhotoURL.value);
         tempPhotoURL.value = '';
       }
-      
-      alert('Profile updated successfully!');
+
+      //alert('Profile updated successfully! skibidlicous');
+      showCustomAlert('Profile updated successfully!', 'success');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      alert('Error updating profile: ' + errorMessage);
+      //alert('Error updating profile: ' + errorMessage);
+      showCustomAlert(errorMessage, 'error');
     }
   }
 };
@@ -527,13 +492,16 @@ const confirmDeleteAccount = async () => {
         await deleteDoc(doc(db, 'users', currentUser.uid));
         await currentUser.delete();
         localStorage.removeItem(`user_${currentUser.uid}`);
-        alert('Account deleted successfully. We are sad to see you go!');
+        //alert('Account deleted successfully. We are sad to see you go!');
+        showCustomAlert('Account deleted successfully. We are sad to see you go!', 'success');
         router.push('/login');
         location.reload();
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-      alert('Error deleting account: ' + errorMessage);
+      const realErrorMessage = 'Error deleting account: ' + errorMessage;
+      //alert('Error deleting account: ' + errorMessage);
+      showCustomAlert('realErrorMessage', 'error');
     }
   }
 };
@@ -571,24 +539,31 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(-15px);
   }
+
   60% {
     transform: translateY(-10px);
   }
 
 }
+
 .bouncing {
   animation: bounce 1s ease;
 }
 
-h2{
+h2 {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -596,8 +571,8 @@ h2{
   font-size: 1.9rem;
   color: black;
   margin: 0;
-  padding-top: 45px; 
-  padding-bottom: 45px; 
+  padding-top: 45px;
+  padding-bottom: 45px;
   border-bottom: black solid 1px;
 }
 
@@ -605,7 +580,8 @@ h2{
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 300px; /* Adjust this value based on your needs */
+  min-height: 300px;
+  /* Adjust this value based on your needs */
 }
 
 .no-container p {
@@ -641,7 +617,7 @@ h2{
 }
 
 
-.nav-links{
+.nav-links {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -756,8 +732,10 @@ input[type="file"] {
 
 .profile-photo {
   display: flex;
-  justify-content: center; /* Horizontally center the image */
-  align-items: center; /* Vertically center the image (if necessary) */
+  justify-content: center;
+  /* Horizontally center the image */
+  align-items: center;
+  /* Vertically center the image (if necessary) */
   margin-top: 15px;
   margin-bottom: 15px;
   width: 200px;
@@ -765,8 +743,10 @@ input[type="file"] {
   border-radius: 50%;
   overflow: hidden;
   background-color: #f0f0f0;
-  margin-left: auto; /* Center the container horizontally */
-  margin-right: auto; /* Center the container horizontally */
+  margin-left: auto;
+  /* Center the container horizontally */
+  margin-right: auto;
+  /* Center the container horizontally */
 }
 
 .profile-photo img {
@@ -776,9 +756,10 @@ input[type="file"] {
   border-radius: 50%;
 }
 
-.col-9{
+.col-9 {
   padding-right: 0px;
 }
+
 .card {
   margin-bottom: 20px;
   width: 400px;
@@ -792,7 +773,9 @@ input[type="file"] {
 }
 
 
-.review-btn, .save-btn, .delete-btn {
+.review-btn,
+.save-btn,
+.delete-btn {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
   background-color: black !important;
@@ -806,10 +789,11 @@ input[type="file"] {
   cursor: pointer;
   width: 100%;
   padding-top: 7px;
-  padding-bottom:7px;
+  padding-bottom: 7px;
 }
 
-.review-btn:hover, .save-btn:hover {
+.review-btn:hover,
+.save-btn:hover {
   color: black !important;
   background-color: white !important;
   border: black 1px solid !important;
@@ -828,8 +812,10 @@ input[type="file"] {
 
 @media (max-width: 1228px) {
   .custom-col {
-    flex: 0 0 100%; /* Make it full width */
-    max-width: 100%; /* Prevent it from exceeding full width */
+    flex: 0 0 100%;
+    /* Make it full width */
+    max-width: 100%;
+    /* Prevent it from exceeding full width */
   }
 }
 
