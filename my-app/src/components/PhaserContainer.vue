@@ -2,10 +2,12 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { auth, db } from '@/lib/firebaseConfig'
 import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore'
-import router from '@/router';
 import CustomAlert from '@/components/CustomAlert.vue';
+import LoadingOverlay from './LoadingOverlay.vue';
+import { useRouter } from 'vue-router'
 
 // Added these refs for alert handling
+const router = useRouter();
 const showAlert = ref(false);
 const alertMessage = ref('');
 const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
@@ -48,11 +50,14 @@ const savePrizeToFirebase = async (prizeData) => {
       const updatedVouchers = [...userData.vouchers, prizeData.code];
       const updatedSpins = userData.spinChance - 1;
 
+      localStorage.setItem('spinChance', updatedSpins.toString());
       await setDoc(userDocRef, { vouchers: updatedVouchers, spinChance: updatedSpins }, { merge: true });
       if (updatedSpins <= 0) {
         //alert('No more spins left');
         showCustomAlert('No more spins left', 'error');
-        router.push({ name: 'home' });
+        setTimeout(() => {
+          router.push({ path: '/profile' });
+        }, 3000);
       }
     }
   } catch (error) {
@@ -81,6 +86,8 @@ onBeforeUnmount(() => {
   <!-- for alerts popping in and out-->
   <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
     @update:visible="showAlert = $event" />
+
+  <LoadingOverlay :isLoading="showAlert" message="Out of spins, redirecting to profile page..." />
 
   <div :id="containerId"></div>
 </template>

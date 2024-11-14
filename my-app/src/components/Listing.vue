@@ -24,7 +24,7 @@
                 <button class="btn float-start" style="background-color: white;" @click="editItem(product.id)">
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                <button class="btn btn-danger float-end" @click="deleteItem(product.id)">
+                <button type="button" class="btn btn-danger float-end" data-bs-toggle="modal" data-bs-target="#giveDeleteModal" @click="showDeleteModal(product.id)">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -33,6 +33,27 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="giveDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="giveDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="giveDeleteModalLabel">
+            <i class="bi bi-trash"></i> Confirm Delete?
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this item? This action cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </template>
   
   <script lang="ts" setup>
@@ -59,6 +80,7 @@
   const products = ref<any[]>([]);
   const isLoading = ref(true);
   const router = useRouter();
+  const productIdToDelete = ref<string | null>(null);
 
   const fetchProducts = async () => {
     const uid = getUserUID();
@@ -99,15 +121,19 @@ const editItem = (itemId: string) => {
   router.push({ name: 'editItem', params: { id: itemId } });
   // console.log('Edit item with ID:', itemId);
 };
-  
-const deleteItem = async (itemId: string) => {
-  // Show confirmation dialog
-  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-  
-  if (!confirmDelete) {
-    // User chose "Cancel," exit the function
-    return;
+
+function showDeleteModal(id: string) {
+  productIdToDelete.value = id;
+}
+
+async function confirmDelete() {
+  if (productIdToDelete.value) {
+    await deleteItem(productIdToDelete.value);
+    productIdToDelete.value = null; // Reset after deletion
   }
+}
+
+const deleteItem = async (itemId: string) => {
 
   const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 
@@ -134,6 +160,7 @@ const deleteItem = async (itemId: string) => {
     showCustomAlert('Error deleting item', 'error');
   }
 };
+
 async function deleteFolder(folderPath: string | undefined) {
   const storage = getStorage();
   const folderRef = storageRef(storage, folderPath);

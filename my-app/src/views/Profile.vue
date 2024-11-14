@@ -336,6 +336,8 @@ interface UserData {
   photoURL?: string;
   rating?: number;
   reviews?: string[];
+  spinChance?: number;
+  vouchers?: string[];
 }
 
 const router = useRouter();
@@ -423,6 +425,7 @@ const fetchUserData = async (uid: string) => {
       name: name.value,
       photoURL: photoURL.value,
     }));
+    localStorage.setItem('spinChance', spinChance.value.toString());
   }
 };
 
