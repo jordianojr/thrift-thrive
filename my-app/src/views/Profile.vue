@@ -136,12 +136,13 @@
     <p>No vouchers yet. Spins left: {{ spinChance }}</p>
   </div>
   <div v-else>
-    <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
-      <p>{{ voucher }}</p>
+    <div v-for="voucher in vouchers" :key="voucher.id" class="voucher-card">
+      <p>{{ voucher.id }} {{ voucher.prize }}</p>
     </div>
     <p>Spins left: {{ spinChance }}</p>
   </div>
 </div>
+
 
           <div v-if="activeSection === 'listing'">
             <Listing></Listing>
@@ -287,8 +288,8 @@
           <p>No vouchers yet. Spins left: {{ spinChance }}</p>
         </div>
         <div v-else>
-          <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
-            <p>{{ voucher}}</p>
+          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" class="voucher-card">
+            <p>{{ voucher.id}} {{ voucher.prize }}</p>
           </div>
           <p>Spins left: {{ spinChance }}</p>
         </div>
@@ -354,7 +355,7 @@ const activeSection = ref('profile');
 const rating = ref(0);
 const reviews = ref<string[]>([]);
 const spinChance = ref(0);
-const vouchers = ref<string[]>([]);
+const vouchers: Ref<Voucher[]> = ref([]);
 
 const isBouncing = ref(false);
 
@@ -507,8 +508,42 @@ const confirmDeleteAccount = async () => {
   }
 };
 
+const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser?.uid;
+    }
+};
 
+const fetchVouchers = async () => {
+  try {
+    const userId = getUserUID()
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
 
+    const userVouchers = userDocSnap.data()?.vouchers || [];
+
+    const fetchedVouchers: Voucher[] = []; // Ensure this array matches the Voucher type
+
+    for (const voucherId of userVouchers) {
+      const voucherDocRef = doc(db, 'prizes', voucherId);
+      const voucherDocSnap = await getDoc(voucherDocRef);
+
+      if (voucherDocSnap.exists()) {
+        fetchedVouchers.push({ id: voucherId, ...voucherDocSnap.data() } as Voucher);
+      }
+    }
+
+    vouchers.value = fetchedVouchers; // This should work now without errors
+
+    console.log(vouchers.value); // Verify the populated data
+  } catch (error) {
+    console.error("Error fetching vouchers:", error);
+  }
+};
 
 watch(activeSection, () => {
   tempName.value = name.value;
@@ -520,7 +555,9 @@ watch(activeSection, () => {
 });
 
 const tl = gsap.timeline({ defaults: { duration: 0.5 } });
-onMounted(() => {
+onMounted(async () => {
+  await fetchVouchers();
+
   if (profileRef.value) {
     tl.fromTo(profileRef.value, { opacity: 0 }, { opacity: 1 });
   }
@@ -545,7 +582,7 @@ onBeforeUnmount(() => {
 <style scoped>
 
 .voucher-card {
-  background-color: #ffffffb5; /* Light grey background */
+  background-color:lightblue; /* Light grey background */
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 8px;
