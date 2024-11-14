@@ -2,6 +2,7 @@
   <div class="success-container text-center">
     <h2 class="text-black mb-4">Payment Successful!</h2>
     <p class="text-black mb-4">Thank you for your purchase.</p>
+    <p class="text-black mb-4">You earned a lucky wheel spin!</p>
     <router-link to="/marketplace" class="btn btn-success">
       Continue Shopping 
     </router-link>

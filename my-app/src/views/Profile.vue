@@ -141,7 +141,8 @@
             class="voucher-card">
             <p>{{ voucher.id}} {{ voucher.prize }}</p>
           </div>
-          <p>Spins left: {{ spinChance }}</p>
+          <p style="font-size: large; font-weight: 800;">Spins left: {{ spinChance }}</p>
+          <p style="font-size: medium;">Get 1 spin for each item purchased!</p>
         </div>
       </div>
 
@@ -299,7 +300,8 @@
             class="voucher-card">
             <p>{{ voucher.id}} {{ voucher.prize }}</p>
           </div>
-          <p>Spins left: {{ spinChance }}</p>
+          <p style="font-size: large; font-weight: 800;">Spins left: {{ spinChance }}</p>
+          <p style="font-size: medium;">Get 1 spin for each item purchased!</p>
         </div>
       </div>
 
