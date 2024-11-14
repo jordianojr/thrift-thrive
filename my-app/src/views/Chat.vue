@@ -2,11 +2,11 @@
   <div class="chat-container">
     <div class="container-fluid h-100">
       <div class="row h-100 chat-wrapper">
-        <!-- Left Column - Inbox -->
+        <!-- Left Column - Inbox (unchanged) -->
         <div :class="['col-md-4 col-lg-3 p-0 border-end border-secondary', {'hidden': isMobileAndChatSelected}]">
           <div class="d-flex align-items-center p-3 border-bottom border-secondary topbar">
             <h5 class="chat-header m-0">Inbox</h5>
-            <span class="chat-header text-secondary ms-2">({{ unreadCount }} unread)</span>
+            <!-- <span class="chat-header text-secondary ms-2">({{ unreadCount }} unread)</span> -->
           </div>
           
           <div class="chat-list">
@@ -16,7 +16,7 @@
             selectedChatId === chat.id ? 'chat-item-selected' : '']">
               <div class="d-flex">
                 <img :src="chat.sellerAvatar" :alt="chat.sellerName" 
-                    class="rounded-circle" style="width: 48px; height: 48px;">
+                    class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
                 <div class="ms-3 flex-grow-1">
                   <div class="d-flex justify-content-between">
                     <h6 class="mb-1 text-black">{{ chat.sellerName }}</h6>
@@ -36,7 +36,7 @@
 
         <!-- Right Column - Chat -->
         <div class="col-md-8 col-lg-9 p-0 d-flex flex-column">
-          <!-- Chat Header -->
+          <!-- Chat Header (unchanged) -->
           <div class="p-3 border-bottom border-secondary chat-header topbar">
             <div class="d-flex align-items-center">
               <button 
@@ -48,7 +48,7 @@
               <img v-if="selectedChatId" :src="selectedChat?.sellerAvatar" alt="" class="rounded-circle chat-header-avatar">
               <div class="ms-3 chat-header-info">
                 <h5 class="mb-0 text-black seller-name">{{ selectedChat?.sellerName || 'Select a chat' }}</h5>
-                <small class="text-secondary product-name">{{ selectedChat?.itemName }}</small>
+                <small class="text-secondary product-name">{{ selectedChat?.itemName || ''}} </small>
               </div>
             </div>
           </div>
@@ -63,8 +63,18 @@
                           message.senderId === userId ? 'justify-content-end' : 'justify-content-start']">
               <div :class="['message-content p-3 rounded', 
                           message.senderId === userId ? 'bg-58ea5d text-white' : 'bg-f8f8f8']">
-                <p class="mb-1">{{ message.content }}</p>
-                <small class="text-secondary">{{ formatDate(message.timestamp) }}</small>
+                <!-- Text message -->
+                <p v-if="message.type === 'text'" class="mb-1">{{ message.content }}</p>
+                <!-- Image message -->
+                <img v-else-if="message.type === 'image'" 
+                     :src="message.content" 
+                     alt="Sent image" 
+                     class="img-fluid rounded mb-1" 
+                     style="max-width: 300px; cursor: pointer"
+                     @click="openImageModal(message.content)">
+                <div class="row">
+                  <small style="float: inline-end;" class="text-secondary">{{ formatDate(message.timestamp) }}</small>
+                </div>
               </div>
             </div>
           </div>
@@ -72,13 +82,44 @@
           <!-- Message Input -->
           <div class="border-top border-secondary chat-input">
             <div class="input-group">
-              <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;" type="text" class="py-3 form-control text-black" 
-                    v-model="newMessage" 
-                    @keyup.enter="sendMessage"
-                    placeholder="Type a message...">
-              <button style="border-radius: 0px; border-left:1px solid black;" class="btn send-button" @click="sendMessage" 
-                      ><span class="bi bi-send px-5"></span></button>
+              <input style="border-radius: 0px; font-family: 'Helvetica Neue', sans-serif; font-weight: 400;" 
+                     type="text" 
+                     class="py-3 form-control text-black" 
+                     v-model="newMessage" 
+                     @keyup.enter="sendMessage"
+                     placeholder="Type a message...">
+              <!-- Image upload button -->
+              <button class="btn" @click="triggerFileInput">
+                <i class="bi bi-image"></i>
+              </button>
+              <input 
+                type="file" 
+                ref="fileInput" 
+                accept="image/*" 
+                class="d-none" 
+                @change="handleImageUpload"
+              >
+              <button style="border-radius: 0px; border-left:1px solid black;" 
+                      class="btn send-button" 
+                      @click="sendMessage">
+                <span class="bi bi-send px-5"></span>
+              </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div v-if="showImageModal" class="modal fade show" 
+         style="display: block; background-color: rgba(0,0,0,0.5)">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" @click="closeImageModal"></button>
+          </div>
+          <div class="modal-body">
+            <img :src="selectedImage" class="img-fluid" alt="Full size image">
           </div>
         </div>
       </div>
@@ -89,17 +130,23 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { db, auth } from '@/lib/firebaseConfig';
+import { db, auth, storage } from '@/lib/firebaseConfig';
 import { 
   collection, query, where, orderBy, onSnapshot,
   addDoc, serverTimestamp, doc, setDoc, updateDoc, getDoc
 } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import router from '@/router';
 
 const route = useRoute();
 const sellerId = route.params.sellerId as string;
 const itemId = route.params.itemId as string;
 const category = route.params.category as string;
 const userId = auth.currentUser?.uid;
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const showImageModal = ref(false);
+const selectedImage = ref('');
 
 const chats = ref<any[]>([]);
 const sellerInfo = ref<Map<string, any>>(new Map());
@@ -114,6 +161,101 @@ const isMobile = ref(window.innerWidth <= 768);
 const isMobileAndChatSelected = computed(() => 
   isMobile.value && selectedChatId.value !== null
 );
+// Image modal functions
+function openImageModal(imageUrl: string) {
+  selectedImage.value = imageUrl;
+  showImageModal.value = true;
+}
+
+function closeImageModal() {
+  showImageModal.value = false;
+  selectedImage.value = '';
+}
+
+// Trigger file input click
+function triggerFileInput() {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+}
+
+// Handle image upload
+async function handleImageUpload(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (!target.files?.length) return;
+
+  const file = target.files[0];
+  const maxSize = 5 * 1024 * 1024; // 5MB limit
+
+  if (file.size > maxSize) {
+    alert('Image size should be less than 5MB');
+    return;
+  }
+
+  try {
+    const imageRef = storageRef(storage, `chat-images/${selectedChatId.value}/${Date.now()}_${file.name}`);
+    await uploadBytes(imageRef, file);
+    const downloadURL = await getDownloadURL(imageRef);
+    await sendImageMessage(downloadURL);
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    alert('Failed to upload image. Please try again.');
+  }
+}
+
+// Send image message
+async function sendImageMessage(imageUrl: string) {
+  if (!selectedChatId.value) return;
+
+  const messageData = {
+    content: imageUrl,
+    type: 'image',
+    senderId: userId,
+    timestamp: serverTimestamp()
+  };
+
+  try {
+    await addDoc(collection(db, `Chats/${selectedChatId.value}/messages`), messageData);
+
+    await updateDoc(doc(db, 'Chats', selectedChatId.value), {
+      lastMessage: '📷 Image',
+      lastMessageTime: serverTimestamp(),
+      lastMessageSenderId: userId,
+    });
+
+    scrollToBottom();
+  } catch (error) {
+    console.error('Error sending image message:', error);
+  }
+}
+
+// Modified sendMessage function to include message type
+async function sendMessage() {
+  if (!newMessage.value.trim() || !selectedChatId.value) return;
+
+  const messageData = {
+    content: newMessage.value,
+    type: 'text',
+    senderId: userId,
+    timestamp: serverTimestamp()
+  };
+
+  try {
+    await addDoc(collection(db, `Chats/${selectedChatId.value}/messages`), messageData);
+
+    await updateDoc(doc(db, 'Chats', selectedChatId.value), {
+      lastMessage: newMessage.value,
+      lastMessageTime: serverTimestamp(),
+      lastMessageSenderId: userId,
+    });
+
+    newMessage.value = '';
+    scrollToBottom();
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+}
+
 function backToInbox() {
   if (isMobile.value) {
     selectedChatId.value = null;
@@ -195,7 +337,7 @@ onMounted(async () => {
   if (sellerId && itemId) {
     await fetchSellerInfo(sellerId);
     const chatId = await getOrCreateChat(sellerId, itemId);
-    selectChat({ id: chatId });
+    // selectChat({ id: chatId });
   }
 });
 
@@ -251,31 +393,6 @@ async function selectChat(chat: any) {
     }));
     scrollToBottom();
   });
-}
-
-async function sendMessage() {
-  if (!newMessage.value.trim() || !selectedChatId.value) return;
-
-  const messageData = {
-    content: newMessage.value,
-    senderId: userId,
-    timestamp: serverTimestamp()
-  };
-
-  try {
-    await addDoc(collection(db, `Chats/${selectedChatId.value}/messages`), messageData);
-
-    await updateDoc(doc(db, 'Chats', selectedChatId.value), {
-      lastMessage: newMessage.value,
-      lastMessageTime: serverTimestamp(),
-      lastMessageSenderId: userId,
-    });
-
-    newMessage.value = '';
-    scrollToBottom();
-  } catch (error) {
-    console.error('Error sending message:', error);
-  }
 }
 
 function formatDate(timestamp: any) {
