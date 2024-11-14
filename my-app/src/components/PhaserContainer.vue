@@ -3,6 +3,19 @@ import { onMounted, onBeforeUnmount } from 'vue'
 import { auth, db } from '@/lib/firebaseConfig'
 import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore'
 import router from '@/router';
+import CustomAlert from '@/components/CustomAlert.vue';
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 
 const emit = defineEmits(['prizeWon'])
 let gameInstance: { destroy: (arg0: boolean) => void; } | null = null
@@ -37,7 +50,8 @@ const savePrizeToFirebase = async (prizeData) => {
 
       await setDoc(userDocRef, { vouchers: updatedVouchers, spinChance: updatedSpins }, { merge: true });
       if (updatedSpins <= 0) {
-        alert('No more spins left');
+        //alert('No more spins left');
+        showCustomAlert('No more spins left', 'error');
         router.push({ name: 'home' });
       }
     }
@@ -64,13 +78,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
   <div :id="containerId"></div>
 </template>
 
 <style scoped>
 #containerId {
   width: 100%;
-  height: 100vh; /* Full viewport height */
-  overflow: hidden; /* Prevents scrolling if the game overflows */
+  height: 100vh;
+  /* Full viewport height */
+  overflow: hidden;
+  /* Prevents scrolling if the game overflows */
 }
 </style>

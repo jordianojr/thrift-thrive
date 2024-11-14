@@ -1,4 +1,7 @@
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
   <div class="cart-container">
     <h2 class="text-white mb-4">Shopping Cart</h2>
 
@@ -109,7 +112,7 @@ const handleCheckout = async () => {
     }
   } catch (error) {
     console.error('Error during checkout:', error)
-    alert('There was an error processing your payment. Please try again.')
+    //alert('There was an error processing your payment. Please try again.')
     showCustomAlert('There was an error processing your payment. Please try again.', 'error');
   } finally {
     isProcessing.value = false
