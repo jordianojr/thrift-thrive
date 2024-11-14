@@ -226,7 +226,7 @@ const submitReview = async () => {
   const goToItem = (id: string) => {
     router.push({ name: 'item', params: { id } });
   }
-  
+
   onMounted(() => {
     fetchUserData(sellerId);
     fetchProducts();
@@ -293,6 +293,12 @@ const submitReview = async () => {
   .card {
     margin-bottom: 20px;
     width: 100%;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   
   .profile-photo img {
