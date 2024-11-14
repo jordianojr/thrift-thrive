@@ -114,14 +114,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { db, auth, storage } from '@/lib/firebaseConfig';
 import {
   collection, query, where, orderBy, onSnapshot,
   addDoc, serverTimestamp, doc, setDoc, updateDoc, getDoc
 } from 'firebase/firestore';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import router from '@/router';
 import CustomAlert from '@/components/CustomAlert.vue';
 
 // Added these refs for alert handling
@@ -136,10 +135,10 @@ const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' |
   showAlert.value = true;
 };
 const route = useRoute();
+const router = useRouter();
 const sellerId = route.params.sellerId as string;
 const itemId = route.params.itemId as string;
 const category = route.params.category as string;
-const userId = auth.currentUser?.uid;
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const showImageModal = ref(false);
@@ -158,6 +157,19 @@ const isMobile = ref(window.innerWidth <= 768);
 const isMobileAndChatSelected = computed(() =>
   isMobile.value && selectedChatId.value !== null
 );
+
+const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser.uid;
+    }
+};
+
+const userId = getUserUID();
+
 // Image modal functions
 function openImageModal(imageUrl: string) {
   selectedImage.value = imageUrl;
@@ -337,6 +349,7 @@ onMounted(async () => {
     await fetchSellerInfo(sellerId);
     const chatId = await getOrCreateChat(sellerId, itemId);
     // selectChat({ id: chatId });
+    router.push({ path: '/chat' });
   }
 });
 
