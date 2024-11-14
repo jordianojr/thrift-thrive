@@ -20,93 +20,139 @@ const voucherId = route.params.voucherId as string | undefined;
 const itemId = route.params.itemId as string;
 const category = route.params.category as string;
 const cartStore = useCartStore();
+
+// Refs for storing data
 const userId = ref('');
 const userName = ref('');
 const itemName = ref('');
 const sellerId = ref('');
 const sellerName = ref('');
+const isProcessing = ref(false);
+const spinCount = ref(0);
 
+// Handle voucher deletion and user update
 const handleVoucher = async () => {
-  if (voucherId) {
-    try {
-      // Reference the voucher document in the 'prizes' collection
-      const voucherDocRef = doc(db, 'prizes', voucherId);
+  if (!voucherId || !auth.currentUser) return;
 
-      // Delete the voucher document
-      await deleteDoc(voucherDocRef);
-      console.log(`Voucher with ID ${voucherId} deleted successfully.`);
-
-      // Reference the user document
-      const userDocRef = doc(db, 'users', auth.currentUser.uid);
-      const userSnapshot = await getDoc(userDocRef);
-
-      // Check if user document exists
-      if (userSnapshot.exists()) {
-        // Remove the voucherId from the user's vouchers array
-        await updateDoc(userDocRef, {
-          orderHistory: arrayUnion(itemId),
-          vouchers: arrayRemove(voucherId)
-        });
-        const data = userSnapshot.data();
-        userId.value = data.id;
-        userName.value = data.username;
-        
-        console.log(`Voucher ID ${voucherId} removed from user's vouchers array.`);
-      } else {
-        console.log("User document does not exist.");
-      }
-    } catch (error) {
-      console.error('Error handling voucher deletion:', error);
+  try {
+    const voucherDocRef = doc(db, 'prizes', voucherId);
+    const userDocRef = doc(db, 'users', auth.currentUser.uid);
+    
+    // Get user data first
+    const userSnapshot = await getDoc(userDocRef);
+    if (!userSnapshot.exists()) {
+      console.error("User document does not exist.");
+      return;
     }
+
+    // Store user data
+    const userData = userSnapshot.data();
+    userId.value = userData.id || auth.currentUser.uid;
+    userName.value = userData.username;
+    spinCount.value = userData.spinChance;
+    // Delete voucher and update user document
+    await Promise.all([
+      deleteDoc(voucherDocRef),
+      updateDoc(userDocRef, {
+        orderHistory: arrayUnion(itemId),
+        vouchers: arrayRemove(voucherId),
+        spinChance: spinCount.value + 1
+      })
+    ]);
+
+    console.log(`Voucher ${voucherId} processed successfully`);
+  } catch (error) {
+    console.error('Error handling voucher:', error);
+    throw error; // Rethrow to be caught by the main handler
   }
 };
 
+// Delete item from its category
 const deleteItem = async () => {
+  if (!itemId || !category) return;
+
   try {
-    // Reference the item document in the respective collection
     const itemDocRef = doc(db, category, itemId);
     const itemSnapshot = await getDoc(itemDocRef);
-    if (itemSnapshot.exists()) {
-      const data = itemSnapshot.data();
-      itemName.value = data.itemName;
-      sellerId.value = data.userId;
-      sellerName.value = data.userName;
-
-      // Delete the item document
-      await deleteDoc(itemDocRef);
-      console.log(`Item with ID ${itemId} deleted successfully.`);
-    } else {
-      console.log(`Item with ID ${itemId} does not exist.`);
+    
+    if (!itemSnapshot.exists()) {
+      console.error(`Item ${itemId} does not exist in category ${category}`);
+      return;
     }
+
+    // Store item data before deletion
+    const itemData = itemSnapshot.data();
+    itemName.value = itemData.itemName;
+    sellerId.value = itemData.userId;
+    sellerName.value = itemData.userName;
+
+    const sellerDocRef = doc(db, 'users', sellerId.value);
+    updateDoc(sellerDocRef, {
+        salesHistory: arrayUnion(itemId),
+      })
+    
+    // Delete the item
+    await deleteDoc(itemDocRef);
+    console.log(`Item ${itemId} deleted successfully`);
   } catch (error) {
     console.error('Error deleting item:', error);
+    throw error;
   }
-}
+};
 
+// Update sold items collection
 const updateSold = async () => {
-  try{
+  if (!itemId || !itemName.value || !sellerId.value || !sellerName.value) {
+    console.error('Missing required data for updating sold items');
+    return;
+  }
+
+  try {
     const soldItem = doc(db, 'Sold', itemId);
     await setDoc(soldItem, {
       itemName: itemName.value,
-      userId: sellerId.value,
-      userName: sellerName.value,
-      buyerId: userId.value,
-      buyerName: userName.value,
-      itemId: itemId,
-      // category: category,
-      // timestamp: new Date().toISOString()
+      sellerUserId: sellerId.value,
+      sellerUserName: sellerName.value,
+      buyerUserId: userId.value,
+      buyerUserName: userName.value,
+      id: itemId,
+      category: category,
+      timestamp: new Date().toISOString()
     });
-  }catch (error){
-    console.error('Error updating sold:', error);
+    
+    console.log(`Item ${itemId} marked as sold successfully`);
+  } catch (error) {
+    console.error('Error updating sold items:', error);
+    throw error;
   }
-}
+};
 
-onMounted( async () => {
-  console.log('Route params:', route.params);
-  cartStore.clearCart();
-  await handleVoucher();
-  await deleteItem();
-  updateSold; // Call handleVoucher on mount to delete the voucher if voucherId exists
+// Main process handler
+const processCheckout = async () => {
+  isProcessing.value = true;
+  
+  try {
+    cartStore.clearCart();
+    
+    // Execute all operations in sequence
+    if (voucherId) {
+      await handleVoucher();
+    }
+    await deleteItem();
+    await updateSold();
+    
+    console.log('Checkout process completed successfully');
+  } catch (error) {
+    console.error('Checkout process failed:', error);
+    // Here you might want to add error handling UI feedback
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+onMounted(() => {
+  console.log('Processing checkout for:', { itemId, category, voucherId });
+  processCheckout();
 });
 </script>
 

@@ -25,9 +25,9 @@ async function getStripeSecretKey() {
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
-    const {price, name, voucher, itemId} = req.body;
+    const {price, name, voucher, itemId, category} = req.body;
     console.log("voucher: ", voucher);
-    const successUrl = `https://thriftthrive-a28e7.web.app/checkout/success/${encodeURIComponent(voucher)}/${encodeURIComponent(itemId + "" + voucher)}`;
+    const successUrl = `https://thriftthrive-a28e7.web.app/checkout/success/${encodeURIComponent(voucher)}/${encodeURIComponent(itemId)}/${encodeURIComponent(category)}`;
     const stripeSecretKey = await getStripeSecretKey();
     const stripe = require("stripe")(stripeSecretKey);
     const session = await stripe.checkout.sessions.create({
