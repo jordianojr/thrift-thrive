@@ -1,10 +1,10 @@
 <template>
   <div class="container-fluid" style="padding-right: 130px; padding-left: 130px; padding-top: 40px;">
-    <div style="padding-bottom: 20px;">
+    <div>
         <Loading :isLoading="isLoading" message="Fetching your products..." />
       </div>
       <div v-if="!isLoading">
-        <div v-if="products.length === 0" style="padding-bottom: 20px;" class="no-container">
+        <div v-if="products.length === 0" class="no-container">
           <p>You have no purchases yet.</p>
         </div>
       <div v-else class="row">

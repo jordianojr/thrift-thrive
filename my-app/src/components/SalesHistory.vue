@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid" style="padding-right: 130px; padding-left: 130px; padding-top: 40px;">
-      <div style="padding-bottom: 20px;">
+      <div>
           <Loading :isLoading="isLoading" message="Fetching your sales..." />
         </div>
         <div v-if="!isLoading">
