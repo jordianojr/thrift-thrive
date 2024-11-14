@@ -36,7 +36,7 @@
       <div class="form-group row">
         <div class="col-6">
           <label for="item-price">Price:</label>
-          <input type="number" id="item-price" v-model="itemPrice" placeholder="Enter item price" required />
+          <input type="number" id="item-price" v-model="itemPrice" placeholder="Enter item price (inc. delivery price)" required />
         </div>
         <div class="col-6">
           <label for="category">Category:</label>
@@ -76,7 +76,7 @@
           </select>
         </div>
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label>Deal Method:</label>
         <br>
         <label for="meetup">
@@ -87,11 +87,11 @@
           <input style="margin-left: 5px;" type="checkbox" id="delivery" value="Delivery" v-model="dealMethod" />
           Delivery
         </label>
-      </div>      
-      <div class="form-group">
+      </div>       -->
+      <!-- <div class="form-group">
         <label for="location">Location:</label>
         <input type="text" id="location" v-model="location" placeholder="Enter item location" required />
-      </div>
+      </div> -->
       <button type="submit" class="btn btn-primary" style="background-color: black;">Sell</button>
     </form>
   </section>
@@ -112,7 +112,8 @@ const postId = ref(route.params.id as string);
 
 const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 const conditions = ['Brand new', 'Like new', 'Lightly used', 'Well used', 'Heavily used'];
-const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S / EU 48 / UK 38 / US 38', 'M / EU 50 / UK 40 / US 40', 'L / EU 52 / UK 42 / US 42', 'XL / EU 54 / UK 44 / US 44', 'XXL / EU 56 / UK 46 / US 46', 'XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+// const sizes = ['XXS / EU 44 / UK 34 / US 34', 'XS / EU 46 / UK 36 / US 36', 'S / EU 48 / UK 38 / US 38', 'M / EU 50 / UK 40 / US 40', 'L / EU 52 / UK 42 / US 42', 'XL / EU 54 / UK 44 / US 44', 'XXL / EU 56 / UK 46 / US 46', 'XXXL / EU 58 / UK 48 / US 48', 'Free Size', 'Others'];
+const sizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'Free Size', 'Others'];
 const genders = ['Male', 'Female', 'Unisex'];
 
 // Form state

@@ -61,18 +61,18 @@
                 <p class="text-black">{{ category }}</p>
               </div>
             </div>
-            <div class="col-6">
+            <!-- <div class="col-6">
               <div class="detail-box">
                 <h3 class="h6 text-black-50">Deal Method</h3>
                 <p class="text-black">{{ dealMethod }}</p>
               </div>
-            </div>
-            <div class="col-6">
+            </div> -->
+            <!-- <div class="col-6">
               <div class="detail-box">
                 <h3 class="h6 text-black-50">Location</h3>
                 <p class="text-black">{{ location }}</p>
               </div>
-            </div>
+            </div> -->
           </div>
   
           <!-- Deal Method -->
@@ -98,11 +98,11 @@
         <div class="col-12 col-lg-4">
           <div class="card bg-white rounded-4 p-4">
             <!-- Seller Info -->
-            <div class="d-flex align-items-center mb-4">
+            <div class="d-flex align-items-center mb-4" style="cursor: pointer;" @click="goToSeller">
               <img v-if="sellerAvatar" :src="sellerAvatar" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <img v-else src="../assets/user.jpeg" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <div>
-                <h3 class="h5 mb-1" style="cursor: pointer;" @click="goToSeller">{{ sellerName }}</h3>
+                <h3 class="h5 mb-1">{{ sellerName }}</h3>
                 <div class="d-flex align-items-center">
                   <span class="text-warning me-1">★</span>
                   <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
@@ -112,7 +112,7 @@
   
             <!-- Action Buttons -->
             <button @click="redirectToChat" class="btn submit-btn w-100 mb-3" :disabled="disableChat">
-              Chat with Seller
+              Chat with seller for more info <i class="bi bi-chat-right-text ms-2"></i>
             </button>
   
             <!-- <div class="input-group mb-3">
@@ -140,11 +140,11 @@
               <p v-if="vouchers.length === 0">No vouchers available</p>
               <div v-else>
                 <select id="voucher-select" v-model="selectedVoucher" @change="applyVoucher">
-                <option v-for="voucher in vouchers" :key="voucher.id" :value="voucher.prize">
-                  {{ voucher.code }} - {{ voucher.prize }}
+                <option v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]">
+                  {{ voucher.id }} - {{ voucher.prize }}
                 </option>
                 </select>
-              <p>Selected Voucher: {{ selectedVoucher }}</p>              
+              <p>Selected Voucher: {{ selectedVoucher[0] }}</p>              
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@
   const reviews = ref([]);
   const offerPrice = ref('');
   const isLoading = ref(true);
-  const selectedVoucher = ref('');  
+  const selectedVoucher = ref([]);  
 
   interface Voucher {
   id: string; // Or use 'any' if you’re unsure of the type
@@ -200,8 +200,8 @@
 const vouchers: Ref<Voucher[]> = ref([]);
   
   const applyVoucher = () => {
-    console.log('Selected voucher:', selectedVoucher.value);
-    const text = selectedVoucher.value;
+    console.log('Selected voucher:', selectedVoucher.value[0]);
+    const text = selectedVoucher.value[0];
     const number = parseInt(text.match(/\d+/)[0], 10);
     const percentage = 1 - number/100; // 10% discount
     itemPrice.value = (originalPrice * percentage).toFixed(2);
@@ -255,9 +255,19 @@ const vouchers: Ref<Voucher[]> = ref([]);
     }
   };
   
+  const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser?.uid;
+    }
+};
+
   const fetchVouchers = async () => {
   try {
-    const userId = auth.currentUser?.uid as string;
+    const userId = getUserUID()
     const userDocRef = doc(db, 'users', userId);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -296,10 +306,12 @@ onMounted( async () => {
     }
 
     isProcessing.value = true;
-    console.log(itemPrice.value, itemName.value);
+    console.log(selectedVoucher.value[1]);
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-checkout-session`, {
       price: itemPrice.value,
       name: itemName.value,
+      voucher: selectedVoucher.value[1],
+      itemId: itemId,
     });
     console.log(response.data);
     const { sessionId } = response.data;

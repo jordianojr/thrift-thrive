@@ -106,7 +106,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/checkout/success',
+      path: '/checkout/success/:voucherId/:itemId',
       name: 'checkout-success',
       component: () => import('../views/CheckoutSuccess.vue'),
       meta: { requiresAuth: true },

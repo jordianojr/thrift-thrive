@@ -303,20 +303,99 @@ const submitReview = async () => {
       max-width: 100%; /* Prevent it from exceeding full width */
     }
   }
+
+  h3 {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
   .container-fluid {
     color: black;
     background-color: #fbfbfb;
     border-radius: 10px;
     padding-top: 15px;
   }
-  .card-subtitle, .card-text {
-    color: black;
-  }
   .card-img-top {
     width: 100%;
     height: 250px;
     object-fit: cover;
   }
+
+  .container-fluid {
+    color: black;
+    border-radius: 10px;
+    padding-top: 15px;
+  }
+  .card-subtitle {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
+  }
+  .card-text {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
+    height: 80px;
+    overflow: scroll;
+  }
+  .card-title {
+    display: flex;
+    align-items: center;  
+    justify-content: center;   /* Centers text horizontally */   
+    font-weight: 400;
+    text-transform: uppercase;
+    color: black;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    height: 100px;             /* Ensures container has height */
+    text-align: center;        /* Optional for multi-line center alignment */
+  }
+
+  .card-img-top {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    aspect-ratio: 3/4;
+  }
+
+@media (min-width: 1200px) {
+  .container-fluid {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container-fluid {
+    padding-left: 90px;
+    padding-right: 90px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container-fluid {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 
   </style>
   
