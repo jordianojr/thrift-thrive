@@ -1,30 +1,37 @@
 <template>
     <div v-if="isLoading" class="loading-container">
-      <Loading :isLoading="isLoading" message="Loading item details..." />
-    </div>
-    <div v-else class="container-fluid">
-      <!-- Image Carousel Section -->
-      <div class="row mb-4">
-        <div class="col-12 p-0">
-          <div id="itemCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              <div v-for="(image, index) in itemImages" 
-                   :key="index" 
-                   :class="['carousel-item', index === 0 ? 'active' : '']">
-                <img :src="image" class="d-block w-100 carousel-img" :alt="`Product image ${index + 1}`">
-              </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#itemCarousel" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#itemCarousel" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
+    <Loading :isLoading="isLoading" message="Loading item details..." />
+  </div>
+  <div v-else class="container-fluid pt-0">
+    <!-- GSAP Image Gallery Section -->
+    <div class="gallery-container mb-4">
+      <div ref="galleryWrapper" class="gallery-wrapper">
+        <div ref="gallery" class="gallery">
+          <div 
+            v-for="(image, index) in itemImages" 
+            :key="index"
+            class="gallery-item"
+          >
+            <img 
+              :src="image" 
+              :alt="`Product image ${index + 1}`"
+              class="gallery-image"
+            >
           </div>
         </div>
       </div>
+      <!-- Progress bar -->
+      <div class="progress-wrapper">
+        <div ref="progressBar" class="progress-bar"></div>
+      </div>
+      <!-- Navigation arrows -->
+      <button @click="navigate('prev')" class="nav-button prev-button">
+        <span class="nav-arrow">←</span>
+      </button>
+      <button @click="navigate('next')" class="nav-button next-button">
+        <span class="nav-arrow">→</span>
+      </button>
+    </div>
   
       <!-- Main Content -->
       <div class="row">
@@ -73,11 +80,16 @@
                 <p class="text-black">{{ location }}</p>
               </div>
             </div>
+            <div class="col-12">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50 ">Description</h3>
+                <p class="text-black">{{ description }}</p>
+              </div>
+            </div>
+        
           </div>
-  
-          <!-- Deal Method -->
-          
 
+        
         <!-- Add to Cart Button -->
         <button
           v-if="!ownSeller"
@@ -87,11 +99,7 @@
           {{ isProcessing ? 'Processing...' : 'Buy Now!' }}
         </button>
   
-          <!-- Description -->
-          <div class="mb-4">
-            <h3 class="h5 text-white mb-3">Description</h3>
-            <p class="text-white-50">{{ description }}</p>
-          </div>
+          
         </div>
   
         <!-- Right Column - Seller Info -->
@@ -154,13 +162,17 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, type Ref } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import axios from 'axios';
-  import { auth, db } from '@/lib/firebaseConfig';
-  import { doc, getDoc } from 'firebase/firestore';
-  import Loading from "@/components/LoadingOverlay.vue";
-  import { stripePromise } from '@/lib/stripeConfig'; // Import stripePromise from your config
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
+import { auth, db } from '@/lib/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import Loading from "@/components/LoadingOverlay.vue";
+import { stripePromise } from '@/lib/stripeConfig';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
   const router = useRouter();
   const route = useRoute();
@@ -206,6 +218,63 @@ const vouchers: Ref<Voucher[]> = ref([]);
     const percentage = 1 - number/100; // 10% discount
     itemPrice.value = (originalPrice * percentage).toFixed(2);
   };
+
+  const gallery = ref(null);
+const galleryWrapper = ref(null);
+const progressBar = ref(null);
+const currentIndex = ref(0);
+const totalSlides = ref(0);
+
+const initGallery = () => {
+  if (!gallery.value || !progressBar.value) return;
+
+  totalSlides.value = itemImages.value.length;
+  
+  // Set initial styles
+  gsap.set(gallery.value, {
+    x: 0,
+  });
+
+  // Create smooth scroll animation
+  const tl = gsap.timeline({
+    defaults: { duration: 1, ease: "power2.inOut" }
+  });
+
+  // Update progress bar
+  watch(currentIndex, (newIndex) => {
+    gsap.to(progressBar.value, {
+      scaleX: (newIndex + 1) / totalSlides.value,
+      duration: 0.5,
+      ease: "power2.out"
+    });
+  });
+};
+
+const navigate = (direction: 'prev' | 'next') => {
+  if (!gallery.value) return;
+
+  const slideWidth = gallery.value.children[0].offsetWidth;
+  const maxIndex = totalSlides.value - 1;
+
+  if (direction === 'next' && currentIndex.value < maxIndex) {
+    currentIndex.value++;
+  } else if (direction === 'prev' && currentIndex.value > 0) {
+    currentIndex.value--;
+  }
+
+  gsap.to(gallery.value, {
+    x: -slideWidth * currentIndex.value,
+    duration: 1,
+    ease: "power2.inOut"
+  });
+};
+
+// Modified onMounted
+onMounted(async () => {
+  await fetchVouchers();
+  await fetchItem();
+  initGallery();
+});
 
   const fetchUserData = async (userId: string) => {
     const userDocRef = doc(db, 'users', userId);
@@ -369,41 +438,90 @@ onMounted( async () => {
 
 .container-fluid {
   padding: 0 4.5rem;
-  padding-top: 20px;
 }
 
 
-  .carousel-control-prev, .carousel-control-next {
-  border-radius: 50%;
-  border: 1px solid black;
+.gallery-container {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.gallery-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gallery {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.gallery-item {
+  flex: 0 0 100%;
+  height: 100%;
+  position: relative;
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.progress-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background: black;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 50px;
   height: 50px;
-  top: 50%; /* Center vertically */
-  transform: translateY(-50%);
-  background-color: black;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
 }
 
-  .carousel-inner{
-    height: 500px;
-  }
-  /* Loading container */
-  .loading-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000;
-    color: black;
-  }
-  .carousel-item {
-  height: 100%; /* Ensure each carousel item takes full height */
+.nav-button:hover {
+  background: black;
 }
-  /* Carousel image sizing */
-  .carousel-img {
-  height: 100%; /* Image fills the height of the carousel item */
-  width: auto; /* Maintain aspect ratio */
-  max-width: 100%; /* Ensure the image doesn’t overflow */
-  object-fit: contain; /* Show the entire image */
+
+.prev-button {
+  left: 20px;
+}
+
+.next-button {
+  right: 20px;
+}
+
+.nav-arrow {
+  font-size: 24px;
+  line-height: 1;
 }
   
   /* Price styling */
