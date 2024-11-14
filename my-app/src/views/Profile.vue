@@ -140,27 +140,30 @@
         </div>
 
         <div v-if="activeSection === 'reviews'" class="content-section">
-          <div v-if="reviews.length === 0" class="no-container">
-            <p>No reviews yet.</p>
-          </div>
-          <div v-else>
-            <ol>
-              <li v-for="review in reviews">{{ review }}</li>
-            </ol>
-          </div>
-        </div>
+  <div v-if="reviews.length === 0" class="no-container">
+    <p>No reviews yet.</p>
+  </div>
+  <div v-else>
+    <!-- Iterate through the reviews array and display each review in its own container -->
+    <div v-for="(review, index) in reviews" :key="index" class="review-card">
+      <div class="review-body">
+        <p>{{ review }}</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <div v-if="activeSection === 'vouchers'" class="content-section">
-          <div v-if="vouchers.length === 0" class="no-container">
-            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
-          </div>
-          <div v-else>
-            <ol>
-              <li v-for="voucher in vouchers">{{ voucher }}</li>
-            </ol>
-            <p>Spins left: {{ spinChance }}</p>
-          </div>
-        </div>
+<div v-if="activeSection === 'vouchers'" class="content-section">
+  <div v-if="vouchers.length === 0" class="no-container">
+    <p>No vouchers yet. Spins left: {{ spinChance }}</p>
+  </div>
+  <div v-else>
+    <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
+      <p>{{ voucher }}</p>
+    </div>
+    <p>Spins left: {{ spinChance }}</p>
+  </div>
+</div>
 
         <div v-if="activeSection === 'listing'">
           <Listing></Listing>
@@ -330,16 +333,16 @@
         </div>
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
-          <div v-if="vouchers.length === 0" class="no-container">
-            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
-          </div>
-          <div v-else>
-            <ol>
-              <li v-for="voucher in vouchers">{{ voucher }}</li>
-            </ol>
-            <p>Spins left: {{ spinChance }}</p>
-          </div>
+        <div v-if="vouchers.length === 0" class="no-container">
+          <p>No vouchers yet. Spins left: {{ spinChance }}</p>
         </div>
+        <div v-else>
+          <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
+            <p>{{ voucher}}</p>
+          </div>
+          <p>Spins left: {{ spinChance }}</p>
+        </div>
+      </div>
 
         <div v-if="activeSection === 'listing'">
           <Listing></Listing>
@@ -536,7 +539,8 @@ const confirmDeleteAccount = async () => {
   }
 };
 
-// Remove updateUserProfile as its functionality is now merged into updateProfile
+
+
 
 watch(activeSection, () => {
   tempName.value = name.value;
@@ -565,10 +569,42 @@ onBeforeUnmount(() => {
     URL.revokeObjectURL(tempPhotoURL.value);
   }
 });
+
+
 </script>
 
 
 <style scoped>
+
+.voucher-card {
+  background-color: #ffffffb5; /* Light grey background */
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  border: 1px solid transparent; /* Initially, no border */
+}
+
+.voucher-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-color: #4CAF50; /* Green glowing border on hover */
+  border-width: 2px; /* Border width on hover */
+  animation: glow 0.5s ease-in-out infinite alternate; /* Animation for glowing effect */
+}
+
+.review-card {
+  background-color: #ffffffb5;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% {
