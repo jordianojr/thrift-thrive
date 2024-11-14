@@ -43,6 +43,13 @@
           <input type="number" id="item-price" v-model="itemPrice" placeholder="Enter item price" required />
         </div>
         <div class="col-6">
+          <label for="gender">Gender:</label>
+          <select v-model="gender" id="gender" required>
+            <option disabled value="">Gender suitable for:</option>
+            <option v-for="g in genders" :key="g">{{ g }}</option>
+          </select>
+        </div>
+        <!-- <div class="col-6">
           <label>Deal Method:</label>
           <br>
           <label for="meetup">
@@ -53,7 +60,7 @@
             <input style="margin-left: 5px;" type="checkbox" id="delivery" value="Delivery" v-model="dealMethod" />
             Delivery
           </label>
-        </div>
+        </div> -->
       </div>
       <!-- Additional Fields -->
       <div class="form-group row">
@@ -77,18 +84,11 @@
           <label for="brand">Brand:</label>
           <input type="text" id="brand" v-model="brand" placeholder="Brand of item" required />
         </div>
-        <div class="col-6">
-          <label for="gender">Gender:</label>
-          <select v-model="gender" id="gender" required>
-            <option disabled value="">Gender suitable for:</option>
-            <option v-for="g in genders" :key="g">{{ g }}</option>
-          </select>
-        </div>
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="location">Location:</label>
         <input type="text" id="location" v-model="location" placeholder="Enter item location" required />
-      </div>
+      </div> -->
       <button type="submit" class="btn btn-primary" style="background-color: black;">Save</button>
     </form>
   </section>

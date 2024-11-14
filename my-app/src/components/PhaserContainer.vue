@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import { auth, db } from '@/lib/firebaseConfig'
 import { serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore'
 import router from '@/router';
