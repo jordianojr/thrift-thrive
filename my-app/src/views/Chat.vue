@@ -329,6 +329,12 @@ watch(messages, () => {
   background-color: white;
 }
 
+.col-md-8 {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .chat-messages {
   padding: 1rem;
   overflow-y: auto;
@@ -338,7 +344,7 @@ watch(messages, () => {
   text-align: left;
   font-size: 0.9rem;
   border-radius: 20px;
-  height: calc(100% - 70px - 70px); /* Subtract the heights of the header and input group */
+  height: auto; /* Changed to auto to flex properly */
 }
 
 .chat-header {
@@ -382,9 +388,9 @@ watch(messages, () => {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 400;
   border-radius: 0px;
-  bottom: 0px;
-  width: 75%;
-  position: fixed;
+  background: white;
+  width: 100%; /* Changed to 100% */
+  position: relative; /* Changed to relative */
 }
 
 .chat-item {
