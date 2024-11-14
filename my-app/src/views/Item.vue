@@ -312,6 +312,7 @@ onMounted( async () => {
       name: itemName.value,
       voucher: selectedVoucher.value[1],
       itemId: itemId,
+      category: category
     });
     console.log(response.data);
     const { sessionId } = response.data;
