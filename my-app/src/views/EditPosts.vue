@@ -1,6 +1,6 @@
 <template>
-    <div class="row">
-      <div v-if="blogPosts.length == 0" style="padding-bottom: 20px;" class="no-container">
+    <div class="row" >
+      <div v-if="blogPosts.length == 0" class="no-container">
           <p>You have no posts to edit yet.</p>
       </div>
 
@@ -248,7 +248,6 @@
             oldUrls.push(file.url);
           }
         });
-        console.log('New Files:', newFiles);
         const photoUrls = newFiles.length
           ? await Promise.all(newFiles.map(async (file: Blob | ArrayBuffer | Uint8Array, index: number) => {
               const storage = getStorage();
@@ -436,14 +435,14 @@
         margin-right: 1px;
       }
 
-      .d-flex.flex-row::-webkit-scrollbar {
-        display: none; /* Hides scrollbar for WebKit browsers */
-      }
+    .d-flex.flex-row::-webkit-scrollbar {
+      display: none; /* Hides scrollbar for WebKit browsers */
+    }
 
-      .d-flex.flex-row {
-        -ms-overflow-style: none;  /* Hides scrollbar for IE and Edge */
-        scrollbar-width: none;  /* Hides scrollbar for Firefox */
-      }
+    .d-flex.flex-row {
+      -ms-overflow-style: none;  /* Hides scrollbar for IE and Edge */
+      scrollbar-width: none;  /* Hides scrollbar for Firefox */
+    }
 
     .blog-card {
     max-width: 100%; /* Prevents card from overflowing */
@@ -451,6 +450,11 @@
     border-right: 1px black solid;
     }
 
+    .row {
+      padding-left: 130px;
+      padding-right: 130px;
+      padding-top: 40px;
+    }
 
     .blog-card:hover{
     cursor: pointer;

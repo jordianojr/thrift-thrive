@@ -128,18 +128,17 @@
             </div>
           </div>
 
-          <div v-if="activeSection === 'vouchers'" class="content-section">
-            <div v-if="vouchers.length === 0" class="no-container">
-              <p>No vouchers yet.</p> <br>
-              <p>Spins left: {{ spinChance }}</p>
-            </div>
-            <div v-else>
-              <ol>
-                <li v-for="voucher in vouchers">{{ voucher }}</li>
-              </ol>
-              <p>Spins left: {{ spinChance }}</p>
-            </div>
+        <div v-if="activeSection === 'vouchers'" class="content-section">
+          <div v-if="vouchers.length === 0" class="no-container">
+            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
           </div>
+          <div v-else>
+            <ol>
+              <li v-for="voucher in vouchers">{{ voucher }}</li>
+            </ol>
+            <p>Spins left: {{ spinChance }}</p>
+          </div>
+        </div>
 
           <div v-if="activeSection === 'listing'">
             <Listing></Listing>
@@ -282,8 +281,7 @@
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
           <div v-if="vouchers.length === 0" class="no-container">
-            <p>No vouchers yet.</p>
-            <p>Spins left: {{ spinChance }}</p>
+            <p>No vouchers yet. Spins left: {{ spinChance }}</p>
           </div>
           <div v-else>
             <ol>

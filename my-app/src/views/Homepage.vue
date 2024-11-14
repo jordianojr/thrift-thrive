@@ -1,6 +1,7 @@
 <template>
   <div class="homepage">
-    <div class="constant" @mouseenter="showSearchBar" @mouseleave="hideSearchBar">
+    <!-- <div class="constant" @mouseenter="showSearchBar" @mouseleave="hideSearchBar"> -->
+    <div class="constant">
       <Navbar @select="handleSelect" />
       <ProgressBar />
 
@@ -50,26 +51,26 @@ function toggleFashionBot() {
 }
 
 // Function to show the search bar with animation
-function showSearchBar() {
-  gsap.to(searchBarContainer.value, {
-    duration: 0.5,
-    y: 0,
-    ease: "power1.out",
-  });
-}
+// function showSearchBar() {
+//   gsap.to(searchBarContainer.value, {
+//     duration: 0.5,
+//     y: 0,
+//     ease: "power1.out",
+//   });
+// }
 
 // Function to hide the search bar with animation
-function hideSearchBar() {
-  gsap.to(searchBarContainer.value, {
-    duration: 0.5,
-    y: "-100%",
-    ease: "power1.in",
-  });
-}
+// function hideSearchBar() {
+//   gsap.to(searchBarContainer.value, {
+//     duration: 0.5,
+//     y: "-100%",
+//     ease: "power1.in",
+//   });
+// }
 
 onMounted(() => {
   // Set initial position of the search bar off-screen
-  gsap.set(searchBarContainer.value, { y: "-100%" });
+  // gsap.set(searchBarContainer.value, { y: "-100%" });
 });
 </script>
 

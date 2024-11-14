@@ -164,19 +164,32 @@ async function deleteFolder(folderPath: string | undefined) {
     border-radius: 10px;
     padding-top: 15px;
   }
-  .card-subtitle, .card-text {
+  .card-subtitle {
     font-family: 'Helvetica Neue', sans-serif;
     color: black;
     font-size: 0.875rem;
     font-weight: 300;
   }
-  .card-title{
-      font-weight: 400;
-      text-transform: uppercase;
-      color: black;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
+  .card-text {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
+    height: 80px;
+    overflow: scroll;
+  }
+  .card-title {
+    display: flex;
+    align-items: center;  
+    justify-content: center;   /* Centers text horizontally */   
+    font-weight: 400;
+    text-transform: uppercase;
+    color: black;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    height: 100px;             /* Ensures container has height */
+    text-align: center;        /* Optional for multi-line center alignment */
+  }
 
   .card-img-top {
     width: 100%;
