@@ -68,6 +68,12 @@
                 <p class="text-black">{{ category }}</p>
               </div>
             </div>
+            <div class="col-12">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50 ">Description</h3>
+                <p class="text-black">{{ description }}</p>
+              </div>
+            </div>
             <!-- <div class="col-6">
               <div class="detail-box">
                 <h3 class="h6 text-black-50">Deal Method</h3>
@@ -81,9 +87,11 @@
               </div>
             </div>
           </div>
+          
 
         
-        <!-- Add to Cart Button -->
+        <-- Add to Cart Button -->
+        </div>
         <button
           v-if="!ownSeller"
           @click="addToCart" 
