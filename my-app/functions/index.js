@@ -26,6 +26,8 @@ async function getStripeSecretKey() {
 app.post("/create-checkout-session", async (req, res) => {
   try {
     const {price, name, voucher, itemId} = req.body;
+    console.log("voucher: ", voucher);
+    const successUrl = `https://thriftthrive-a28e7.web.app/checkout/success/${encodeURIComponent(voucher)}/${encodeURIComponent(itemId + "" + voucher)}`;
     const stripeSecretKey = await getStripeSecretKey();
     const stripe = require("stripe")(stripeSecretKey);
     const session = await stripe.checkout.sessions.create({
@@ -41,7 +43,7 @@ app.post("/create-checkout-session", async (req, res) => {
         quantity: 1,
       }],
       mode: "payment", // Changed to double quotes
-      success_url: `https://thriftthrive-a28e7.web.app/checkout/success/${voucher}/${itemId}`,
+      success_url: successUrl,
       cancel_url: `https://thriftthrive-a28e7.web.app/marketplace`,
     });
 
