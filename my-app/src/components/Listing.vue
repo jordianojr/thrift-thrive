@@ -1,4 +1,8 @@
 <template>
+      <!-- for alerts popping in and out-->
+      <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+      
     <div class="container-fluid" style="padding-top: 40px;">
       <div style="padding-bottom: 20px;">
         <Loading :isLoading="isLoading" message="Fetching your products..." />
@@ -38,6 +42,19 @@
   import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
   import { getStorage, ref as storageRef, listAll, deleteObject } from 'firebase/storage';
   import { useRouter } from "vue-router";
+  import CustomAlert from '@/components/CustomAlert.vue';
+
+  // Added these refs for alert handling
+  const showAlert = ref(false);
+  const alertMessage = ref('');
+  const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+  // Helper function to show alerts
+  const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+    alertMessage.value = message;
+    alertType.value = type;
+    showAlert.value = true;
+  };
 
   const products = ref<any[]>([]);
   const isLoading = ref(true);
@@ -109,10 +126,12 @@ const deleteItem = async (itemId: string) => {
     products.value = products.value.filter(product => product.id !== itemId);
     localStorage.setItem('listing', JSON.stringify(products.value));
 
-    alert('Item deleted successfully');
+    //alert('Item deleted successfully');
+    showCustomAlert('Item deleted successfully!', 'success');
   } catch (error) {
     console.error('Error deleting item:', error);
-    alert('Error deleting item');
+    //alert('Error deleting item');
+    showCustomAlert('Error deleting item', 'error');
   }
 };
 async function deleteFolder(folderPath: string | undefined) {

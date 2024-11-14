@@ -1,4 +1,8 @@
 <template>
+    <!-- for alerts popping in and out-->
+    <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+      
     <div v-if="isLoading" class="loading-container">
     <Loading :isLoading="isLoading" message="Loading item details..." />
   </div>
@@ -68,29 +72,30 @@
                 <p class="text-black">{{ category }}</p>
               </div>
             </div>
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Deal Method</h3>
-                <p class="text-black">{{ dealMethod }}</p>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Location</h3>
-                <p class="text-black">{{ location }}</p>
-              </div>
-            </div>
             <div class="col-12">
               <div class="detail-box">
                 <h3 class="h6 text-black-50 ">Description</h3>
                 <p class="text-black">{{ description }}</p>
               </div>
             </div>
-        
+            <!-- <div class="col-6">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50">Deal Method</h3>
+                <p class="text-black">{{ dealMethod }}</p>
+              </div>
+            </div> -->
+            <!-- <div class="col-6">
+              <div class="detail-box">
+                <h3 class="h6 text-black-50">Location</h3>
+                <p class="text-black">{{ location }}</p>
+              </div>
+            </div>
           </div>
+          
 
         
-        <!-- Add to Cart Button -->
+        <-- Add to Cart Button -->
+        </div>
         <button
           v-if="!ownSeller"
           @click="addToCart" 
@@ -106,11 +111,11 @@
         <div class="col-12 col-lg-4">
           <div class="card bg-white rounded-4 p-4">
             <!-- Seller Info -->
-            <div class="d-flex align-items-center mb-4">
+            <div class="d-flex align-items-center mb-4" style="cursor: pointer;" @click="goToSeller">
               <img v-if="sellerAvatar" :src="sellerAvatar" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <img v-else src="../assets/user.jpeg" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
               <div>
-                <h3 class="h5 mb-1" style="cursor: pointer;" @click="goToSeller">{{ sellerName }}</h3>
+                <h3 class="h5 mb-1">{{ sellerName }}</h3>
                 <div class="d-flex align-items-center">
                   <span class="text-warning me-1">★</span>
                   <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
@@ -120,7 +125,7 @@
   
             <!-- Action Buttons -->
             <button @click="redirectToChat" class="btn submit-btn w-100 mb-3" :disabled="disableChat">
-              Chat with Seller
+              Chat with seller for more info <i class="bi bi-chat-right-text ms-2"></i>
             </button>
   
             <!-- <div class="input-group mb-3">
@@ -148,11 +153,11 @@
               <p v-if="vouchers.length === 0">No vouchers available</p>
               <div v-else>
                 <select id="voucher-select" v-model="selectedVoucher" @change="applyVoucher">
-                <option v-for="voucher in vouchers" :key="voucher.id" :value="voucher.prize">
-                  {{ voucher.code }} - {{ voucher.prize }}
+                <option v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]">
+                  {{ voucher.id }} - {{ voucher.prize }}
                 </option>
                 </select>
-              <p>Selected Voucher: {{ selectedVoucher }}</p>              
+              <p>Selected Voucher: {{ selectedVoucher[0] }}</p>              
               </div>
             </div>
           </div>
@@ -162,11 +167,11 @@
   </template>
   
   <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { auth, db } from '@/lib/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, type DocumentData } from 'firebase/firestore';
 import Loading from "@/components/LoadingOverlay.vue";
 import { stripePromise } from '@/lib/stripeConfig';
 import gsap from 'gsap';
@@ -177,7 +182,7 @@ gsap.registerPlugin(ScrollTrigger);
   const router = useRouter();
   const route = useRoute();
   const itemId = route.params.id as string;
-  const category = route.params.category as string;
+  let category = route.params.category as string;
 
   const isProcessing = ref(false);
 
@@ -201,7 +206,7 @@ gsap.registerPlugin(ScrollTrigger);
   const reviews = ref([]);
   const offerPrice = ref('');
   const isLoading = ref(true);
-  const selectedVoucher = ref('');  
+  const selectedVoucher = ref([]);  
 
   interface Voucher {
   id: string; // Or use 'any' if you’re unsure of the type
@@ -212,14 +217,14 @@ gsap.registerPlugin(ScrollTrigger);
 const vouchers: Ref<Voucher[]> = ref([]);
   
   const applyVoucher = () => {
-    console.log('Selected voucher:', selectedVoucher.value);
-    const text = selectedVoucher.value;
+    console.log('Selected voucher:', selectedVoucher.value[0]);
+    const text = selectedVoucher.value[0];
     const number = parseInt(text.match(/\d+/)[0], 10);
     const percentage = 1 - number/100; // 10% discount
     itemPrice.value = (originalPrice * percentage).toFixed(2);
   };
 
-  const gallery = ref(null);
+const gallery = ref(null);
 const galleryWrapper = ref(null);
 const progressBar = ref(null);
 const currentIndex = ref(0);
@@ -291,42 +296,82 @@ onMounted(async () => {
   };
   
   const fetchItem = async () => {
-    try {
+  const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+  let itemFound = false;
+
+  try {
+    if (category) {
+      // Attempt to fetch item in the specified category
       const docRef = doc(db, category, itemId);
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
+        itemFound = true;
         const data = docSnap.data();
-        itemImages.value = data.itemPhotoURLs || [];
-        itemName.value = data.itemName || 'Unnamed Item';
-        itemPrice.value = data.itemPrice || 0;
-        condition.value = data.condition || 'N/A';
-        gender.value = data.gender || 'N/A';
-        listedTime.value = data.listedDate || 'N/A';
-        sellerName.value = data.userName || 'Anonymous Seller';
-        sellerId.value = data.userId || 'N/A';
-        dealMethod.value = data.dealMethod || 'N/A';
-        location.value = data.location || 'N/A';
-        description.value = data.description || 'N/A';
-  
-        // Fetch user data based on sellerId
-        checkSeller(sellerId.value);
-        await fetchUserData(sellerId.value);
-        originalPrice = itemPrice.value;
-      } else {
-        console.error("No such item!");
-        alert("Item not found. Please try again.");
+        updateItemData(data);
       }
-    } catch (error) {
-      console.error('Error fetching item:', error);
-      alert("Error fetching item details. Please try again.");
-    } finally {
-      isLoading.value = false;
+    } 
+
+    if (!itemFound) {
+      // If category is null or item not found, iterate through all categories
+      for (const cat of categories) {
+        const docRef = doc(db, cat, itemId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          itemFound = true;
+          const data = docSnap.data();
+          updateItemData(data);
+          category = cat;
+          break;
+        }
+      }
     }
-  };
+
+    if (!itemFound) {
+      console.error("No such item!");
+      alert("Item not found in any category. Please try again.");
+    }
+  } catch (error) {
+    console.error('Error fetching item:', error);
+    alert("Error fetching item details. Please try again.");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const updateItemData = (data: DocumentData) => {
+  itemImages.value = data.itemPhotoURLs || [];
+  itemName.value = data.itemName || 'Unnamed Item';
+  itemPrice.value = data.itemPrice || 0;
+  condition.value = data.condition || 'N/A';
+  gender.value = data.gender || 'N/A';
+  listedTime.value = data.listedDate || 'N/A';
+  sellerName.value = data.userName || 'Anonymous Seller';
+  sellerId.value = data.userId || 'N/A';
+  dealMethod.value = data.dealMethod || 'N/A';
+  location.value = data.location || 'N/A';
+  description.value = data.description || 'N/A';
+
+  // Fetch user data based on sellerId
+  checkSeller(sellerId.value);
+  fetchUserData(sellerId.value);
+  originalPrice = itemPrice.value;
+};
   
+  const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser?.uid;
+    }
+};
+
   const fetchVouchers = async () => {
   try {
-    const userId = auth.currentUser?.uid as string;
+    const userId = getUserUID()
     const userDocRef = doc(db, 'users', userId);
     const userDocSnap = await getDoc(userDocRef);
 
@@ -360,15 +405,19 @@ onMounted( async () => {
   try {
     if (!itemId || !itemName.value || !itemPrice.value) {
       console.error('Missing required item data');
-      alert('Error: Could not process payment');
+      //alert('Error: Could not process payment');
+      showCustomAlert('Error: Could not process payment.', 'error');
       return;
     }
 
     isProcessing.value = true;
-    console.log(itemPrice.value, itemName.value);
+    console.log(selectedVoucher.value[1]);
     const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-checkout-session`, {
       price: itemPrice.value,
       name: itemName.value,
+      voucher: selectedVoucher.value[1],
+      itemId: itemId,
+      category: category
     });
     console.log(response.data);
     const { sessionId } = response.data;
@@ -380,11 +429,13 @@ onMounted( async () => {
 
     if (error) {
       console.error('Error:', error);
-      alert('Payment failed. Please try again.');
+      //alert('Payment failed. Please try again.');
+      showCustomAlert('Payment failed. Please try again.', 'error');
     }
   } catch (error) {
     console.error('Error processing payment:', error);
-    alert('Error: Could not process payment');
+    //alert('Error: Could not process payment');
+    showCustomAlert('Error: Could not process payment', 'error');
   } finally {
     isProcessing.value = false;
   }
@@ -396,6 +447,7 @@ onMounted( async () => {
         disableChat.value = true;
       }
     };
+
   const redirectToChat = () => {
     router.push({
       name: 'chat',

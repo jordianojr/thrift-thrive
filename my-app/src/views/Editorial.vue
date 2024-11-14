@@ -82,9 +82,20 @@ const navigateToCreatePost = () => {
 };
 
 const userRole = ref('');
+
+const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser?.uid;
+    }
+};
+
 const getUserRole = async () => {
   try {
-    const userId = auth.currentUser?.uid; // Get the current user's ID
+    const userId = getUserUID(); // Get the current user's ID
 
     if (!userId) {
       throw new Error("User is not authenticated.");

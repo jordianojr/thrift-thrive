@@ -1,4 +1,8 @@
 <template>
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
   <section class="upload-section container-fluid px-0">
     <LoadingOverlay :isLoading="isLoading" message="Fetching your item details..." />
     <LoadingOverlay :isLoading="!isSaved" message="Saving your new item details..." />
@@ -39,16 +43,16 @@
           <input type="number" id="item-price" v-model="itemPrice" placeholder="Enter item price" required />
         </div>
         <div class="col-6">
-            <label>Deal Method:</label>
-            <br>
-            <label for="meetup">
+          <label>Deal Method:</label>
+          <br>
+          <label for="meetup">
             <input type="checkbox" id="meetup" value="Meet-up" v-model="dealMethod" />
             Meet-up
-            </label>
-            <label for="delivery">
+          </label>
+          <label for="delivery">
             <input style="margin-left: 5px;" type="checkbox" id="delivery" value="Delivery" v-model="dealMethod" />
             Delivery
-            </label>
+          </label>
         </div>
       </div>
       <!-- Additional Fields -->
@@ -97,6 +101,19 @@ import { db, auth, storage } from "@/lib/firebaseConfig"; // Adjust the path as 
 import { collection, getDoc, setDoc, doc, documentId } from "firebase/firestore";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
+import CustomAlert from '@/components/CustomAlert.vue';
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -179,7 +196,7 @@ const removeFile = (index: number) => {
 };
 
 const fetchItem = async () => {
-    const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
+  const collectionsToCheck = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
 
     try {
         for (const collectionName of collectionsToCheck) {
@@ -225,7 +242,7 @@ const handleSave = async () => {
     }
   try {
     isSaved.value = false;
-    
+
     // Create or update item document
     const itemDocRef = doc(db, chosenCat.value, itemId.value); // Replace with the correct collection and document ID
 
@@ -268,31 +285,34 @@ const handleSave = async () => {
     // Save to Firestore
     await setDoc(itemDocRef, itemData, { merge: true });
 
-    alert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`);
+    //alert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`);
+    showCustomAlert(`Item ${itemId.value ? 'updated' : 'uploaded'} successfully!`, 'success');
     router.push({ name: 'profile' });
   } catch (error) {
     console.error('Error during upload:', error);
-    alert('An error occurred during upload. Please try again.');
+    //alert('An error occurred during upload. Please try again.');
+    showCustomAlert('An error occurred during upload. Please try again.', 'error');
   } finally {
     isSaved.value = true;
   }
 };
 
 onMounted(() => {
-    fetchItem();
+  fetchItem();
 });
 </script>
 
 <style scoped>
 .header-container {
   border-bottom: 1px solid black;
-  width: 50%; /* Match the form width */
+  width: 50%;
+  /* Match the form width */
   margin: 0 auto;
   border-left: 1px black solid;
   border-right: 1px black solid;
 }
 
-.head{
+.head {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 700;
   text-transform: uppercase;
@@ -300,8 +320,8 @@ onMounted(() => {
   font-size: 1.9rem;
   color: black;
   margin: 0;
-  padding-top: 45px; 
-  padding-bottom: 45px; 
+  padding-top: 45px;
+  padding-bottom: 45px;
 }
 
 .upload-form {
@@ -334,7 +354,8 @@ select {
 }
 
 textarea {
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
+  /* Allow vertical resizing */
 }
 
 button {
@@ -406,37 +427,40 @@ button:hover {
 
 @media (max-width: 992px) {
   .upload-form {
-  padding: 20px;
-  margin: 0px;
-  max-width: 100%;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-weight: 400;
-  } 
+    padding: 20px;
+    margin: 0px;
+    max-width: 100%;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+  }
 
   .form-group {
     margin-top: 10px;
   }
 
-  .upload-section{
+  .upload-section {
     padding-bottom: 0px;
     margin: 0px;
   }
 
   button {
-    padding: 10px; /* Adjust button padding */
+    padding: 10px;
+    /* Adjust button padding */
   }
 }
+
 .custom-file-upload {
   display: inline-block;
   cursor: pointer;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: #f8f9fa; /* Light background */
+  background-color: #f8f9fa;
+  /* Light background */
 }
 
 .custom-file-upload input {
-  display: none; /* Hide the default file input */
+  display: none;
+  /* Hide the default file input */
 }
-
 </style>

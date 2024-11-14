@@ -1,4 +1,8 @@
 <template>
+      <!-- for alerts popping in and out-->
+      <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+      @update:visible="showAlert = $event" />
+
     <div class="row">
       <div ref="profileRef" class="card col-lg-3 col-12 profile mx-auto" style="width: 18rem;">
         <div class="card-body">
@@ -41,7 +45,7 @@
         <div v-if="!isLoading">
             <div class="row">
             <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
-                <div class="card mb-4">
+                <div class="card mb-4" @click="goToItem(product.id)">
                 <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">
                 <div class="card-body">
                     <h4 class="card-title">{{ product.itemName }}</h4>
@@ -122,10 +126,24 @@
   import { ref, onMounted } from 'vue';
   import { db } from '../lib/firebaseConfig'; 
   import { doc, getDoc, collection, getDocs, query, where, setDoc } from 'firebase/firestore';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
-  
+  import CustomAlert from "@/components/CustomAlert.vue";
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
+
   const route = useRoute();
+  const router = useRouter();
   const sellerId = route.params.sellerId as string;
   const userEmail = ref('');
   const name = ref('');
@@ -177,12 +195,14 @@
 
 const submitReview = async () => {
   if (!reviewText.value) {
-    alert('Please enter a review.');
+    //alert('Please enter a review.');
+    showCustomAlert('Please enter a review', 'error');
     return;
   }
 
   if (reviewRating.value < 1 || reviewRating.value > 5) {
-    alert('Please enter a rating between 1 and 5.');
+    //alert('Please enter a rating between 1 and 5.');
+    showCustomAlert('Please enter a rating between 1 and 5.', 'error');
     return;
   }
 
@@ -190,12 +210,14 @@ const submitReview = async () => {
     const { updatedReviews, updatedRating } = await updateUserReview(sellerId, reviewText.value, reviewRating.value);
     reviews.value = updatedReviews;
     rating.value = updatedRating;
-    alert('Review submitted successfully!');
+    //alert('Review submitted successfully!');
+    showCustomAlert('Review submitted successfully!', 'success');
     reviewText.value = '';
     reviewRating.value = 0;
   } catch (error) {
     console.error('Error submitting review:', error);
-    alert('Failed to submit review. Please try again later.');
+    //alert('Failed to submit review. Please try again later.');
+    showCustomAlert('Failed to submit review. Please try again later.', 'error');
   }
 };
 
@@ -221,6 +243,10 @@ const submitReview = async () => {
       }
     isLoading.value = false;
   };
+
+  const goToItem = (id: string) => {
+    router.push({ name: 'item', params: { id } });
+  }
 
   onMounted(() => {
     fetchUserData(sellerId);
@@ -288,6 +314,12 @@ const submitReview = async () => {
   .card {
     margin-bottom: 20px;
     width: 100%;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   
   .profile-photo img {
@@ -303,20 +335,99 @@ const submitReview = async () => {
       max-width: 100%; /* Prevent it from exceeding full width */
     }
   }
+
+  h3 {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
   .container-fluid {
     color: black;
     background-color: #fbfbfb;
     border-radius: 10px;
     padding-top: 15px;
   }
-  .card-subtitle, .card-text {
-    color: black;
-  }
   .card-img-top {
     width: 100%;
     height: 250px;
     object-fit: cover;
   }
+
+  .container-fluid {
+    color: black;
+    border-radius: 10px;
+    padding-top: 15px;
+  }
+  .card-subtitle {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
+  }
+  .card-text {
+    font-family: 'Helvetica Neue', sans-serif;
+    color: black;
+    font-size: 0.875rem;
+    font-weight: 300;
+    height: 80px;
+    overflow: scroll;
+  }
+  .card-title {
+    display: flex;
+    align-items: center;  
+    justify-content: center;   /* Centers text horizontally */   
+    font-weight: 400;
+    text-transform: uppercase;
+    color: black;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    height: 100px;             /* Ensures container has height */
+    text-align: center;        /* Optional for multi-line center alignment */
+  }
+
+  .card-img-top {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    aspect-ratio: 3/4;
+  }
+
+@media (min-width: 1200px) {
+  .container-fluid {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container-fluid {
+    padding-left: 90px;
+    padding-right: 90px;
+  }
+}
+
+@media (max-width: 992px) {
+  .container-fluid {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 
   </style>
   
