@@ -7,50 +7,54 @@
   </transition>
 </template>
 
-<script>
-export default {
-  props: {
-    visible: {
-      type: Boolean,
-      default: false,
-    },
-    message: {
-      type: String,
-      default: '',
-    },
-    alertType: {
-      type: String,
-      default: 'info',
-    },
-    timeout: {
-      type: Number,
-      default: 3000, // Default timeout of 3 seconds
-    },
-  },
-  watch: {
-    visible(newValue) {
-      if (newValue) {
-        this.startTimer();
-      }
-    },
-  },
-  methods: {
-    closeAlert() {
-      this.$emit('update:visible', false);
-    },
-    startTimer() {
-      setTimeout(() => {
-        this.closeAlert();
-      }, this.timeout);
-    },
-  },
-  mounted() {
-    if (this.visible) {
-      this.startTimer();
-    }
-  },
-};
-</script>
+<script setup lang="ts">
+import { watch, onMounted } from 'vue'
+
+// Define props with TypeScript interface
+interface Props {
+  visible: boolean
+  message: string
+  alertType: 'info' | 'success' | 'warning' | 'error'
+  timeout?: number
+}
+
+// Define props with default values
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  message: '',
+  alertType: 'info',
+  timeout: 3000
+})
+
+// Define emits
+const emit = defineEmits<{
+  'update:visible': [value: boolean]
+}>()
+
+// Methods
+const closeAlert = () => {
+  emit('update:visible', false)
+}
+
+const startTimer = () => {
+  setTimeout(() => {
+    closeAlert()
+  }, props.timeout)
+}
+
+// Watchers
+watch(() => props.visible, (newValue) => {
+  if (newValue) {
+    startTimer()
+  }
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  if (props.visible) {
+    startTimer()
+  }
+})</script>
 
 <style scoped>
 .notification {
