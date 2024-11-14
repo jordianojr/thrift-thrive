@@ -1,9 +1,9 @@
 <template>
-    <!-- for alerts popping in and out-->
-    <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
-      @update:visible="showAlert = $event" />
-      
-    <div v-if="isLoading" class="loading-container">
+  <!-- for alerts popping in and out-->
+  <CustomAlert :visible="showAlert" :message="alertMessage" :alert-type="alertType" :timeout="3000"
+    @update:visible="showAlert = $event" />
+
+  <div v-if="isLoading" class="loading-container">
     <Loading :isLoading="isLoading" message="Loading item details..." />
   </div>
   <div v-else class="container-fluid pt-0">
@@ -11,16 +11,8 @@
     <div class="gallery-container mb-4">
       <div ref="galleryWrapper" class="gallery-wrapper">
         <div ref="gallery" class="gallery">
-          <div 
-            v-for="(image, index) in itemImages" 
-            :key="index"
-            class="gallery-item"
-          >
-            <img 
-              :src="image" 
-              :alt="`Product image ${index + 1}`"
-              class="gallery-image"
-            >
+          <div v-for="(image, index) in itemImages" :key="index" class="gallery-item">
+            <img :src="image" :alt="`Product image ${index + 1}`" class="gallery-image">
           </div>
         </div>
       </div>
@@ -36,55 +28,55 @@
         <span class="nav-arrow">→</span>
       </button>
     </div>
-  
-      <!-- Main Content -->
-      <div class="row">
-        <!-- Left Column - Item Details -->
-        <div class="col-12 col-lg-8 mb-4">
-          <h1 class="display-6 itemName text-black mb-3">{{ itemName }}</h1>
-          <div class="price-text mb-4">
-            S${{ itemPrice }}
+
+    <!-- Main Content -->
+    <div class="row">
+      <!-- Left Column - Item Details -->
+      <div class="col-12 col-lg-8 mb-4">
+        <h1 class="display-6 itemName text-black mb-3">{{ itemName }}</h1>
+        <div class="price-text mb-4">
+          S${{ itemPrice }}
+        </div>
+
+        <!-- Item Details -->
+        <div class="row mb-4">
+          <div class="col-6">
+            <div class="detail-box">
+              <h3 class="h6 text-black-50">Condition</h3>
+              <p class="text-black">{{ condition }}</p>
+            </div>
           </div>
-  
-          <!-- Item Details -->
-          <div class="row mb-4">
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Condition</h3>
-                <p class="text-black">{{ condition }}</p>
-              </div>
+          <div class="col-6">
+            <div class="detail-box">
+              <h3 class="h6 text-black-50">Suitable for:</h3>
+              <p class="text-black">{{ gender }}</p>
             </div>
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Suitable for:</h3>
-                <p class="text-black">{{ gender }}</p>
-              </div>
+          </div>
+          <div class="col-6">
+            <div class="detail-box">
+              <h3 class="h6 text-black-50">Listed</h3>
+              <p class="text-black">{{ listedTime }}</p>
             </div>
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Listed</h3>
-                <p class="text-black">{{ listedTime }}</p>
-              </div>
+          </div>
+          <div class="col-6">
+            <div class="detail-box">
+              <h3 class="h6 text-black-50">Category</h3>
+              <p class="text-black">{{ category }}</p>
             </div>
-            <div class="col-6">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50">Category</h3>
-                <p class="text-black">{{ category }}</p>
-              </div>
+          </div>
+          <div class="col-12">
+            <div class="detail-box">
+              <h3 class="h6 text-black-50 ">Description</h3>
+              <p class="text-black">{{ description }}</p>
             </div>
-            <div class="col-12">
-              <div class="detail-box">
-                <h3 class="h6 text-black-50 ">Description</h3>
-                <p class="text-black">{{ description }}</p>
-              </div>
-            </div>
-            <!-- <div class="col-6">
+          </div>
+          <!-- <div class="col-6">
               <div class="detail-box">
                 <h3 class="h6 text-black-50">Deal Method</h3>
                 <p class="text-black">{{ dealMethod }}</p>
               </div>
             </div> -->
-            <!-- <div class="col-6">
+          <!-- <div class="col-6">
               <div class="detail-box">
                 <h3 class="h6 text-black-50">Location</h3>
                 <p class="text-black">{{ location }}</p>
@@ -96,39 +88,37 @@
         
         <-- Add to Cart Button -->
         </div>
-        <button
-          v-if="!ownSeller"
-          @click="addToCart" 
-          :disabled="isProcessing"
-          class="btn submit-btn py-2 w-100">
+        <button v-if="!ownSeller" @click="addToCart" :disabled="isProcessing" class="btn submit-btn py-2 w-100">
           {{ isProcessing ? 'Processing...' : 'Buy Now!' }}
         </button>
-  
-          
-        </div>
-  
-        <!-- Right Column - Seller Info -->
-        <div class="col-12 col-lg-4">
-          <div class="card bg-white rounded-4 p-4">
-            <!-- Seller Info -->
-            <div class="d-flex align-items-center mb-4" style="cursor: pointer;" @click="goToSeller">
-              <img v-if="sellerAvatar" :src="sellerAvatar" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
-              <img v-else src="../assets/user.jpeg" alt="Seller avatar" class="rounded-circle me-3" style="width: 48px; height: 48px;">
-              <div>
-                <h3 class="h5 mb-1">{{ sellerName }}</h3>
-                <div class="d-flex align-items-center">
-                  <span class="text-warning me-1">★</span>
-                  <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
-                </div>
+
+
+      </div>
+
+      <!-- Right Column - Seller Info -->
+      <div class="col-12 col-lg-4">
+        <div class="card bg-white rounded-4 p-4">
+          <!-- Seller Info -->
+          <div class="d-flex align-items-center mb-4" style="cursor: pointer;" @click="goToSeller">
+            <img v-if="sellerAvatar" :src="sellerAvatar" alt="Seller avatar" class="rounded-circle me-3"
+              style="width: 48px; height: 48px;">
+            <img v-else src="../assets/user.jpeg" alt="Seller avatar" class="rounded-circle me-3"
+              style="width: 48px; height: 48px;">
+            <div>
+              <h3 class="h5 mb-1">{{ sellerName }}</h3>
+              <div class="d-flex align-items-center">
+                <span class="text-warning me-1">★</span>
+                <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
               </div>
             </div>
-  
-            <!-- Action Buttons -->
-            <button @click="redirectToChat" class="btn submit-btn w-100 mb-3" :disabled="disableChat">
-              Chat with seller for more info <i class="bi bi-chat-right-text ms-2"></i>
-            </button>
-  
-            <!-- <div class="input-group mb-3">
+          </div>
+
+          <!-- Action Buttons -->
+          <button @click="redirectToChat" class="btn submit-btn w-100 mb-3" :disabled="disableChat">
+            Chat with seller for more info <i class="bi bi-chat-right-text ms-2"></i>
+          </button>
+
+          <!-- <div class="input-group mb-3">
               <input 
                 v-model="offerPrice" 
                 type="text" 
@@ -142,31 +132,33 @@
                 Make Offer
               </button>
             </div> -->
-            
-            <!-- Safety Notice -->
-            <div class="small text-muted mt-3">
-              <p style="color: black" class="mb-2">Returns and refunds depend on the seller's decision. Not covered by Buyer Protection.</p>
-              <p style="color: black" class="mb-0">Pay only at the meet-up. Transferring money directly to strangers puts you at risk of e-commerce scams.</p>
-            </div>
-            <div class="card bg-white rounded-2 p-4" style="margin-top: 20px; padding: 10px !important;">
-              <h5>Vouchers</h5>
-              <p v-if="vouchers.length === 0">No vouchers available</p>
-              <div v-else>
-                <select id="voucher-select" v-model="selectedVoucher" @change="applyVoucher">
+
+          <!-- Safety Notice -->
+          <div class="small text-muted mt-3">
+            <p style="color: black" class="mb-2">Returns and refunds depend on the seller's decision. Not covered by
+              Buyer Protection.</p>
+            <p style="color: black" class="mb-0">Pay only at the meet-up. Transferring money directly to strangers puts
+              you at risk of e-commerce scams.</p>
+          </div>
+          <div class="card bg-white rounded-2 p-4" style="margin-top: 20px; padding: 10px !important;">
+            <h5>Vouchers</h5>
+            <p v-if="vouchers.length === 0">No vouchers available</p>
+            <div v-else>
+              <select id="voucher-select" v-model="selectedVoucher" @change="applyVoucher">
                 <option v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]">
                   {{ voucher.id }} - {{ voucher.prize }}
                 </option>
-                </select>
-              <p>Selected Voucher: {{ selectedVoucher[0] }}</p>              
-              </div>
+              </select>
+              <p>Selected Voucher: {{ selectedVoucher[0] }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
+  </div>
+</template>
+
+<script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
@@ -176,53 +168,66 @@ import Loading from "@/components/LoadingOverlay.vue";
 import { stripePromise } from '@/lib/stripeConfig';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import CustomAlert from '@/components/CustomAlert.vue';
+
+// Added these refs for alert handling
+const showAlert = ref(false);
+const alertMessage = ref('');
+const alertType = ref('info');  // Can be 'info', 'success', 'warning', or 'error'
+
+// Helper function to show alerts
+const showCustomAlert = (message: string, type: 'info' | 'success' | 'warning' | 'error') => {
+  alertMessage.value = message;
+  alertType.value = type;
+  showAlert.value = true;
+};
 
 gsap.registerPlugin(ScrollTrigger);
 
-  const router = useRouter();
-  const route = useRoute();
-  const itemId = route.params.id as string;
-  let category = route.params.category as string;
+const router = useRouter();
+const route = useRoute();
+const itemId = route.params.id as string;
+let category = route.params.category as string;
 
-  const isProcessing = ref(false);
+const isProcessing = ref(false);
 
-  const ownSeller = ref(false);
-  const disableChat = ref(false);
+const ownSeller = ref(false);
+const disableChat = ref(false);
 
-  const itemImages = ref<string[]>([]);
-  const itemName = ref('');
-  const itemPrice = ref(0);
-  let originalPrice = 0;
-  const condition = ref('');
-  const gender = ref('');
-  const listedTime = ref('');
-  const dealMethod = ref('');
-  const location = ref('');
-  const description = ref('');
-  const sellerAvatar = ref(''); // Default avatar
-  const sellerName = ref('');
-  const sellerId = ref('');
-  const rating = ref(0);
-  const reviews = ref([]);
-  const offerPrice = ref('');
-  const isLoading = ref(true);
-  const selectedVoucher = ref([]);  
+const itemImages = ref<string[]>([]);
+const itemName = ref('');
+const itemPrice = ref(0);
+let originalPrice = 0;
+const condition = ref('');
+const gender = ref('');
+const listedTime = ref('');
+const dealMethod = ref('');
+const location = ref('');
+const description = ref('');
+const sellerAvatar = ref(''); // Default avatar
+const sellerName = ref('');
+const sellerId = ref('');
+const rating = ref(0);
+const reviews = ref([]);
+const offerPrice = ref('');
+const isLoading = ref(true);
+const selectedVoucher = ref([]);
 
-  interface Voucher {
+interface Voucher {
   id: string; // Or use 'any' if you’re unsure of the type
   // Add other properties of your voucher documents if needed
   prize?: string; // Optional example property
 }
 
 const vouchers: Ref<Voucher[]> = ref([]);
-  
-  const applyVoucher = () => {
-    console.log('Selected voucher:', selectedVoucher.value[0]);
-    const text = selectedVoucher.value[0];
-    const number = parseInt(text.match(/\d+/)[0], 10);
-    const percentage = 1 - number/100; // 10% discount
-    itemPrice.value = (originalPrice * percentage).toFixed(2);
-  };
+
+const applyVoucher = () => {
+  console.log('Selected voucher:', selectedVoucher.value[0]);
+  const text = selectedVoucher.value[0];
+  const number = parseInt(text.match(/\d+/)[0], 10);
+  const percentage = 1 - number / 100; // 10% discount
+  itemPrice.value = (originalPrice * percentage).toFixed(2);
+};
 
 const gallery = ref(null);
 const galleryWrapper = ref(null);
@@ -234,7 +239,7 @@ const initGallery = () => {
   if (!gallery.value || !progressBar.value) return;
 
   totalSlides.value = itemImages.value.length;
-  
+
   // Set initial styles
   gsap.set(gallery.value, {
     x: 0,
@@ -281,21 +286,21 @@ onMounted(async () => {
   initGallery();
 });
 
-  const fetchUserData = async (userId: string) => {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-    
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      sellerAvatar.value = userData.photoURL || '';
-      rating.value = userData.rating || 0;
-      reviews.value = userData.reviews || 0;
-    } else {
-      console.error("No such user!");
-    }
-  };
-  
-  const fetchItem = async () => {
+const fetchUserData = async (userId: string) => {
+  const userDocRef = doc(db, 'users', userId);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (userDocSnap.exists()) {
+    const userData = userDocSnap.data();
+    sellerAvatar.value = userData.photoURL || '';
+    rating.value = userData.rating || 0;
+    reviews.value = userData.reviews || 0;
+  } else {
+    console.error("No such user!");
+  }
+};
+
+const fetchItem = async () => {
   const categories = ['Shoes', 'Accessories', 'Belt', 'T-shirt', 'Jeans', 'Outerwear'];
   let itemFound = false;
 
@@ -310,7 +315,7 @@ onMounted(async () => {
         const data = docSnap.data();
         updateItemData(data);
       }
-    } 
+    }
 
     if (!itemFound) {
       // If category is null or item not found, iterate through all categories
@@ -330,11 +335,13 @@ onMounted(async () => {
 
     if (!itemFound) {
       console.error("No such item!");
-      alert("Item not found in any category. Please try again.");
+      //alert("Item not found in any category. Please try again.");
+      showCustomAlert('Item not found in any category. Please try again.', 'error');
     }
   } catch (error) {
     console.error('Error fetching item:', error);
-    alert("Error fetching item details. Please try again.");
+    //alert("Error fetching item details. Please try again.");
+    showCustomAlert('Error fetching item details. Please try again.', 'error');
   } finally {
     isLoading.value = false;
   }
@@ -358,18 +365,18 @@ const updateItemData = (data: DocumentData) => {
   fetchUserData(sellerId.value);
   originalPrice = itemPrice.value;
 };
-  
-  const getUserUID = () => {
-    const cachedData = localStorage.getItem(`user`);
-    if (cachedData) {
+
+const getUserUID = () => {
+  const cachedData = localStorage.getItem(`user`);
+  if (cachedData) {
     const userData = JSON.parse(cachedData);
     return userData.uid;
-    } else {
+  } else {
     return auth.currentUser?.uid;
-    }
+  }
 };
 
-  const fetchVouchers = async () => {
+const fetchVouchers = async () => {
   try {
     const userId = getUserUID()
     const userDocRef = doc(db, 'users', userId);
@@ -396,12 +403,12 @@ const updateItemData = (data: DocumentData) => {
   }
 };
 
-onMounted( async () => {
-    await fetchVouchers();
-    fetchItem();
-    });
+onMounted(async () => {
+  await fetchVouchers();
+  fetchItem();
+});
 
-  const addToCart = async () => {
+const addToCart = async () => {
   try {
     if (!itemId || !itemName.value || !itemPrice.value) {
       console.error('Missing required item data');
@@ -440,44 +447,44 @@ onMounted( async () => {
     isProcessing.value = false;
   }
 };
-  
-  const checkSeller = (sellerId: string | undefined) => {
-      if (auth.currentUser?.uid === sellerId) {
-        ownSeller.value = true;
-        disableChat.value = true;
-      }
-    };
 
-  const redirectToChat = () => {
-    router.push({
-      name: 'chat',
-      params: { 
-        sellerId: sellerId.value, 
-        itemId: itemId,
-        category: category 
-      }
-    });
-  };
-
-  const goToSeller = () => {
-    if (sellerId.value === auth.currentUser?.uid) {
-      router.push({ name: 'profile' });
-      return;
-    }
-    router.push({
-      name: 'sellerprofile',
-      params: { sellerId: sellerId.value }
-    });
-  };
-  </script>
-    
-  <style scoped>
-  /* Base page styling */
-  :deep(body) {
-    background-color: #000;
+const checkSeller = (sellerId: string | undefined) => {
+  if (auth.currentUser?.uid === sellerId) {
+    ownSeller.value = true;
+    disableChat.value = true;
   }
+};
 
-  #itemCarousel {
+const redirectToChat = () => {
+  router.push({
+    name: 'chat',
+    params: {
+      sellerId: sellerId.value,
+      itemId: itemId,
+      category: category
+    }
+  });
+};
+
+const goToSeller = () => {
+  if (sellerId.value === auth.currentUser?.uid) {
+    router.push({ name: 'profile' });
+    return;
+  }
+  router.push({
+    name: 'sellerprofile',
+    params: { sellerId: sellerId.value }
+  });
+};
+</script>
+
+<style scoped>
+/* Base page styling */
+:deep(body) {
+  background-color: #000;
+}
+
+#itemCarousel {
   border-bottom: 1px black solid;
   margin: 0 -100vw;
   width: 100vw;
@@ -575,36 +582,37 @@ onMounted( async () => {
   font-size: 24px;
   line-height: 1;
 }
-  
-  /* Price styling */
-  .price-text {
-    font-size: 1.6rem;
-    font-weight: 600;
-    font-family: 'Helvetica Neue', sans-serif;
-    color: hsla(160, 100%, 37%, 1);
-  }
-  
-  /* Detail boxes */
-  .detail-box {
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Deal method section */
-  .deal-method {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Custom rounded corners for seller card */
-  .rounded-4 {
-    border-radius: 1rem;
-  }
-  .container-fluid{
-    padding: 0 4.5rem ;
-    border: 1px solid lightgrey;
-    padding-top: 20px;
-  }
-  
-  .submit-btn {
+
+/* Price styling */
+.price-text {
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-family: 'Helvetica Neue', sans-serif;
+  color: hsla(160, 100%, 37%, 1);
+}
+
+/* Detail boxes */
+.detail-box {
+  margin-bottom: 1.5rem;
+}
+
+/* Deal method section */
+.deal-method {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom rounded corners for seller card */
+.rounded-4 {
+  border-radius: 1rem;
+}
+
+.container-fluid {
+  padding: 0 4.5rem;
+  border: 1px solid lightgrey;
+  padding-top: 20px;
+}
+
+.submit-btn {
   font-family: 'Helvetica Neue', sans-serif;
   font-weight: 500;
   background-color: black !important;
@@ -627,20 +635,19 @@ onMounted( async () => {
 
 .itemName {
   font-family: 'Helvetica Neue', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: left;
-    font-size: 1.9rem;
-    color: black;
-    margin: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 1.9rem;
+  color: black;
+  margin: 0;
 }
 
-h3, p {
+h3,
+p {
   font-family: 'Helvetica Neue', sans-serif;
   color: black;
   font-size: 1rem;
   font-weight: 400;
 }
-
-
-  </style>
+</style>
