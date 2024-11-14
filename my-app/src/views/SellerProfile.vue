@@ -103,14 +103,16 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div v-if="reviews.length === 0">
-            <p>No reviews yet.</p>
-          </div>
-          <div v-else >
-            <ol>
-              <li v-for="review in reviews"> {{ review }}</li>
-            </ol>
-          </div>
+  <div v-if="reviews.length === 0">
+    <p>No reviews yet.</p>
+  </div>
+  <div v-else>
+    <div class="reviews-container">
+      <div v-for="review in reviews" :key="review.id" class="review-card">
+        <p>{{ review }}</p>
+      </div>
+    </div>
+  </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
@@ -265,6 +267,32 @@ const submitReview = async () => {
   </script>
   
   <style scoped>
+
+.reviews-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Space between each review */
+  padding: 15px;
+}
+
+.review-card {
+  background-color: #ffffffb5;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.review-card p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
   .profile-container {
     max-width: 600px;
     margin: auto;

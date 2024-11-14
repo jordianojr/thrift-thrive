@@ -132,16 +132,19 @@
 </div>
 
 <div v-if="activeSection === 'vouchers'" class="content-section">
-  <div v-if="vouchers.length === 0" class="no-container">
-    <p>No vouchers yet. Spins left: {{ spinChance }}</p>
-  </div>
-  <div v-else>
-    <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
-      <p>{{ voucher }}</p>
-    </div>
-    <p>Spins left: {{ spinChance }}</p>
-  </div>
-</div>
+        <div v-if="vouchers.length === 0" class="no-container">
+          <p>No vouchers yet. Spins left: {{ spinChance }}</p>
+        </div>
+        <div v-else>
+          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" 
+          :style="getVoucherBackgroundColor(voucher.prize)"
+            class="voucher-card">
+            <p>{{ voucher.id}} {{ voucher.prize }}</p>
+          </div>
+          <p>Spins left: {{ spinChance }}</p>
+        </div>
+      </div>
+
 
           <div v-if="activeSection === 'listing'">
             <Listing></Listing>
@@ -272,23 +275,29 @@
         </div>
 
         <div v-if="activeSection === 'reviews'" class="content-section">
-          <div v-if="reviews.length === 0" class="no-container">
-            <p>No reviews yet.</p>
-          </div>
-          <div v-else>
-            <ol>
-              <li v-for="review in reviews">{{ review }}</li>
-            </ol>
-          </div>
-        </div>
+          
+  <div v-if="reviews.length === 0" class="no-container">
+    <p>No reviews yet.</p>
+  </div>
+  <div v-else>
+    <!-- Iterate through the reviews array and display each review in its own container -->
+    <div v-for="(review, index) in reviews" :key="index" class="review-card">
+      <div class="review-body">
+        <p>{{ review }}</p>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
         <div v-if="vouchers.length === 0" class="no-container">
           <p>No vouchers yet. Spins left: {{ spinChance }}</p>
         </div>
         <div v-else>
-          <div v-for="voucher in vouchers" :key="voucher" class="voucher-card">
-            <p>{{ voucher}}</p>
+          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" 
+          :style="getVoucherBackgroundColor(voucher.prize)"
+            class="voucher-card">
+            <p>{{ voucher.id}} {{ voucher.prize }}</p>
           </div>
           <p>Spins left: {{ spinChance }}</p>
         </div>
@@ -356,7 +365,7 @@ const activeSection = ref('profile');
 const rating = ref(0);
 const reviews = ref<string[]>([]);
 const spinChance = ref(0);
-const vouchers = ref<string[]>([]);
+const vouchers: Ref<Voucher[]> = ref([]);
 
 const isBouncing = ref(false);
 
@@ -510,6 +519,76 @@ const confirmDeleteAccount = async () => {
   }
 };
 
+const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser?.uid;
+    }
+};
+
+const fetchVouchers = async () => {
+  try {
+    const userId = getUserUID()
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+
+    const userVouchers = userDocSnap.data()?.vouchers || [];
+
+    const fetchedVouchers: Voucher[] = []; // Ensure this array matches the Voucher type
+
+    for (const voucherId of userVouchers) {
+      const voucherDocRef = doc(db, 'prizes', voucherId);
+      const voucherDocSnap = await getDoc(voucherDocRef);
+
+      if (voucherDocSnap.exists()) {
+        fetchedVouchers.push({ id: voucherId, ...voucherDocSnap.data() } as Voucher);
+      }
+    }
+
+    vouchers.value = fetchedVouchers; // This should work now without errors
+
+    console.log(vouchers.value); // Verify the populated data
+  } catch (error) {
+    console.error("Error fetching vouchers:", error);
+  }
+};
+
+const getVoucherClass = (prize) => {
+  const discount = parseInt(prize.match(/\d+/)[0], 10); // Extract the discount percentage from the string
+
+  if (discount === 5) {
+    return 'bronze'; // Bronze class for 5%
+  } else if (discount === 10) {
+    return 'silver'; // Silver class for 10%
+  } else if (discount === 20) {
+    return 'gold'; // Gold class for 20%
+  }
+  return ''; // Default class if no match
+};
+
+const getVoucherBackgroundColor = (prize) => {
+  const discount = parseInt(prize.match(/\d+/)[0], 10);  // Extract the discount percentage from the string
+
+  let gradient = '';
+  switch (discount) {
+    case 5:
+      gradient = 'linear-gradient(to right, #cd7f32, #f4c542)'; // Bronze gradient
+      break;
+    case 10:
+      gradient = 'linear-gradient(to right, #c0c0c0, #e5e5e5)'; // Silver gradient
+      break;
+    case 20:
+      gradient = 'linear-gradient(to right, #ffd700, #ffcc00)'; // Gold gradient
+      break;
+    default:
+      gradient = 'linear-gradient(to right, #f0f0f0, #ffffff)'; // Default gradient (light gray)
+  }
+  return { background: gradient };
+};
+
 watch(activeSection, () => {
   tempName.value = name.value;
   if (tempPhotoURL.value) {
@@ -520,7 +599,9 @@ watch(activeSection, () => {
 });
 
 const tl = gsap.timeline({ defaults: { duration: 0.5 } });
-onMounted(() => {
+onMounted(async () => {
+  await fetchVouchers();
+
   if (profileRef.value) {
     tl.fromTo(profileRef.value, { opacity: 0 }, { opacity: 1 });
   }
@@ -545,7 +626,6 @@ onBeforeUnmount(() => {
 <style scoped>
 
 .voucher-card {
-  background-color: #ffffffb5; /* Light grey background */
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 8px;
@@ -553,6 +633,7 @@ onBeforeUnmount(() => {
   transition: all 0.3s ease; /* Smooth transition for hover effects */
   border: 1px solid transparent; /* Initially, no border */
 }
+
 
 .voucher-card:hover {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
