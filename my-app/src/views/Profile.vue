@@ -132,16 +132,18 @@
 </div>
 
 <div v-if="activeSection === 'vouchers'" class="content-section">
-  <div v-if="vouchers.length === 0" class="no-container">
-    <p>No vouchers yet. Spins left: {{ spinChance }}</p>
-  </div>
-  <div v-else>
-    <div v-for="voucher in vouchers" :key="voucher.id" class="voucher-card">
-      <p>{{ voucher.id }} {{ voucher.prize }}</p>
-    </div>
-    <p>Spins left: {{ spinChance }}</p>
-  </div>
-</div>
+        <div v-if="vouchers.length === 0" class="no-container">
+          <p>No vouchers yet. Spins left: {{ spinChance }}</p>
+        </div>
+        <div v-else>
+          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" 
+          :style="getVoucherBackgroundColor(voucher.prize)"
+            class="voucher-card">
+            <p>{{ voucher.id}} {{ voucher.prize }}</p>
+          </div>
+          <p>Spins left: {{ spinChance }}</p>
+        </div>
+      </div>
 
 
           <div v-if="activeSection === 'listing'">
@@ -273,22 +275,28 @@
         </div>
 
         <div v-if="activeSection === 'reviews'" class="content-section">
-          <div v-if="reviews.length === 0" class="no-container">
-            <p>No reviews yet.</p>
-          </div>
-          <div v-else>
-            <ol>
-              <li v-for="review in reviews">{{ review }}</li>
-            </ol>
-          </div>
-        </div>
+          
+  <div v-if="reviews.length === 0" class="no-container">
+    <p>No reviews yet.</p>
+  </div>
+  <div v-else>
+    <!-- Iterate through the reviews array and display each review in its own container -->
+    <div v-for="(review, index) in reviews" :key="index" class="review-card">
+      <div class="review-body">
+        <p>{{ review }}</p>
+      </div>
+    </div>
+  </div>
+</div>
 
         <div v-if="activeSection === 'vouchers'" class="content-section">
         <div v-if="vouchers.length === 0" class="no-container">
           <p>No vouchers yet. Spins left: {{ spinChance }}</p>
         </div>
         <div v-else>
-          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" class="voucher-card">
+          <div v-for="voucher in vouchers" :key="voucher.id" :value="[voucher.prize, voucher.id]" 
+          :style="getVoucherBackgroundColor(voucher.prize)"
+            class="voucher-card">
             <p>{{ voucher.id}} {{ voucher.prize }}</p>
           </div>
           <p>Spins left: {{ spinChance }}</p>
@@ -545,6 +553,32 @@ const fetchVouchers = async () => {
   }
 };
 
+const getVoucherClass = (prize) => {
+  const discount = parseInt(prize.match(/\d+/)[0], 10); // Extract the discount percentage from the string
+
+  if (discount === 5) {
+    return 'bronze'; // Bronze class for 5%
+  } else if (discount === 10) {
+    return 'silver'; // Silver class for 10%
+  } else if (discount === 20) {
+    return 'gold'; // Gold class for 20%
+  }
+  return ''; // Default class if no match
+};
+
+const getVoucherBackgroundColor = (prize) => {
+  const discount = parseInt(prize.match(/\d+/)[0], 10);  // Extract the discount percentage from the string
+  console.log(discount); // Debug log to ensure correct extraction
+  if (discount === 5) {
+    return { backgroundColor: '#cd7f32' }; // Bronze color
+  } else if (discount === 10) {
+    return { backgroundColor: '#c0c0c0' }; // Silver color
+  } else if (discount === 20) {
+    return { backgroundColor: '#ffd700' }; // Gold color
+  }
+  return { backgroundColor: '#f0f0f0' }; // Default color for any other prize
+};
+
 watch(activeSection, () => {
   tempName.value = name.value;
   if (tempPhotoURL.value) {
@@ -582,7 +616,6 @@ onBeforeUnmount(() => {
 <style scoped>
 
 .voucher-card {
-  background-color:lightblue; /* Light grey background */
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 8px;
@@ -590,6 +623,7 @@ onBeforeUnmount(() => {
   transition: all 0.3s ease; /* Smooth transition for hover effects */
   border: 1px solid transparent; /* Initially, no border */
 }
+
 
 .voucher-card:hover {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
