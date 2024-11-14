@@ -507,9 +507,6 @@ const confirmDeleteAccount = async () => {
   }
 };
 
-
-
-
 watch(activeSection, () => {
   tempName.value = name.value;
   if (tempPhotoURL.value) {

@@ -142,7 +142,6 @@ const router = useRouter();
 const sellerId = route.params.sellerId as string;
 const itemId = route.params.itemId as string;
 const category = route.params.category as string;
-const userId = auth.currentUser?.uid;
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const showImageModal = ref(false);
@@ -161,6 +160,19 @@ const isMobile = ref(window.innerWidth <= 768);
 const isMobileAndChatSelected = computed(() => 
   isMobile.value && selectedChatId.value !== null
 );
+
+const getUserUID = () => {
+    const cachedData = localStorage.getItem(`user`);
+    if (cachedData) {
+    const userData = JSON.parse(cachedData);
+    return userData.uid;
+    } else {
+    return auth.currentUser.uid;
+    }
+};
+
+const userId = getUserUID();
+
 // Image modal functions
 function openImageModal(imageUrl: string) {
   selectedImage.value = imageUrl;
