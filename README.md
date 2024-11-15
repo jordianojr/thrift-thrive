@@ -5,12 +5,7 @@ An all in one platform for thrift and fashion, encouraging thrifting culture thr
 ## Table of Contents
 
 - [Description](#description)
-- [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 ## Description
 
