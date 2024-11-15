@@ -6,6 +6,8 @@ An all in one platform for thrift and fashion, encouraging thrifting culture thr
 
 - [Description](#description)
 - [Installation](#installation)
+- [Warning](#warning)
+
 
 ## Description
 
@@ -43,3 +45,7 @@ npm start
 ```
 
 You should be able to view this application on localhost:5173
+
+## Warning
+
+Using StripeAPI and completing/refusing a transaction will lead you to our cloud deployed app as StripeAPI is hosted on Firebase Cloud Functions as it requires https:// to run.
