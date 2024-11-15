@@ -237,7 +237,7 @@
               <p class="mb-1"><strong>{{ tempName || name }}</strong></p>
               <p class="mb-1">{{ userEmail }}</p>
               <p class="mb-1">
-                <strong>Rating: </strong> {{ rating }}
+                <strong>Rating: </strong> {{ rating.toFixed(2) }}
                 <span v-for="n in 5" :key="n">
                   <i :class="{
                     'bi-star-fill': n <= rating,

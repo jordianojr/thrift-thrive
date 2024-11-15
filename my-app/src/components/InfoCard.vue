@@ -97,10 +97,9 @@ const newEvent = ref({
 
 const filteredEvents = computed(() => {
   const currentDate = new Date();
-  return props.events.filter(event => {
-    const eventDate = new Date(event.date);
-    return eventDate > currentDate;
-  });
+  return props.events
+    .filter(event => new Date(event.date) > currentDate)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 });
 
 const openGoogleMapsDirections = () => {
@@ -175,6 +174,8 @@ onMounted(() => {
   list-style-type: none;
   margin-top: 10px;
   padding: 0rem;
+  overflow: scroll;
+  height: 300px;
 }
 
 .event-item {

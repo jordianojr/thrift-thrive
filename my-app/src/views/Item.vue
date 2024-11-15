@@ -108,7 +108,7 @@
               <h3 class="h5 mb-1">{{ sellerName }}</h3>
               <div class="d-flex align-items-center">
                 <span class="text-warning me-1">★</span>
-                <span class="text-dark">{{ rating }} ({{ reviews.length }} review(s))</span>
+                <span class="text-dark">{{ rating.toFixed(2) }} ({{ reviews.length }} review(s))</span>
               </div>
             </div>
           </div>

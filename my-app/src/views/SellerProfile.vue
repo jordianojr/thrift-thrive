@@ -15,7 +15,7 @@
           </div>
           <p class="card-text" style="color: black"><strong>Email:</strong> {{ userEmail }}</p>
           <p class="card-text" style="color: black"><strong>Name:</strong> {{ name }}</p>
-          <p class="card-text" style="color: black"><strong>Rating: </strong> {{ rating }}
+          <p class="card-text" style="color: black"><strong>Rating: </strong> {{ rating.toFixed(2) }}
           <span v-for="n in 5" :key="n">
             <i 
               :class="{
@@ -44,7 +44,10 @@
         <Loading :isLoading="isLoading" message="Fetching your products..." />
         <div v-if="!isLoading">
             <div class="row">
-            <div v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
+            <div v-if="products.length === 0" class="no-container">
+              <p>No products found.</p>
+            </div>
+            <div v-else v-for="product in products" :key="product.id" class="col-lg-4 col-md-6 col-sm-12">
                 <div class="card mb-4" @click="goToItem(product.id)">
                 <img :src="product.itemPhotoURLs" class="card-img-top img-fluid" alt="Product Image">
                 <div class="card-body">

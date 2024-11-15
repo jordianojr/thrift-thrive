@@ -11,7 +11,7 @@
             <ul v-for="product in products" :key="product.id">
               <li>
                 <h4 class="card-title">{{ product.itemName }}</h4>
-                <h6 class="card-subtitle text-muted">Bought by: {{ product.buyerUserName }}</h6>
+                <h6 class="card-subtitle text-muted" style="cursor: pointer;" @click="goToBuyer(product.buyerUserId)">Bought by: {{ product.buyerUserName }}</h6>
               </li>
             </ul>
         </div>
@@ -24,10 +24,15 @@
   import Loading from "@/components/Loading.vue"; // Adjust the path as necessary
   import { db, auth } from "@/lib/firebaseConfig"; // Adjust the path as necessary
   import { collection, getDocs, query, where, getDoc, doc } from "firebase/firestore";
-  
+  import { useRouter } from "vue-router";
+
+  const router = useRouter();
   const products = ref<any[]>([]);
   const isLoading = ref(true);
   
+  const goToBuyer = (buyerId: string) => {
+    router.push(`/sellerprofile/${buyerId}`);
+  };
   // Function to fetch products based on order history
   const fetchProducts = async () => {
     isLoading.value = true; // Set loading state to true

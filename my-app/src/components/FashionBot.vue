@@ -222,6 +222,38 @@ const sendMessage = async () => {
   try {
     let response;
 
+    // Convert message history to OpenAI format, handling both text and image messages
+    const promptMessages = messages.value.map(message => {
+      if (message.from === 'bot') {
+        return {
+          role: 'assistant',
+          content: message.text
+        };
+      } else {
+        // For user messages, if there's an image, create a message with both text and image
+        if (message.image) {
+          return {
+            role: 'user',
+            content: [
+              { type: 'text', text: message.text || "What is this clothing item? Please suggest some outfits for me" },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: message.image,
+                },
+              },
+            ],
+          };
+        } else {
+          // For text-only messages
+          return {
+            role: 'user',
+            content: message.text
+          };
+        }
+      }
+    });
+
     if (previewImage.value) {
       const base64Image = previewImage.value.split(',')[1];
       clearImage();
@@ -230,11 +262,20 @@ const sendMessage = async () => {
 
       const imageUrl = await getDownloadURL(imageRef);
 
-      const promptMessages = messages.value.map(message => ({
-        role: message.from === 'user' ? 'user' : 'assistant',
-        content: message.text,
-      }));
-      // Properly typed messages for OpenAI
+      // Create new image message
+      const currentImageMessage = {
+        role: 'user',
+        content: [
+          { type: 'text', text: messageContent.text || "What is this clothing item? Please suggest some outfits for me" },
+          {
+            type: 'image_url',
+            image_url: {
+              url: imageUrl,
+            },
+          },
+        ],
+      };
+
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
@@ -271,28 +312,13 @@ const sendMessage = async () => {
             </ul>
           `,
           },
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: "What is this clothing item? Please suggest some outfits for me" },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageUrl,
-                },
-              },
-            ],
-          },
-          ...promptMessages,
+          ...promptMessages.slice(0, -1), // Include previous messages except the last one
+          currentImageMessage, // Add the current image message
         ],
         max_tokens: 500,
       });
     } else {
       // Handle text-only messages
-      const promptMessages = messages.value.map(message => ({
-        role: message.from === 'user' ? 'user' : 'assistant',
-        content: message.text,
-      }));
       response = await openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
@@ -328,14 +354,11 @@ const sendMessage = async () => {
             </ul>
           `,
           },
-          {
-            role: 'user',
-            content: userInput.value.trim(),
-          },
-          ...promptMessages,
+          ...promptMessages
         ],
       });
     }
+
     // Check if the response has choices and content
     if (response.choices && response.choices.length > 0) {
       const botMessage = { from: 'bot', text: response.choices[0].message.content };
