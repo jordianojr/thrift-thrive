@@ -8,7 +8,6 @@ An all in one platform for thrift and fashion, encouraging thrifting culture thr
 - [Installation](#installation)
 - [Warning](#warning)
 
-
 ## Description
 
 In response to a growing demand for conscious consumerism and sustainable fashion choices, there is an opportunity for a platform that offers a:
@@ -21,6 +20,10 @@ In response to a growing demand for conscious consumerism and sustainable fashio
 
 Below is the deployed link of this application: 
 https://thriftthrive-a28e7.web.app/
+
+## GitHub Repo Link 
+
+https://github.com/jordianojr/thrift-thrive
 
 ## Installation
 
@@ -35,7 +38,7 @@ Go on your IDE and in the terminal run each line separately:
 git clone https://github.com/jordianojr/thrift-thrive
 ```
 ```console
-cd my-app
+cd thrift-thrive/my-app
 ```
 ```console
 npm install
@@ -45,6 +48,31 @@ npm start
 ```
 
 You should be able to view this application on localhost:5173
+
+## Test User Credentials
+
+**Normal user account:**
+Email: john@gmail.com
+Password: 123456
+
+**Admin account:**
+Email: thriftthrive@gmail.com
+Password: 123456
+
+**StripeAPI Payment Card**
+For success cases:
+Email: **any**
+Card number: 4242 4242 4242 4242
+MM/YY: **any**
+CVC: **any**
+Name: **any**
+
+For decline cases:
+Email: **any**
+Card number: 4000 0000 0000 0002
+MM/YY: **any**
+CVC: **any**
+Name: **any**
 
 ## Warning
 
