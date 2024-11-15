@@ -51,28 +51,33 @@ You should be able to view this application on localhost:5173
 
 ## Test User Credentials
 
-**Normal user account:**
-Email: john@gmail.com
-Password: 123456
+**Normal user account:**  
+Email: john@gmail.com  
+Password: 123456  
 
-**Admin account:**
-Email: thriftthrive@gmail.com
-Password: 123456
+---
 
-**StripeAPI Payment Card**
-For success cases:
-Email: **any**
-Card number: 4242 4242 4242 4242
-MM/YY: **any**
-CVC: **any**
-Name: **any**
+**Admin account:**  
+Email: thriftthrive@gmail.com  
+Password: 123456  
 
-For decline cases:
-Email: **any**
-Card number: 4000 0000 0000 0002
-MM/YY: **any**
-CVC: **any**
-Name: **any**
+---
+
+**StripeAPI Payment Card**  
+
+**For success cases:**  
+Email: **any**  
+Card number: 4242 4242 4242 4242  
+MM/YY: **any**  
+CVC: **any**  
+Name: **any**  
+
+**For decline cases:**  
+Email: **any**  
+Card number: 4000 0000 0000 0002  
+MM/YY: **any**  
+CVC: **any**  
+Name: **any**  
 
 ## Warning
 
